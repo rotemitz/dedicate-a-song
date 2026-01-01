@@ -521,9 +521,15 @@ audio::-webkit-media-controls-panel {
 /* ============================================
    RESPONSIVE DESIGN
    ============================================ */
+
+/* Tablet - 2 column grid */
 @media (min-width: 768px) {
     .dedications-container {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--spacing-md);
         padding: var(--spacing-lg);
+        max-width: 900px;
     }
 
     .dedication-card {
@@ -534,6 +540,15 @@ audio::-webkit-media-controls-panel {
     .card-avatar-placeholder {
         width: 80px;
         height: 80px;
+    }
+}
+
+/* Large desktop - 3 column grid */
+@media (min-width: 1200px) {
+    .dedications-container {
+        grid-template-columns: repeat(3, 1fr);
+        max-width: 1400px;
+        gap: var(--spacing-lg);
     }
 }
 
