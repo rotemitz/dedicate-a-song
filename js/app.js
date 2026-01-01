@@ -76,18 +76,8 @@ class BirthdayApp {
             ? `<img src="${dedication.photo}" alt="${dedication.name}" class="card-avatar">`
             : `<div class="card-avatar-placeholder">${this.getInitials(dedication.name)}</div>`;
 
-        const voiceMessageHtml = dedication.voice_message
-            ? `
-                <div class="voice-message-section">
-                    <div class="section-label">
-                        <span>🎙️</span> Voice Message
-                    </div>
-                    <audio controls class="audio-player" preload="metadata">
-                        <source src="${dedication.voice_message}" type="audio/mpeg">
-                        Your browser does not support audio playback.
-                    </audio>
-                </div>
-            ` : '';
+        // Determine if greeting is video or audio
+        const greetingHtml = this.createGreetingHtml(dedication);
 
         const songLinksHtml = this.createSongLinks(dedication.song);
 
@@ -98,7 +88,7 @@ class BirthdayApp {
                     <h2 class="card-name">${dedication.name}</h2>
                 </header>
                 
-                ${voiceMessageHtml}
+                ${greetingHtml}
                 
                 ${dedication.song ? `
                     <div class="song-section">
@@ -117,6 +107,40 @@ class BirthdayApp {
                 ` : ''}
             </article>
         `;
+    }
+
+    createGreetingHtml(dedication) {
+        // Video greeting takes priority
+        if (dedication.video_message) {
+            return `
+                <div class="greeting-section video-greeting">
+                    <div class="section-label">
+                        <span>🎬</span> Video Message
+                    </div>
+                    <video controls class="video-player" preload="metadata" playsinline>
+                        <source src="${dedication.video_message}" type="video/mp4">
+                        Your browser does not support video playback.
+                    </video>
+                </div>
+            `;
+        }
+
+        // Fall back to voice message
+        if (dedication.voice_message) {
+            return `
+                <div class="greeting-section voice-greeting">
+                    <div class="section-label">
+                        <span>🎙️</span> Voice Message
+                    </div>
+                    <audio controls class="audio-player" preload="metadata">
+                        <source src="${dedication.voice_message}" type="audio/mpeg">
+                        Your browser does not support audio playback.
+                    </audio>
+                </div>
+            `;
+        }
+
+        return '';
     }
 
     createSongLinks(song) {

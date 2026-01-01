@@ -6,6 +6,7 @@ A special birthday gift website where friends and family share voice messages an
 
 1. **Add Your Content:**
    - Place voice recordings (MP3/WAV) in `assets/recordings/`
+   - Place video greetings (MP4) in `assets/videos/`
    - Place photos (optional) in `assets/images/`
    - Place local song MP3s (optional) in `songs/`
    - Edit `data/dedications.json` with the actual dedications
@@ -22,8 +23,10 @@ A special birthday gift website where friends and family share voice messages an
    git init
    git add .
    git commit -m "Initial commit"
-   gh repo create dedicate-a-song --public --push
-   # Then enable GitHub Pages in Settings > Pages > Source: main branch
+   # Create repo on github.com/new, then:
+   git remote add origin https://github.com/YOUR_USERNAME/dedicate-a-song.git
+   git push -u origin main
+   # Enable GitHub Pages in Settings > Pages > Source: main branch
    ```
 
 ## Adding Dedications
@@ -34,16 +37,19 @@ Edit `data/dedications.json`:
 {
     "id": 1,
     "name": "Person's Name",
-    "photo": "assets/images/person.jpg",      // or null
-    "voice_message": "assets/recordings/person.mp3",
+    "photo": "assets/images/person.jpg",
+    "video_message": "assets/videos/person.mp4",
+    "voice_message": null,
     "song": {
         "title": "Song Title",
         "artist": "Artist Name",
-        "spotify_url": "https://open.spotify.com/track/...",  // or null
-        "local_file": "songs/song.mp3"                        // or null
+        "spotify_url": "https://open.spotify.com/track/...",
+        "local_file": "songs/song.mp3"
     }
 }
 ```
+
+> **Note:** If both `video_message` and `voice_message` are set, video takes priority.
 
 ## Customizing Colors
 

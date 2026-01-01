@@ -18,6 +18,7 @@
             "name": "Aliza",
             "photo": "assets/images/aliza.jpg",
             "voice_message": "assets/recordings/aliza.opus",
+            "video_message": "assets/videos/aliza.MOV",
             "song": {
                 "title": "לקחת את ידי בידך",
                 "artist": "יהודית רביץ",
