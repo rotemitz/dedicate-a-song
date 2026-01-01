@@ -1,0 +1,508 @@
+/* ============================================
+   COLOR CONFIGURATION
+   Change these CSS variables to customize the theme
+   ============================================ */
+:root {
+    /* Primary Colors - Warm Romantic Theme */
+    --color-primary: #e85d75;
+    --color-primary-light: #ff7b93;
+    --color-primary-dark: #c94a60;
+    
+    /* Secondary/Accent Colors */
+    --color-accent: #f9a825;
+    --color-accent-light: #ffd95a;
+    
+    /* Background Gradients */
+    --gradient-welcome: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    --gradient-dedications: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
+    
+    /* Card Colors */
+    --card-background: rgba(255, 255, 255, 0.08);
+    --card-border: rgba(255, 255, 255, 0.15);
+    --card-shadow: rgba(0, 0, 0, 0.3);
+    
+    /* Text Colors */
+    --text-primary: #ffffff;
+    --text-secondary: rgba(255, 255, 255, 0.8);
+    --text-muted: rgba(255, 255, 255, 0.6);
+    
+    /* Fonts */
+    --font-display: 'Playfair Display', Georgia, serif;
+    --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    
+    /* Spacing */
+    --spacing-xs: 0.5rem;
+    --spacing-sm: 1rem;
+    --spacing-md: 1.5rem;
+    --spacing-lg: 2rem;
+    --spacing-xl: 3rem;
+    
+    /* Border Radius */
+    --radius-sm: 8px;
+    --radius-md: 16px;
+    --radius-lg: 24px;
+    --radius-full: 50px;
+}
+
+/* ============================================
+   RESET & BASE STYLES
+   ============================================ */
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    font-size: 16px;
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: var(--font-body);
+    background: var(--gradient-welcome);
+    color: var(--text-primary);
+    min-height: 100vh;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* ============================================
+   SCREEN CONTAINERS
+   ============================================ */
+.screen {
+    min-height: 100vh;
+    display: none;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+.screen.active {
+    display: flex;
+    flex-direction: column;
+    opacity: 1;
+}
+
+/* ============================================
+   WELCOME SCREEN
+   ============================================ */
+#welcome-screen {
+    background: var(--gradient-welcome);
+    justify-content: center;
+    align-items: center;
+    padding: var(--spacing-lg);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Animated background particles */
+#welcome-screen::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+        radial-gradient(2px 2px at 20% 30%, rgba(255,255,255,0.3) 50%, transparent 50%),
+        radial-gradient(2px 2px at 40% 70%, rgba(255,255,255,0.2) 50%, transparent 50%),
+        radial-gradient(2px 2px at 70% 40%, rgba(255,255,255,0.3) 50%, transparent 50%),
+        radial-gradient(2px 2px at 90% 80%, rgba(255,255,255,0.2) 50%, transparent 50%);
+    animation: twinkle 4s ease-in-out infinite;
+}
+
+@keyframes twinkle {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+}
+
+.welcome-content {
+    text-align: center;
+    z-index: 1;
+    max-width: 400px;
+}
+
+/* Sparkle Animation */
+.sparkle-container {
+    margin-bottom: var(--spacing-md);
+}
+
+.sparkle {
+    font-size: 1.5rem;
+    display: inline-block;
+    animation: sparkle-float 3s ease-in-out infinite;
+    margin: 0 0.3rem;
+}
+
+.sparkle:nth-child(2) {
+    animation-delay: 0.5s;
+}
+
+.sparkle:nth-child(3) {
+    animation-delay: 1s;
+}
+
+@keyframes sparkle-float {
+    0%, 100% { transform: translateY(0) scale(1); opacity: 1; }
+    50% { transform: translateY(-10px) scale(1.2); opacity: 0.7; }
+}
+
+.welcome-title {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 8vw, 3rem);
+    font-weight: 400;
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-xs);
+    letter-spacing: 0.02em;
+}
+
+.welcome-name {
+    font-family: var(--font-display);
+    font-size: clamp(3rem, 12vw, 5rem);
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--color-primary-light), var(--color-accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: var(--spacing-md);
+    text-shadow: 0 0 40px rgba(232, 93, 117, 0.3);
+}
+
+.welcome-subtitle {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin-bottom: var(--spacing-xl);
+}
+
+/* Start Button */
+.start-button {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: 1rem 2.5rem;
+    font-family: var(--font-body);
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+    border: none;
+    border-radius: var(--radius-full);
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    box-shadow: 
+        0 4px 20px rgba(232, 93, 117, 0.4),
+        0 0 0 0 rgba(232, 93, 117, 0.4);
+    animation: button-glow 2s ease-in-out infinite;
+}
+
+@keyframes button-glow {
+    0%, 100% { box-shadow: 0 4px 20px rgba(232, 93, 117, 0.4), 0 0 0 0 rgba(232, 93, 117, 0.4); }
+    50% { box-shadow: 0 4px 30px rgba(232, 93, 117, 0.6), 0 0 0 10px rgba(232, 93, 117, 0); }
+}
+
+.start-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 30px rgba(232, 93, 117, 0.5);
+}
+
+.start-button:active {
+    transform: translateY(0);
+}
+
+.button-icon {
+    transition: transform 0.3s ease;
+}
+
+.start-button:hover .button-icon {
+    transform: translateX(5px);
+}
+
+.welcome-footer {
+    position: absolute;
+    bottom: var(--spacing-lg);
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.875rem;
+    color: var(--text-muted);
+}
+
+/* ============================================
+   CONFETTI CANVAS
+   ============================================ */
+#confetti-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1000;
+}
+
+/* ============================================
+   DEDICATIONS SCREEN
+   ============================================ */
+#dedications-screen {
+    background: var(--gradient-dedications);
+    padding: 0;
+}
+
+.dedications-header {
+    position: sticky;
+    top: 0;
+    background: linear-gradient(180deg, rgba(26, 26, 46, 1) 0%, rgba(26, 26, 46, 0.95) 80%, rgba(26, 26, 46, 0) 100%);
+    padding: var(--spacing-lg) var(--spacing-md);
+    padding-bottom: var(--spacing-xl);
+    text-align: center;
+    z-index: 10;
+}
+
+.dedications-header h1 {
+    font-family: var(--font-display);
+    font-size: clamp(1.5rem, 5vw, 2rem);
+    font-weight: 600;
+    margin-bottom: var(--spacing-xs);
+}
+
+.highlight-name {
+    background: linear-gradient(135deg, var(--color-primary-light), var(--color-accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.dedications-intro {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+.dedications-container {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+    padding: 0 var(--spacing-md) var(--spacing-lg);
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* ============================================
+   DEDICATION CARD
+   ============================================ */
+.dedication-card {
+    background: var(--card-background);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-md);
+    box-shadow: 0 8px 32px var(--card-shadow);
+    opacity: 0;
+    transform: translateY(30px);
+    animation: card-appear 0.6s ease forwards;
+}
+
+.dedication-card:nth-child(1) { animation-delay: 0.1s; }
+.dedication-card:nth-child(2) { animation-delay: 0.2s; }
+.dedication-card:nth-child(3) { animation-delay: 0.3s; }
+.dedication-card:nth-child(4) { animation-delay: 0.4s; }
+.dedication-card:nth-child(5) { animation-delay: 0.5s; }
+
+@keyframes card-appear {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Card Header */
+.card-header {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-md);
+}
+
+.card-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--color-primary);
+    flex-shrink: 0;
+}
+
+.card-avatar-placeholder {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.card-name {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+/* Voice Message Player */
+.voice-message-section {
+    margin-bottom: var(--spacing-md);
+}
+
+.section-label {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-bottom: var(--spacing-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.audio-player {
+    width: 100%;
+    height: 50px;
+    border-radius: var(--radius-md);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+/* Custom Audio Player Styling */
+audio::-webkit-media-controls-panel {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* Song Section */
+.song-section {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-sm);
+}
+
+.song-info {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.song-icon {
+    font-size: 2rem;
+}
+
+.song-details {
+    flex: 1;
+}
+
+.song-title {
+    font-weight: 500;
+    color: var(--text-primary);
+    margin-bottom: 2px;
+}
+
+.song-artist {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.song-links {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+    margin-top: var(--spacing-sm);
+}
+
+.song-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-xs);
+    padding: 0.6rem 1rem;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    text-decoration: none;
+    border-radius: var(--radius-full);
+    transition: all 0.3s ease;
+}
+
+.song-link.spotify {
+    background: #1DB954;
+}
+
+.song-link.spotify:hover {
+    background: #1ed760;
+    transform: translateY(-2px);
+}
+
+.song-link.local-play {
+    background: var(--color-primary);
+}
+
+.song-link.local-play:hover {
+    background: var(--color-primary-light);
+    transform: translateY(-2px);
+}
+
+/* Local Song Audio Player */
+.local-song-player {
+    width: 100%;
+    margin-top: var(--spacing-xs);
+    border-radius: var(--radius-sm);
+}
+
+/* ============================================
+   DEDICATIONS FOOTER
+   ============================================ */
+.dedications-footer {
+    text-align: center;
+    padding: var(--spacing-xl) var(--spacing-md);
+    color: var(--text-muted);
+    font-size: 1.5rem;
+}
+
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+@media (min-width: 768px) {
+    .dedications-container {
+        padding: var(--spacing-lg);
+    }
+    
+    .dedication-card {
+        padding: var(--spacing-lg);
+    }
+    
+    .card-avatar,
+    .card-avatar-placeholder {
+        width: 80px;
+        height: 80px;
+    }
+}
+
+/* ============================================
+   ACCESSIBILITY
+   ============================================ */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* Focus styles for accessibility */
+.start-button:focus,
+.song-link:focus {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+}

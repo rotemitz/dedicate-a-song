@@ -1,0 +1,41 @@
+{
+    "birthday_person": "Tal",
+    "dedications": [
+        {
+            "id": 1,
+            "name": "Mom & Dad",
+            "photo": null,
+            "voice_message": "assets/recordings/mom-dad.mp3",
+            "song": {
+                "title": "You Are the Sunshine of My Life",
+                "artist": "Stevie Wonder",
+                "spotify_url": "https://open.spotify.com/track/2jXETnkWV6aX1Qp2V4gTfg",
+                "local_file": null
+            }
+        },
+        {
+            "id": 2,
+            "name": "Aliza",
+            "photo": "assets/images/aliza.jpg",
+            "voice_message": "assets/recordings/aliza.opus",
+            "song": {
+                "title": "לקחת את ידי בידך",
+                "artist": "יהודית רביץ",
+                "spotify_url": "https://open.spotify.com/track/0GjEhVFGZW8afUYGChu3Rr",
+                "local_file": "songs/lakachta-at-yadi.mp3"
+            }
+        },
+        {
+            "id": 3,
+            "name": "David",
+            "photo": null,
+            "voice_message": "assets/recordings/david.mp3",
+            "song": {
+                "title": "Happy Birthday",
+                "artist": "Stevie Wonder",
+                "spotify_url": null,
+                "local_file": "songs/happy-birthday.mp3"
+            }
+        }
+    ]
+}
