@@ -305,6 +305,81 @@ body {
     color: var(--text-muted);
 }
 
+/* Autoplay Toggle Control */
+.autoplay-control {
+    margin-top: var(--spacing-md);
+}
+
+.autoplay-label {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    padding: 0.5rem 1rem;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-full);
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    transition: all 0.3s ease;
+}
+
+.autoplay-label:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.autoplay-icon {
+    font-size: 1rem;
+}
+
+.toggle-switch {
+    position: relative;
+    width: 44px;
+    height: 24px;
+    margin-left: var(--spacing-xs);
+}
+
+.toggle-input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 24px;
+    transition: 0.3s;
+}
+
+.toggle-slider::before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background: white;
+    border-radius: 50%;
+    transition: 0.3s;
+}
+
+.toggle-input:checked+.toggle-slider {
+    background: var(--color-primary);
+}
+
+.toggle-input:checked+.toggle-slider::before {
+    transform: translateX(20px);
+}
+
+.toggle-input:focus+.toggle-slider {
+    box-shadow: 0 0 0 2px var(--color-accent);
+}
+
 .dedications-container {
     display: flex;
     flex-direction: column;
@@ -328,6 +403,42 @@ body {
     opacity: 0;
     transform: translateY(30px);
     animation: card-appear 0.6s ease forwards;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+    cursor: pointer;
+}
+
+.dedication-card:hover:not(.now-playing) {
+    border-color: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px var(--card-shadow);
+}
+
+/* Now Playing Highlight */
+.dedication-card.now-playing {
+    border-color: var(--color-primary);
+    box-shadow:
+        0 8px 32px var(--card-shadow),
+        0 0 20px rgba(232, 93, 117, 0.4),
+        0 0 40px rgba(232, 93, 117, 0.2);
+    animation: card-appear 0.6s ease forwards, now-playing-pulse 2s ease-in-out infinite;
+}
+
+@keyframes now-playing-pulse {
+
+    0%,
+    100% {
+        box-shadow:
+            0 8px 32px var(--card-shadow),
+            0 0 20px rgba(232, 93, 117, 0.4),
+            0 0 40px rgba(232, 93, 117, 0.2);
+    }
+
+    50% {
+        box-shadow:
+            0 8px 32px var(--card-shadow),
+            0 0 30px rgba(232, 93, 117, 0.6),
+            0 0 60px rgba(232, 93, 117, 0.3);
+    }
 }
 
 .dedication-card:nth-child(1) {
