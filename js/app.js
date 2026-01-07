@@ -81,7 +81,8 @@ class BirthdayApp {
         try {
             const response = await fetch('data/dedications.json');
             const data = await response.json();
-            this.dedications = data.dedications;
+
+            this.dedications = data.dedications.sort((a, b) => a.id - b.id);
             this.renderDedications(this.dedications);
         } catch (error) {
             console.error('Error loading dedications:', error);

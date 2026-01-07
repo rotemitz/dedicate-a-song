@@ -2,15 +2,15 @@
     "birthday_person": "Tal",
     "dedications": [
         {
-            "id": 1,
-            "name": "Mom & Dad",
-            "photo": null,
-            "voice_message": "assets/recordings/mom-dad.mp3",
+            "id": 4,
+            "name": "ויקי מיירס",
+            "photo": "assets/images/vicky.png",
+            "voice_message": "assets/recordings/vicky.opus",
             "song": {
-                "title": "You Are the Sunshine of My Life",
-                "artist": "Stevie Wonder",
-                "spotify_url": "https://open.spotify.com/track/2jXETnkWV6aX1Qp2V4gTfg",
-                "local_file": null
+                "title": "Cigarettes & Alcohol",
+                "artist": "Oasis",
+                "spotify_url": "https://open.spotify.com/track/2wKeVnM8OBoGjGm8Qvqhi5?si=8c39503be219470f",
+                "local_file": "songs/oasis-cigarettes-alcohol.mp3"
             }
         },
         {
