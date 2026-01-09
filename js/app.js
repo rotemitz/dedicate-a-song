@@ -39,6 +39,11 @@ class BirthdayApp {
             });
         }
 
+        // Check if returning visitor
+        if (localStorage.getItem('birthday_app_visited')) {
+            this.showDedications(true);
+        }
+
         // Preload dedications data
         this.loadDedications();
     }
@@ -56,13 +61,24 @@ class BirthdayApp {
         this.startButton.disabled = true;
         this.startButton.style.opacity = '0.7';
 
+        // Mark as visited
+        localStorage.setItem('birthday_app_visited', 'true');
+
         // Transition to dedications screen after confetti starts
         setTimeout(() => {
             this.showDedications();
         }, 1500);
     }
 
-    showDedications() {
+    showDedications(immediate = false) {
+        if (immediate) {
+            this.welcomeScreen.classList.remove('active');
+            this.welcomeScreen.style.opacity = '0';
+            this.dedicationsScreen.classList.add('active');
+            this.dedicationsScreen.style.opacity = '1';
+            return;
+        }
+
         // Fade out welcome screen
         this.welcomeScreen.style.opacity = '0';
 
