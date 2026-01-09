@@ -279,11 +279,39 @@ body {
 .dedications-header {
     position: sticky;
     top: 0;
-    background: linear-gradient(180deg, rgba(26, 26, 46, 1) 0%, rgba(26, 26, 46, 0.95) 80%, rgba(26, 26, 46, 0) 100%);
+    background: linear-gradient(180deg, rgba(26, 26, 46, 1) 0%, rgba(26, 26, 46, 0.95) 80%, rgba(26, 26, 46, 0.6) 100%);
     padding: var(--spacing-lg) var(--spacing-md);
     padding-bottom: var(--spacing-xl);
-    text-align: center;
-    z-index: 10;
+    z-index: 100;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    will-change: transform, padding, background;
+}
+
+.dedications-header.scrolled {
+    padding: 0.8rem var(--spacing-md);
+    background: rgba(26, 26, 46, 0.98);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+
+    /* Layout change without switching flex-direction row */
+    align-items: stretch;
+}
+
+.header-main-row {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    transition: all 0.4s ease;
+}
+
+.dedications-header.scrolled .header-main-row {
+    flex-direction: row;
+    justify-content: space-between;
 }
 
 .dedications-header h1 {
@@ -291,6 +319,15 @@ body {
     font-size: clamp(1.5rem, 5vw, 2rem);
     font-weight: 600;
     margin-bottom: var(--spacing-xs);
+    transition: all 0.4s ease;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.dedications-header.scrolled h1 {
+    font-size: 1.1rem;
+    margin-bottom: 0;
+    text-align: left;
 }
 
 .highlight-name {
@@ -303,11 +340,27 @@ body {
 .dedications-intro {
     font-size: 0.9rem;
     color: var(--text-muted);
+    transition: all 0.3s ease;
+    max-height: 50px;
+    opacity: 1;
+    overflow: hidden;
+}
+
+.dedications-header.scrolled .dedications-intro {
+    opacity: 0;
+    max-height: 0;
+    margin: 0;
+    pointer-events: none;
 }
 
 /* Autoplay Toggle Control */
 .autoplay-control {
     margin-top: var(--spacing-md);
+    transition: all 0.4s ease;
+}
+
+.dedications-header.scrolled .autoplay-control {
+    margin-top: 0;
 }
 
 .autoplay-label {
@@ -321,6 +374,16 @@ body {
     font-size: 0.9rem;
     color: var(--text-secondary);
     transition: all 0.3s ease;
+}
+
+.dedications-header.scrolled .autoplay-label {
+    background: transparent;
+    padding: 0;
+}
+
+.dedications-header.scrolled .autoplay-label>span:not(.toggle-switch),
+.dedications-header.scrolled .autoplay-icon {
+    display: none;
 }
 
 .autoplay-label:hover {

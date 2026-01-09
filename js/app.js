@@ -39,6 +39,19 @@ class BirthdayApp {
             });
         }
 
+        // Scroll listener for collapsing header with hysteresis to prevent jitter
+        const header = document.querySelector('.dedications-header');
+        if (header) {
+            window.addEventListener('scroll', () => {
+                const scrollPos = window.scrollY;
+                if (scrollPos > 60) {
+                    header.classList.add('scrolled');
+                } else if (scrollPos < 20) {
+                    header.classList.remove('scrolled');
+                }
+            });
+        }
+
         // Check if returning visitor
         if (localStorage.getItem('birthday_app_visited')) {
             this.showDedications(true);
