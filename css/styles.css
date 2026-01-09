@@ -405,6 +405,11 @@ body {
     animation: card-appear 0.6s ease forwards;
     transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
     cursor: pointer;
+
+    /* Layout consistency */
+    display: flex;
+    flex-direction: column;
+    height: 100%;
 }
 
 .dedication-card:hover:not(.now-playing) {
@@ -543,8 +548,9 @@ audio::-webkit-media-controls-panel {
     background: rgba(255, 255, 255, 0.1);
 }
 
-/* Song Section */
+/* Song Section - Pushed to bottom for alignment */
 .song-section {
+    margin-top: auto;
     background: rgba(255, 255, 255, 0.05);
     border-radius: var(--radius-md);
     padding: var(--spacing-sm);
