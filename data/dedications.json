@@ -10,11 +10,11 @@
                 "title": "Cigarettes & Alcohol",
                 "artist": "Oasis",
                 "spotify_url": "https://open.spotify.com/track/2wKeVnM8OBoGjGm8Qvqhi5?si=8c39503be219470f",
-                "local_file": "songs/oasis-cigarettes-alcohol.mp3"
+                "local_file": "songs/vicky.mp3"
             }
         },
         {
-            "id": 2,
+            "id": 10,
             "name": "ליעד ועלווה",
             "photo": null,
             "voice_message": null,
@@ -22,19 +22,43 @@
                 "title": "טל",
                 "artist": "יהורם גאון",
                 "spotify_url": "https://open.spotify.com/track/2dQUqI5SfE750QgsZ3gVtL?si=f2e0e32bfcc24b88",
-                "local_file": "songs/yehoram-gaon-tal.mp3"
+                "local_file": "songs/liad.mp3"
             }
         },
         {
-            "id": 3,
-            "name": "David",
-            "photo": null,
-            "voice_message": "assets/recordings/david.mp3",
+            "id": 1,
+            "name": "עליזה רום-פוזניאק",
+            "photo": "assets/images/aliza.jpg",
+            "voice_message": "assets/recordings/aliza.opus",
             "song": {
-                "title": "Happy Birthday",
-                "artist": "Stevie Wonder",
-                "spotify_url": null,
-                "local_file": "songs/happy-birthday.mp3"
+                "title": "קרן פלס ורוני אלטר",
+                "artist": "באת לי פתאום",
+                "spotify_url": "https://open.spotify.com/track/1QHK3rRp4PB3HhkXASTlNO?si=154b5214fd7c4d64",
+                "local_file": "songs/aliza.mp3"
+            }
+        },
+        {
+            "id": 2,
+            "name": "אייל פוזניאק",
+            "photo": "assets/images/eyal-pozniak.jpg",
+            "voice_message": "assets/recordings/eyal-pozniak.opus",
+            "song": {
+                "title": "מנוף",
+                "artist": "בן ורד ויעל ארנון ורד",
+                "spotify_url": "https://open.spotify.com/track/2M5rT9JUyJEBcsSO3847Z9?si=ebed7b4dde354ef1",
+                "local_file": "songs/eyal-pozniak.mp3"
+            }
+        },
+        {
+            "id": 5,
+            "name": "קרן שלב",
+            "photo": "assets/images/keren.jpg",
+            "video_message": "assets/videos/keren.mp4",
+            "song": {
+                "title": "Hakuna Matata",
+                "artist": "The Lion King",
+                "spotify_url": "https://open.spotify.com/track/5k3U0OGYBccHdKJJu3HrUN?si=6d98d86aed3d4a79",
+                "local_file": "songs/keren.mp3"
             }
         }
     ]
