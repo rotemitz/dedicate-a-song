@@ -110,12 +110,12 @@ export const DedicationAvatar = ({
 // VINYL RECORD (Song Phase) - Record Player with Antigravity Tonearm
 // Uses Framer Motion for smooth spring physics animations
 // ============================================
-export const VinylRecord = ({ albumArt, isPlaying, songTitle, size = 'w-72 h-72' }) => {
+export const VinylRecord = ({ albumArt, isPlaying, songTitle, size = 'w-72 h-72', onClick }) => {
     // Parse size for responsive container
     const sizeClasses = size.includes('md:') ? size : `${size} md:w-96 md:h-96`;
 
     return (
-        <div className="relative flex flex-col items-center justify-center p-8">
+        <div className={`relative flex flex-col items-center justify-center p-8 ${onClick ? 'cursor-pointer' : ''}`} onClick={onClick}>
             {/* Container for the Record and Tonearm */}
             <div className={`relative ${sizeClasses}`}>
 

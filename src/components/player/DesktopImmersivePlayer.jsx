@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { WaveformVisualizer, DedicationAvatar } from './PlayerComponents';
+import { WaveformVisualizer, DedicationAvatar, VinylRecord } from './PlayerComponents';
 
 // Helper function
 const formatTime = (time) => {
@@ -154,7 +154,9 @@ const VinylCard = ({
     songRef,
     isPlaying,
     isGreeting,
-    onEnded
+    onEnded,
+    onSkipToSong,
+    onTogglePlay
 }) => (
     <motion.div
         initial={{ y: 50, opacity: 0 }}
@@ -167,57 +169,22 @@ const VinylCard = ({
             minHeight: '400px'
         }}
     >
-        {/* Vinyl Container */}
-        <div className="relative w-80 h-80 flex items-center justify-center">
-            {/* Vinyl Disc */}
-            <div
-                className={`absolute inset-0 rounded-full bg-[#111] shadow-2xl flex items-center justify-center border-4 border-black/10 ${isPlaying && !isGreeting ? 'animate-spin-slow' : ''}`}
-                style={{
-                    background: 'radial-gradient(circle at 50% 50%, #333 0%, #111 30%, #1a1a1a 60%, #0a0a0a 100%)'
-                }}
-            >
-                {/* Vinyl grooves */}
-                <div className="absolute inset-4 rounded-full border border-white/5" />
-                <div className="absolute inset-8 rounded-full border border-white/5" />
-                <div className="absolute inset-12 rounded-full border border-white/5" />
-                <div className="absolute inset-16 rounded-full border border-white/5" />
-                <div className="absolute inset-20 rounded-full border border-white/5" />
+        {/* Vinyl Record - Clickable for skip/play-pause */}
+        <VinylRecord
+            albumArt={dedication.song?.album_art || dedication.photo}
+            songTitle={dedication.song?.title}
+            isPlaying={isPlaying && !isGreeting}
+            size="w-64 h-64"
+            onClick={isGreeting ? onSkipToSong : onTogglePlay}
+        />
 
-                {/* Center Label / Album Art */}
-                <div className="relative w-28 h-28 rounded-full overflow-hidden border-2 border-black/30 shadow-inner">
-                    <img
-                        src={dedication.song?.album_art || dedication.photo || 'assets/placeholder.png'}
-                        alt="Album Art"
-                        className="w-full h-full object-cover"
-                    />
-                    {/* Center hole */}
-                    <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="w-3 h-3 rounded-full bg-black/80" />
-                    </div>
-                </div>
-            </div>
-
-            {/* Tonearm */}
-            <div
-                className="absolute -top-2 -right-8 w-32 h-40 pointer-events-none transition-transform duration-700 origin-top-right"
-                style={{
-                    transform: isPlaying && !isGreeting ? 'rotate(28deg)' : 'rotate(0deg)'
-                }}
-            >
-                {/* Arm base */}
-                <div className="absolute top-0 right-0 w-6 h-6 rounded-full bg-gray-400 shadow-lg" />
-                {/* Arm shaft */}
-                <div className="absolute top-3 right-2 w-2 h-28 bg-gradient-to-b from-gray-300 to-gray-400 rounded-full shadow-md origin-top" style={{ transform: 'rotate(-15deg)' }} />
-                {/* Headshell */}
-                <div className="absolute top-28 right-[-8px] w-3 h-8 bg-gray-600 rounded-sm shadow-md origin-top" style={{ transform: 'rotate(-15deg)' }} />
-            </div>
-
-            <audio ref={songRef} src={dedication.song?.local_file} onEnded={onEnded} />
-        </div>
+        <audio ref={songRef} src={dedication.song?.local_file} onEnded={onEnded} />
 
         {/* Now Playing Info - Bottom Center */}
         <div className="absolute bottom-8 left-0 right-0 text-center px-8">
-            <p className="text-xs font-bold tracking-[0.2em] uppercase text-[#D4907B] font-sans mb-2">Now Playing</p>
+            <p className="text-xs font-bold tracking-[0.2em] uppercase text-[#D4907B] font-sans mb-2">
+                {isGreeting ? 'Click to Skip to Song' : 'Now Playing'}
+            </p>
             <h2 className="text-2xl font-semibold font-display text-slate-800 mb-1">{dedication.song?.title}</h2>
             <p className="text-[#D4907B]/80 italic font-sans">{dedication.song?.artist}</p>
         </div>
@@ -432,6 +399,8 @@ const DesktopImmersivePlayer = ({
                         isPlaying={isPlaying}
                         isGreeting={isGreeting}
                         onEnded={handleSongEnded}
+                        onSkipToSong={handleGreetingEnded}
+                        onTogglePlay={togglePlay}
                     />
                 </div>
             </div>
