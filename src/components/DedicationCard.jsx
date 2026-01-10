@@ -14,7 +14,15 @@ const DedicationCard = ({
     isNowPlaying,
     activeMediaType,
     onPlay,
-    onMediaEnded
+    onMediaEnded,
+    // Inline play props
+    isInlinePlaying,
+    inlineProgress,
+    inlineDuration,
+    inlinePhase,
+    onInlinePlay,
+    onInlinePause,
+    onOpenFullView
 }) => {
     const greetingRef = useRef(null);
     const audioRef = useRef(null);
@@ -60,6 +68,13 @@ const DedicationCard = ({
                     isNowPlaying={isNowPlaying}
                     onPlay={handlePlay}
                     layoutId={`card-${dedication.id}`}
+                    // Inline play props
+                    isInlinePlaying={isInlinePlaying}
+                    inlineProgress={inlineProgress}
+                    inlineDuration={inlineDuration}
+                    onInlinePlay={onInlinePlay}
+                    onInlinePause={onInlinePause}
+                    onOpenFullView={onOpenFullView}
                 />
             </div>
 
@@ -69,6 +84,13 @@ const DedicationCard = ({
                     dedication={dedication}
                     isNowPlaying={isNowPlaying}
                     onPlay={handlePlay}
+                    // Inline play props
+                    isInlinePlaying={isInlinePlaying}
+                    inlineProgress={inlineProgress}
+                    inlineDuration={inlineDuration}
+                    onInlinePlay={onInlinePlay}
+                    onInlinePause={onInlinePause}
+                    onOpenFullView={onOpenFullView}
                 />
             </div>
 

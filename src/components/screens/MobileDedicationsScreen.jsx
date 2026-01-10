@@ -15,7 +15,17 @@ const MobileDedicationsScreen = ({
     onNowListeningClick,
     onNext,
     onPrevious,
-    onClosePlayer
+    onClosePlayer,
+    // Inline play props
+    inlinePlayingIndex,
+    inlineProgress,
+    inlineDuration,
+    inlineIsPlaying,
+    inlinePhase,
+    onInlinePlay,
+    onInlinePause,
+    onInlineSkip,
+    onOpenFullView
 }) => {
     return (
         <section id="dedications-screen" className="min-h-screen bg-celebration-cream">
@@ -49,6 +59,14 @@ const MobileDedicationsScreen = ({
                                 activeMediaType={null}
                                 onPlay={() => onCardClick(index)}
                                 onMediaEnded={() => { }}
+                                // Inline play props
+                                isInlinePlaying={inlinePlayingIndex === index}
+                                inlineProgress={inlineProgress}
+                                inlineDuration={inlineDuration}
+                                inlinePhase={inlinePhase}
+                                onInlinePlay={() => onInlinePlay(index)}
+                                onInlinePause={onInlinePause}
+                                onOpenFullView={() => onOpenFullView(index)}
                             />
                         </div>
                     ))}
@@ -58,15 +76,16 @@ const MobileDedicationsScreen = ({
                 <MobileFooter />
             </main>
 
-            {/* Floating Now Playing Bar */}
+            {/* Floating Now Playing Bar (for inline playback) */}
             <AnimatePresence>
-                {!showPlayer && lastPlayedIndex >= 0 && (
+                {!showPlayer && inlinePlayingIndex >= 0 && (
                     <NowPlayingBar
                         key="now-playing"
-                        dedication={dedications[lastPlayedIndex]}
-                        isPlaying={true}
-                        onOpen={onNowListeningClick}
-                        onSkip={onNext}
+                        dedication={dedications[inlinePlayingIndex]}
+                        isPlaying={inlineIsPlaying}
+                        onPlayPause={() => inlineIsPlaying ? onInlinePause() : onInlinePlay(inlinePlayingIndex)}
+                        onSkip={onInlineSkip}
+                        onOpen={() => onOpenFullView(inlinePlayingIndex)}
                     />
                 )}
             </AnimatePresence>

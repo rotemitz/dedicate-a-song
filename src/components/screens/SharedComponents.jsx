@@ -14,11 +14,12 @@ export const NowPlayingBar = ({ dedication, isPlaying = true, onOpen, onPlayPaus
             transition={{ type: 'spring', stiffness: 300, damping: 30 }}
             onClick={onOpen}
             className="
-                fixed bottom-6 left-6 right-6 z-50 cursor-pointer
+                fixed left-6 right-6 z-50 cursor-pointer
                 flex items-center p-3 h-16
                 bg-white/90 backdrop-blur-md
                 rounded-full shadow-floating
             "
+            style={{ bottom: 'max(24px, env(safe-area-inset-bottom))' }}
         >
             {/* Rotating Record Icon */}
             <motion.div

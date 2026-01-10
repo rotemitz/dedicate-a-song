@@ -25,6 +25,107 @@ const contentTransition = {
 };
 
 // ============================================
+// FULLSCREEN VIDEO PLAYER (for video greetings)
+// ============================================
+const FullscreenVideoPlayer = ({ videoRef, dedication, isPlaying, onTogglePlay, onCollapse, onSkipToSong, onEnded }) => {
+    const [controlsVisible, setControlsVisible] = useState(true);
+    const [hideTimeout, setHideTimeout] = useState(null);
+
+    const showControls = () => {
+        setControlsVisible(true);
+        if (hideTimeout) clearTimeout(hideTimeout);
+        const timeout = setTimeout(() => setControlsVisible(false), 3000);
+        setHideTimeout(timeout);
+    };
+
+    useEffect(() => {
+        showControls();
+        return () => {
+            if (hideTimeout) clearTimeout(hideTimeout);
+        };
+    }, []);
+
+    return (
+        <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[2100] bg-black flex items-center justify-center"
+            onClick={showControls}
+            onTouchStart={showControls}
+        >
+            {/* Video Element - centered with auto-fit */}
+            <video
+                ref={videoRef}
+                src={dedication.video_message}
+                className="absolute inset-0 w-full h-full object-contain"
+                playsInline
+                muted={false}
+                onEnded={onEnded}
+                onClick={(e) => {
+                    e.stopPropagation();
+                    onTogglePlay();
+                }}
+            />
+
+            {/* Always Visible Top Bar - Collapse and Skip Buttons */}
+            <div className="absolute top-0 left-0 right-0 p-4 flex justify-between items-start z-10">
+                <button
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        onSkipToSong();
+                    }}
+                    className="p-3 rounded-full bg-black/60 hover:bg-black/80 transition-colors backdrop-blur-sm"
+                    aria-label="Skip to song"
+                >
+                    <span className="material-symbols-outlined text-white">skip_next</span>
+                </button>
+                <button
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        onCollapse();
+                    }}
+                    className="p-3 rounded-full bg-black/60 hover:bg-black/80 transition-colors backdrop-blur-sm"
+                    aria-label="Collapse video"
+                >
+                    <span className="material-symbols-outlined text-white">close</span>
+                </button>
+            </div>
+
+            {/* Auto-hiding Controls Overlay */}
+            <AnimatePresence>
+                {controlsVisible && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none"
+                    >
+
+                        {/* Center - Play/Pause Indicator (when paused) */}
+                        {!isPlaying && (
+                            <div className="absolute inset-0 flex items-center justify-center">
+                                <div className="p-6 rounded-full bg-white/20 backdrop-blur-sm">
+                                    <span className="material-symbols-outlined text-white !text-7xl" style={{ fontVariationSettings: "'FILL' 1" }}>
+                                        play_arrow
+                                    </span>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Bottom Info */}
+                        <div className="absolute bottom-0 left-0 right-0 p-6 pb-8">
+                            <p className="text-white/80 text-sm mb-1">Video message from</p>
+                            <h2 className="text-white text-2xl font-serif">{dedication.name}</h2>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </motion.div>
+    );
+};
+
+// ============================================
 // VOICE PHASE VIEW
 // ============================================
 const VoicePhaseView = ({
@@ -34,7 +135,8 @@ const VoicePhaseView = ({
     duration,
     onTogglePlay,
     onSkipToSong,
-    onSeek
+    onSeek,
+    onExpandVideo
 }) => (
     <motion.div
         key="voice-phase"
@@ -48,12 +150,25 @@ const VoicePhaseView = ({
         {/* Header */}
         <div className="text-center">
             <p className="text-sm uppercase tracking-widest text-rose-gold-500 font-medium mb-2">
-                Voice Dedication
+                {dedication.video_message ? 'Video Dedication' : 'Voice Dedication'}
             </p>
             <h1 className="text-2xl font-serif text-celebration-charcoal">
                 A message from <span className="italic">{dedication.name}</span>
             </h1>
         </div>
+
+        {/* Expand to Fullscreen Button (when video is playing in background) */}
+        {dedication.video_message && onExpandVideo && (
+            <motion.button
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                onClick={onExpandVideo}
+                className="px-4 py-2 bg-rose-gold-500 text-white rounded-full text-sm font-medium hover:bg-rose-gold-600 transition-colors flex items-center gap-2"
+            >
+                <span className="material-symbols-outlined text-sm">fullscreen</span>
+                View Video
+            </motion.button>
+        )}
 
         {/* Hero Profile */}
         <div className="my-8 flex flex-col items-center gap-4">
@@ -62,22 +177,12 @@ const VoicePhaseView = ({
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ duration: 0.5 }}
             >
-                {dedication.video_message ? (
-                    <div className="w-64 h-64 rounded-full overflow-hidden border-4 border-white shadow-floating">
-                        <video
-                            src={dedication.video_message}
-                            className="w-full h-full object-cover"
-                            playsInline
-                        />
-                    </div>
-                ) : (
-                    <DedicationAvatar
-                        src={dedication.photo}
-                        alt={dedication.name}
-                        isPlaying={isPlaying}
-                        size="large"
-                    />
-                )}
+                <DedicationAvatar
+                    src={dedication.photo}
+                    alt={dedication.name}
+                    isPlaying={isPlaying}
+                    size="large"
+                />
             </motion.div>
 
             {/* Waveform */}
@@ -220,6 +325,7 @@ const MobileImmersivePlayer = ({
     const [isPlaying, setIsPlaying] = useState(false);
     const [progress, setProgress] = useState(0);
     const [duration, setDuration] = useState(0);
+    const [isVideoFullscreen, setIsVideoFullscreen] = useState(true);
 
     const videoRef = useRef(null);
     const audioRef = useRef(null);
@@ -232,6 +338,7 @@ const MobileImmersivePlayer = ({
         setMode(newMode);
         setIsPlaying(true);
         setProgress(0);
+        setIsVideoFullscreen(true); // Reset to fullscreen on new dedication
     }, [dedication]);
 
     // Lock body scroll
@@ -327,13 +434,14 @@ const MobileImmersivePlayer = ({
                 <span className="material-symbols-outlined text-celebration-charcoal">close</span>
             </button>
 
-            {/* Hidden Audio/Video Elements */}
-            {dedication.video_message && (
+            {/* Hidden Video Element - displayed inside FullscreenVideoPlayer when greeting */}
+            {dedication.video_message && !isGreeting && (
                 <video
                     ref={videoRef}
                     src={dedication.video_message}
                     className="hidden"
                     playsInline
+                    muted={false}
                     onEnded={handleGreetingEnded}
                 />
             )}
@@ -352,6 +460,19 @@ const MobileImmersivePlayer = ({
                 />
             )}
 
+            {/* Fullscreen Video Player (for video greetings) */}
+            {isGreeting && dedication.video_message && isVideoFullscreen && (
+                <FullscreenVideoPlayer
+                    videoRef={videoRef}
+                    dedication={dedication}
+                    isPlaying={isPlaying}
+                    onTogglePlay={togglePlay}
+                    onCollapse={() => setIsVideoFullscreen(false)}
+                    onSkipToSong={handleGreetingEnded}
+                    onEnded={handleGreetingEnded}
+                />
+            )}
+
             {/* Phase Content */}
             <AnimatePresence mode="wait">
                 {isGreeting ? (
@@ -364,6 +485,7 @@ const MobileImmersivePlayer = ({
                         onTogglePlay={togglePlay}
                         onSkipToSong={handleGreetingEnded}
                         onSeek={handleSeek}
+                        onExpandVideo={dedication.video_message && !isVideoFullscreen ? () => setIsVideoFullscreen(true) : null}
                     />
                 ) : (
                     <SongPhaseView

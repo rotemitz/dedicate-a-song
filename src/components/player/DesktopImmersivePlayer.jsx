@@ -22,15 +22,15 @@ const DesktopSegmentBar = ({ current, total, progress, duration }) => {
                 <div
                     key={i}
                     className="h-1.5 flex-1 rounded-full overflow-hidden"
-                    style={{ backgroundColor: 'rgba(229, 178, 163, 0.3)' }}
+                    className="bg-rose-gold-200/30"
                 >
                     {i < current ? (
                         // Completed segments
-                        <div className="h-full w-full rounded-full bg-[#D4907B]" />
+                        <div className="h-full w-full rounded-full bg-rose-gold-500" />
                     ) : i === current ? (
                         // Active segment with animated fill
                         <motion.div
-                            className="h-full rounded-full bg-[#D4907B]"
+                            className="h-full rounded-full bg-rose-gold-500"
                             initial={{ width: 0 }}
                             animate={{ width: `${segmentProgress}%` }}
                             transition={{ duration: 0.1, ease: "linear" }}
@@ -49,16 +49,17 @@ const DesktopHeader = ({ eventTitle, current, total, progress, duration, onClose
     <div className="flex flex-col gap-4 px-8 pt-8 pb-4">
         <DesktopSegmentBar current={current} total={total} progress={progress} duration={duration} />
         <div className="flex items-center justify-between">
-            <h1 className="font-display text-xl text-slate-700">{eventTitle}</h1>
+            <h1 className="font-display text-xl text-celebration-charcoal">{eventTitle}</h1>
             <div className="flex items-center gap-6">
-                <span className="font-display text-sm text-slate-500">
+                <span className="font-display text-sm text-celebration-charcoal/70">
                     Segment {current + 1} of {total}
                 </span>
                 <button
                     onClick={onClose}
                     className="p-2 rounded-full hover:bg-black/5 transition-colors"
+                    aria-label="Close player"
                 >
-                    <span className="material-symbols-outlined text-[#D4907B]">close</span>
+                    <span className="material-symbols-outlined text-rose-gold-500">close</span>
                 </button>
             </div>
         </div>
@@ -81,7 +82,7 @@ const GreetingCard = ({
         initial={{ y: 50, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
-        className="relative flex-1 bg-[#2D2D2D] overflow-hidden flex flex-col"
+        className="relative flex-1 bg-celebration-charcoal overflow-hidden flex flex-col"
         style={{
             borderRadius: '80px',
             boxShadow: '0 20px 50px rgba(0,0,0,0.15)',
@@ -162,7 +163,7 @@ const VinylCard = ({
         initial={{ y: 50, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.6, ease: "easeOut", delay: 0.1 }}
-        className="relative flex-1 bg-[#FFFBF5] overflow-hidden flex flex-col items-center justify-center"
+        className="relative flex-1 bg-celebration-cream-light overflow-hidden flex flex-col items-center justify-center"
         style={{
             borderRadius: '80px',
             boxShadow: '0 20px 50px rgba(0,0,0,0.08)',
@@ -182,11 +183,11 @@ const VinylCard = ({
 
         {/* Now Playing Info - Bottom Center */}
         <div className="absolute bottom-8 left-0 right-0 text-center px-8">
-            <p className="text-xs font-bold tracking-[0.2em] uppercase text-[#D4907B] font-sans mb-2">
+            <p className="text-xs font-bold tracking-[0.2em] uppercase text-rose-gold-500 font-sans mb-2">
                 {isGreeting ? 'Click to Skip to Song' : 'Now Playing'}
             </p>
-            <h2 className="text-2xl font-semibold font-display text-slate-800 mb-1">{dedication.song?.title}</h2>
-            <p className="text-[#D4907B]/80 italic font-sans">{dedication.song?.artist}</p>
+            <h2 className="text-2xl font-semibold font-display text-celebration-charcoal mb-1">{dedication.song?.title}</h2>
+            <p className="text-rose-gold-500/80 italic font-sans">{dedication.song?.artist}</p>
         </div>
     </motion.div>
 );
@@ -207,7 +208,7 @@ const DesktopFooterControls = ({
             {/* Previous */}
             <button
                 onClick={onPrevious}
-                className="text-[#D4907B] hover:text-[#9F3E50] transition-colors p-2"
+                className="text-rose-gold-500 hover:text-rose-gold-700 transition-colors p-2"
             >
                 <span className="material-symbols-outlined !text-3xl">skip_previous</span>
             </button>
@@ -215,11 +216,9 @@ const DesktopFooterControls = ({
             {/* Play/Pause FAB */}
             <button
                 onClick={onTogglePlay}
-                className="w-16 h-16 rounded-full flex items-center justify-center text-white shadow-lg hover:scale-105 transition-transform"
-                style={{
-                    background: 'linear-gradient(135deg, #E5B2A3 0%, #D4907B 100%)',
-                    boxShadow: '0 8px 24px rgba(212, 144, 123, 0.4)'
-                }}
+                className="w-16 h-16 rounded-full flex items-center justify-center text-white shadow-lg hover:scale-105 transition-transform bg-gradient-to-br from-rose-gold-300 to-rose-gold-500"
+                style={{ boxShadow: '0 8px 24px rgba(212, 144, 123, 0.4)' }}
+                aria-label={isPlaying ? "Pause" : "Play"}
             >
                 <span className="material-symbols-outlined !text-4xl" style={{ fontVariationSettings: "'FILL' 1" }}>
                     {isPlaying ? 'pause' : 'play_arrow'}
@@ -229,17 +228,17 @@ const DesktopFooterControls = ({
             {/* Next */}
             <button
                 onClick={onNext}
-                className="text-[#D4907B] hover:text-[#9F3E50] transition-colors p-2"
+                className="text-rose-gold-500 hover:text-rose-gold-700 transition-colors p-2"
             >
                 <span className="material-symbols-outlined !text-3xl">skip_next</span>
             </button>
 
             {/* Divider */}
-            <div className="w-px h-10 bg-slate-300/50 mx-4" />
+            <div className="w-px h-10 bg-rose-gold-200/30 mx-4" />
 
             {/* Volume Control */}
             <div className="flex items-center gap-3">
-                <span className="material-symbols-outlined text-[#D4907B] !text-2xl">
+                <span className="material-symbols-outlined text-rose-gold-500 !text-2xl">
                     {volume === 0 ? 'volume_off' : volume < 0.5 ? 'volume_down' : 'volume_up'}
                 </span>
                 <input
@@ -249,10 +248,11 @@ const DesktopFooterControls = ({
                     step="0.01"
                     value={volume}
                     onChange={(e) => onVolumeChange(parseFloat(e.target.value))}
-                    className="w-28 h-1.5 rounded-full appearance-none cursor-pointer"
+                    className="w-28 h-1.5 rounded-full appearance-none cursor-pointer volume-slider"
                     style={{
                         background: `linear-gradient(to right, #D4907B 0%, #D4907B ${volume * 100}%, rgba(212, 144, 123, 0.2) ${volume * 100}%, rgba(212, 144, 123, 0.2) 100%)`
                     }}
+                    aria-label="Volume"
                 />
             </div>
         </div>
@@ -366,10 +366,7 @@ const DesktopImmersivePlayer = ({
 
     return (
         <div
-            className="fixed inset-0 z-[2000] flex flex-col overflow-hidden font-sans"
-            style={{
-                background: 'linear-gradient(180deg, #FDF8F2 0%, #F4E4E0 100%)'
-            }}
+            className="fixed inset-0 z-[2000] flex flex-col overflow-hidden font-sans bg-gradient-to-b from-celebration-cream to-rose-gold-100"
         >
             {/* Header */}
             <DesktopHeader

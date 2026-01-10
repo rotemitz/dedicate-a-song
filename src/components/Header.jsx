@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-const Header = ({ autoplayEnabled, setAutoplayEnabled }) => {
+const Header = ({ autoplayEnabled, setAutoplayEnabled, title = "Birthday Dedications" }) => {
     const [scrolled, setScrolled] = useState(false);
 
     useEffect(() => {
@@ -17,37 +17,35 @@ const Header = ({ autoplayEnabled, setAutoplayEnabled }) => {
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
+    const handleBackToHome = () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
     return (
         <header
             className={`
                 sticky top-0 z-50 w-full transition-all duration-300
-                border-b border-rose-gold-100/50
                 ${scrolled
-                    ? 'bg-celebration-cream/80 backdrop-blur-md'
-                    : 'bg-celebration-cream/80 backdrop-blur-md'
+                    ? 'bg-celebration-cream/95 backdrop-blur-md shadow-lg border-b border-rose-gold-200/50 py-3'
+                    : 'bg-celebration-cream/80 backdrop-blur-md border-b border-rose-gold-100/30'
                 }
             `}
         >
             {/* Desktop Layout */}
-            <div
-                className="hidden md:flex items-center justify-between py-4 md:py-6"
-                style={{
-                    maxWidth: '1000px',
-                    marginLeft: 'auto',
-                    marginRight: 'auto',
-                    paddingLeft: '48px',
-                    paddingRight: '48px'
-                }}
-            >
+            <div className={`hidden md:flex items-center justify-between max-w-[1000px] mx-auto px-12 transition-all duration-300 ${scrolled ? 'py-3' : 'py-6'}`}>
                 {/* Back Button */}
-                <button className="flex items-center gap-2 text-rose-gold-600 hover:text-rose-gold-700 transition-colors">
+                <button
+                    onClick={handleBackToHome}
+                    className="flex items-center gap-2 text-rose-gold-600 hover:text-rose-gold-700 transition-colors focus:outline-none focus:ring-2 focus:ring-rose-gold-400 focus:ring-offset-2 rounded-lg px-2 py-1"
+                    aria-label="Back to top"
+                >
                     <span className="material-symbols-outlined">chevron_left</span>
-                    <span className="font-medium">Back to Home</span>
+                    <span className="font-medium">Back to Top</span>
                 </button>
 
                 {/* Title */}
-                <h2 className="text-celebration-charcoal text-lg md:text-xl font-bold leading-tight tracking-tight text-center">
-                    For Your 40th
+                <h2 className={`text-celebration-charcoal font-bold leading-tight tracking-tight text-center transition-all duration-300 ${scrolled ? 'text-lg' : 'text-xl'}`}>
+                    {title}
                 </h2>
 
                 {/* Continuous Play Button */}
@@ -61,25 +59,17 @@ const Header = ({ autoplayEnabled, setAutoplayEnabled }) => {
             </div>
 
             {/* Mobile Layout */}
-            <div
-                className="md:hidden flex justify-between items-center"
-                style={{ paddingTop: '48px', paddingLeft: '24px', paddingRight: '24px', paddingBottom: '20px' }}
-            >
+            <div className={`md:hidden flex justify-between items-center px-6 transition-all duration-300 ${scrolled ? 'pt-4 pb-3' : 'pt-12 pb-5'}`}>
                 {/* Title Section */}
                 <div className="space-y-0.5">
-                    <h1
-                        className="font-serif text-2xl font-bold leading-tight"
-                        style={{
-                            background: 'linear-gradient(135deg, #D4907B 0%, #955444 100%)',
-                            WebkitBackgroundClip: 'text',
-                            WebkitTextFillColor: 'transparent',
-                        }}
-                    >
-                        Birthday Dedications
+                    <h1 className={`font-serif font-bold leading-tight bg-gradient-to-r from-rose-gold-500 to-rose-gold-700 bg-clip-text text-transparent transition-all duration-300 ${scrolled ? 'text-xl' : 'text-2xl'}`}>
+                        {title}
                     </h1>
-                    <p className="font-serif text-lg text-celebration-charcoal/60">
-                        for your 40th
-                    </p>
+                    {!scrolled && (
+                        <p className="font-serif text-lg text-celebration-charcoal/60">
+                            A collection of love
+                        </p>
+                    )}
                 </div>
 
                 {/* Toggle Section */}
