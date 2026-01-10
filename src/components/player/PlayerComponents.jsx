@@ -151,19 +151,19 @@ export const VinylRecord = ({ albumArt, isPlaying, songTitle, size = 'w-72 h-72'
 
                 {/* The Tonearm with Spring Physics */}
                 <motion.div
-                    initial={{ rotate: -45 }}
-                    animate={{ rotate: isPlaying ? 0 : -45 }}
+                    initial={{ rotate: -35 }}
+                    animate={{ rotate: isPlaying ? 15 : -35 }}
                     transition={{ type: "spring", stiffness: 50, damping: 15 }}
-                    className="absolute -top-4 -right-4 w-1/2 h-full pointer-events-none z-20 origin-top-right"
+                    className="absolute -top-2 -right-2 w-1/2 h-full pointer-events-none z-20 origin-top-right"
                 >
                     {/* Base of Tonearm */}
-                    <div className="absolute top-0 right-8 w-12 h-12 bg-rose-gold-500 rounded-full border-4 border-white shadow-lg" />
+                    <div className="absolute top-0 right-4 w-10 h-10 bg-rose-gold-500 rounded-full border-4 border-white shadow-lg" />
 
                     {/* Arm Shaft */}
-                    <div className="absolute top-6 right-12 w-1 h-48 bg-gradient-to-b from-rose-gold-500 to-rose-gold-300 rounded-full origin-top transform rotate-[15deg] shadow-sm">
+                    <div className="absolute top-5 right-7 w-1 h-40 bg-gradient-to-b from-rose-gold-500 to-rose-gold-300 rounded-full origin-top transform rotate-[15deg] shadow-sm">
                         {/* Needle Head */}
-                        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4 h-8 bg-rose-gold-600 rounded-sm transform -rotate-[15deg]">
-                            <div className="w-0.5 h-2 bg-gray-400 mx-auto mt-6" />
+                        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-3 h-6 bg-rose-gold-600 rounded-sm transform -rotate-[15deg]">
+                            <div className="w-0.5 h-2 bg-gray-400 mx-auto mt-4" />
                         </div>
                     </div>
                 </motion.div>

@@ -156,6 +156,7 @@ const SongPhaseView = ({
                 songTitle={dedication.song?.title}
                 isPlaying={isPlaying}
                 size="w-72 h-72"
+                onClick={onTogglePlay}
             />
         </div>
 
