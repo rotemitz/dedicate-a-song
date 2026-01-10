@@ -124,8 +124,10 @@ html {
 
 body {
   font-family: var(--font-body);
-  background: var(--gradient-welcome);
-  color: var(--text-primary);
+  background: #FDF8F2;
+  /* celebration-cream */
+  color: #2D2D2D;
+  /* celebration-charcoal */
   min-height: 100vh;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
@@ -165,7 +167,7 @@ body {
    WELCOME SCREEN
    ============================================ */
 #welcome-screen {
-  background: var(--gradient-welcome);
+  background: linear-gradient(180deg, #FDF8F2 0%, #F4E4E0 100%);
   display: flex;
   /* Always flex since we render conditionally */
   flex-direction: column;
@@ -249,7 +251,8 @@ body {
   font-family: var(--font-display);
   font-size: clamp(2rem, 8vw, 3rem);
   font-weight: 400;
-  color: var(--text-primary);
+  color: #2D2D2D;
+  /* celebration-charcoal */
   margin-bottom: var(--spacing-xs);
   letter-spacing: 0.02em;
 }
@@ -258,17 +261,18 @@ body {
   font-family: var(--font-display);
   font-size: clamp(3rem, 12vw, 5rem);
   font-weight: 700;
-  background: linear-gradient(135deg, var(--color-primary-light), var(--color-accent));
+  background: linear-gradient(135deg, #D4907B 0%, #955444 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   margin-bottom: var(--spacing-md);
-  text-shadow: 0 0 40px rgba(232, 93, 117, 0.3);
+  text-shadow: none;
 }
 
 .welcome-subtitle {
   font-size: 1rem;
-  color: var(--text-secondary);
+  color: #955444;
+  /* rose-gold-700 */
   line-height: 1.6;
   margin-bottom: var(--spacing-xl);
 }
@@ -282,8 +286,8 @@ body {
   font-family: var(--font-body);
   font-size: 1.1rem;
   font-weight: 500;
-  color: var(--text-primary);
-  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+  color: white;
+  background: linear-gradient(135deg, #E5B2A3 0%, #D4907B 100%);
   border: none;
   border-radius: var(--radius-full);
   cursor: pointer;
@@ -291,8 +295,8 @@ body {
   overflow: hidden;
   transition: all 0.3s ease;
   box-shadow:
-    0 4px 20px rgba(232, 93, 117, 0.4),
-    0 0 0 0 rgba(232, 93, 117, 0.4);
+    0 4px 20px rgba(212, 144, 123, 0.4),
+    0 0 0 0 rgba(212, 144, 123, 0.4);
   animation: button-glow 2s ease-in-out infinite;
 }
 
@@ -300,11 +304,11 @@ body {
 
   0%,
   100% {
-    box-shadow: 0 4px 20px rgba(232, 93, 117, 0.4), 0 0 0 0 rgba(232, 93, 117, 0.4);
+    box-shadow: 0 4px 20px rgba(212, 144, 123, 0.4), 0 0 0 0 rgba(212, 144, 123, 0.4);
   }
 
   50% {
-    box-shadow: 0 4px 30px rgba(232, 93, 117, 0.6), 0 0 0 10px rgba(232, 93, 117, 0);
+    box-shadow: 0 4px 30px rgba(212, 144, 123, 0.6), 0 0 0 10px rgba(212, 144, 123, 0);
   }
 }
 
@@ -331,7 +335,8 @@ body {
   left: 50%;
   transform: translateX(-50%);
   font-size: 0.875rem;
-  color: var(--text-muted);
+  color: #B8725E;
+  /* rose-gold-600 */
 }
 
 /* ============================================
@@ -351,7 +356,8 @@ body {
    DEDICATIONS SCREEN
    ============================================ */
 #dedications-screen {
-  background: var(--gradient-dedications);
+  background: #FDF8F2;
+  /* celebration-cream */
   padding: 0;
   min-height: 100vh;
 }
@@ -889,4 +895,48 @@ input[type="range"]::-moz-range-thumb {
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+/* ============================================
+   ROSE GOLD THEME UTILITIES
+   ============================================ */
+
+/* Gradient text effect for titles */
+.rose-gold-text {
+  background: linear-gradient(135deg, #D4907B 0%, #955444 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Premium metallic shadow for cards */
+.metallic-shadow {
+  box-shadow: 0 8px 25px -5px rgba(212, 144, 123, 0.15), 0 4px 10px -5px rgba(212, 144, 123, 0.1);
+}
+
+/* Floating shadow effect */
+.shadow-floating {
+  box-shadow: 0 20px 50px rgba(212, 144, 123, 0.15);
+}
+
+/* Premium subtle shadow */
+.shadow-premium {
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+}
+
+/* Waveform bar for audio visualization */
+.waveform-bar {
+  width: 3px;
+  background: linear-gradient(to top, #955444, #D99884);
+  border-radius: 9999px;
+}
+
+/* Card hover animation */
+.card-hover {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card-hover:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 25px -5px rgba(151, 78, 90, 0.2);
 }
