@@ -162,12 +162,13 @@ const DedicationsScreen = ({ dedications }) => {
             )}
 
             {/* Main Content Area */}
+            {/* Main Content Area */}
             <main
-                className={`${showPlayer ? 'hidden' : ''}`}
+                className={`w-full mx-auto px-4 md:px-6 pb-24 ${showPlayer ? 'hidden' : ''}`}
                 style={showPlayer ? { display: 'none' } : {}}
             >
                 {/* Desktop Headline Section */}
-                <section className="hidden md:block max-w-7xl mx-auto px-4 pt-8 pb-4">
+                <section className="hidden md:block pt-8 pb-4">
                     <h1 className="text-celebration-charcoal tracking-tight text-4xl lg:text-5xl font-bold leading-tight text-center pb-3 font-serif">
                         A Collection of Love
                     </h1>
@@ -177,12 +178,12 @@ const DedicationsScreen = ({ dedications }) => {
                 </section>
 
                 {/* Section Divider */}
-                <div className="max-w-7xl mx-auto px-4">
+                <div>
                     <SectionDivider title="Rose Gold Audio Tracks" />
                 </div>
 
-                {/* Cards Container */}
-                <div className="max-w-7xl mx-auto px-4 md:px-6 pb-32">
+                {/* Cards Grid/List */}
+                <div className="pb-20">
                     {/* Mobile: Vertical list */}
                     <div className="md:hidden space-y-4 px-2">
                         {dedications.map((dedication, index) => (
@@ -216,8 +217,8 @@ const DedicationsScreen = ({ dedications }) => {
                     </div>
                 </div>
 
-                {/* Footer Quote (Desktop) */}
-                <div className="max-w-7xl mx-auto px-4">
+                {/* Desktop Footer Quote */}
+                <div className="hidden md:block">
                     <FooterQuote />
                 </div>
 

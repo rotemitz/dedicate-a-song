@@ -28,7 +28,7 @@ const Header = ({ autoplayEnabled, setAutoplayEnabled }) => {
             `}
         >
             {/* Desktop Layout */}
-            <div className="hidden md:flex max-w-7xl mx-auto items-center justify-between p-4 lg:p-6">
+            <div className="hidden md:flex w-full mx-auto items-center justify-between px-4 md:px-6 py-4 lg:py-6">
                 {/* Back Button */}
                 <button className="flex items-center gap-2 text-rose-gold-600 hover:text-rose-gold-700 transition-colors">
                     <span className="material-symbols-outlined">chevron_left</span>
