@@ -36,7 +36,8 @@
                 "title": "קרן פלס ורוני אלטר",
                 "artist": "באת לי פתאום",
                 "spotify_url": "https://open.spotify.com/track/1QHK3rRp4PB3HhkXASTlNO?si=154b5214fd7c4d64",
-                "local_file": "songs/aliza.mp3"
+                "local_file": "songs/aliza.mp3",
+                "album_art": "songs/aliza.png"
             }
         },
         {
@@ -48,7 +49,8 @@
                 "title": "מנוף",
                 "artist": "בן ורד ויעל ארנון ורד",
                 "spotify_url": "https://open.spotify.com/track/2M5rT9JUyJEBcsSO3847Z9?si=ebed7b4dde354ef1",
-                "local_file": "songs/eyal-pozniak.mp3"
+                "local_file": "songs/eyal-pozniak.mp3",
+                "album_art": "songs/eyal-pozniak.png"
             }
         },
         {
@@ -61,7 +63,8 @@
                 "title": "Hakuna Matata",
                 "artist": "The Lion King",
                 "spotify_url": "https://open.spotify.com/track/5k3U0OGYBccHdKJJu3HrUN?si=6d98d86aed3d4a79",
-                "local_file": "songs/keren.mp3"
+                "local_file": "songs/keren.mp3",
+                "album_art": "songs/keren.png"
             }
         }
     ]
