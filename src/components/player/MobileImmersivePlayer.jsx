@@ -8,6 +8,7 @@ import {
     PrimaryActionButton,
     DedicationAvatar
 } from './PlayerComponents';
+import { useAudioPlayer } from '../../context/AudioContext';
 
 // ============================================
 // PAGE TRANSITION VARIANTS
@@ -321,24 +322,32 @@ const MobileImmersivePlayer = ({
     onNext,
     onPrevious,
 }) => {
-    const [mode, setMode] = useState('greeting');
-    const [isPlaying, setIsPlaying] = useState(false);
-    const [progress, setProgress] = useState(0);
-    const [duration, setDuration] = useState(0);
     const [isVideoFullscreen, setIsVideoFullscreen] = useState(true);
 
-    const videoRef = useRef(null);
-    const audioRef = useRef(null);
-    const songRef = useRef(null);
+    // Use global audio context
+    const {
+        isPlaying,
+        currentTime,
+        duration,
+        phase,
+        togglePlay,
+        seek,
+        skipToSong,
+        setCurrentTime,
+        setDuration,
+        setIsPlaying,
+    } = useAudioPlayer();
 
-    // Determine initial mode
+    // Video ref for video greetings (kept local for display)
+    const videoRef = useRef(null);
+
+    // Determine if we're in greeting phase
+    const isGreeting = phase === 'greeting';
+    const hasVideoGreeting = dedication.video_message != null;
+
+    // Reset video fullscreen on dedication change
     useEffect(() => {
-        const hasGreeting = dedication.video_message || dedication.voice_message;
-        const newMode = hasGreeting ? 'greeting' : 'song';
-        setMode(newMode);
-        setIsPlaying(true);
-        setProgress(0);
-        setIsVideoFullscreen(true); // Reset to fullscreen on new dedication
+        setIsVideoFullscreen(true);
     }, [dedication]);
 
     // Lock body scroll
@@ -347,78 +356,57 @@ const MobileImmersivePlayer = ({
         return () => { document.body.style.overflow = ''; };
     }, []);
 
-    // Get active media ref
-    const getActiveRef = () => {
-        if (mode === 'greeting') {
-            if (dedication.video_message) return videoRef.current;
-            if (dedication.voice_message) return audioRef.current;
-        }
-        return songRef.current;
-    };
-
-    // Handle media playback sync
+    // Handle video playback sync with global state
     useEffect(() => {
-        const activeRef = getActiveRef();
+        if (!videoRef.current || !hasVideoGreeting || !isGreeting) return;
 
-        // Pause others
-        [videoRef, audioRef, songRef].forEach(ref => {
-            if (ref.current && ref.current !== activeRef) {
-                ref.current.pause();
-            }
-        });
-
-        if (isPlaying && activeRef) {
-            activeRef.play().catch(e => console.error("Play error:", e));
-        } else if (!isPlaying && activeRef) {
-            activeRef.pause();
+        if (isPlaying) {
+            videoRef.current.play().catch(e => console.error("Video play error:", e));
+        } else {
+            videoRef.current.pause();
         }
-    }, [mode, isPlaying, dedication]);
+    }, [isPlaying, hasVideoGreeting, isGreeting]);
 
-    // Progress tracking with events (more efficient than polling)
+    // Video progress tracking
     useEffect(() => {
-        const activeRef = getActiveRef();
-        if (!activeRef) return;
+        if (!videoRef.current || !hasVideoGreeting || !isGreeting) return;
 
-        const updateProgress = () => {
-            setProgress(activeRef.currentTime || 0);
-            setDuration(activeRef.duration || 0);
+        const video = videoRef.current;
+        const handleTimeUpdate = () => {
+            setCurrentTime(video.currentTime);
+        };
+        const handleLoadedMetadata = () => {
+            setDuration(video.duration);
         };
 
-        // Update on time change and when metadata loads
-        activeRef.addEventListener('timeupdate', updateProgress);
-        activeRef.addEventListener('loadedmetadata', updateProgress);
-
-        // Initial update
-        updateProgress();
+        video.addEventListener('timeupdate', handleTimeUpdate);
+        video.addEventListener('loadedmetadata', handleLoadedMetadata);
 
         return () => {
-            activeRef.removeEventListener('timeupdate', updateProgress);
-            activeRef.removeEventListener('loadedmetadata', updateProgress);
+            video.removeEventListener('timeupdate', handleTimeUpdate);
+            video.removeEventListener('loadedmetadata', handleLoadedMetadata);
         };
-    }, [mode, dedication]);
+    }, [hasVideoGreeting, isGreeting, setCurrentTime, setDuration]);
 
-    const handleGreetingEnded = () => {
-        if (dedication.song?.local_file) {
-            setMode('song');
-            setIsPlaying(true);
-        } else {
-            onNext();
-        }
-    };
-
-    const handleSongEnded = () => {
-        onNext();
+    const handleVideoEnded = () => {
+        skipToSong();
     };
 
     const handleSeek = (time) => {
-        const activeRef = getActiveRef();
-        if (activeRef) {
-            activeRef.currentTime = time;
+        seek(time);
+        // Also seek video if in video greeting mode
+        if (videoRef.current && hasVideoGreeting && isGreeting) {
+            videoRef.current.currentTime = time;
         }
     };
 
-    const togglePlay = () => setIsPlaying(!isPlaying);
-    const isGreeting = mode === 'greeting';
+    const handleTogglePlay = () => {
+        togglePlay();
+    };
+
+    const handleSkipToSong = () => {
+        skipToSong();
+    };
 
     return (
         <motion.div
@@ -433,7 +421,7 @@ const MobileImmersivePlayer = ({
             <SegmentProgressBar
                 current={currentIndex}
                 total={totalCount}
-                progress={progress}
+                progress={currentTime}
                 duration={duration}
             />
 
@@ -445,42 +433,28 @@ const MobileImmersivePlayer = ({
                 <span className="material-symbols-outlined text-celebration-charcoal">close</span>
             </button>
 
-            {/* Hidden Video Element - displayed inside FullscreenVideoPlayer when greeting */}
-            {dedication.video_message && !isGreeting && (
+            {/* Fullscreen Video Player (for video greetings) */}
+            {isGreeting && hasVideoGreeting && isVideoFullscreen && (
+                <FullscreenVideoPlayer
+                    videoRef={videoRef}
+                    dedication={dedication}
+                    isPlaying={isPlaying}
+                    onTogglePlay={handleTogglePlay}
+                    onCollapse={() => setIsVideoFullscreen(false)}
+                    onSkipToSong={handleSkipToSong}
+                    onEnded={handleVideoEnded}
+                />
+            )}
+
+            {/* Hidden video for non-fullscreen mode */}
+            {hasVideoGreeting && !isVideoFullscreen && isGreeting && (
                 <video
                     ref={videoRef}
                     src={dedication.video_message}
                     className="hidden"
                     playsInline
                     muted={false}
-                    onEnded={handleGreetingEnded}
-                />
-            )}
-            {dedication.voice_message && (
-                <audio
-                    ref={audioRef}
-                    src={dedication.voice_message}
-                    onEnded={handleGreetingEnded}
-                />
-            )}
-            {dedication.song?.local_file && (
-                <audio
-                    ref={songRef}
-                    src={dedication.song.local_file}
-                    onEnded={handleSongEnded}
-                />
-            )}
-
-            {/* Fullscreen Video Player (for video greetings) */}
-            {isGreeting && dedication.video_message && isVideoFullscreen && (
-                <FullscreenVideoPlayer
-                    videoRef={videoRef}
-                    dedication={dedication}
-                    isPlaying={isPlaying}
-                    onTogglePlay={togglePlay}
-                    onCollapse={() => setIsVideoFullscreen(false)}
-                    onSkipToSong={handleGreetingEnded}
-                    onEnded={handleGreetingEnded}
+                    onEnded={handleVideoEnded}
                 />
             )}
 
@@ -491,21 +465,21 @@ const MobileImmersivePlayer = ({
                         key="voice"
                         dedication={dedication}
                         isPlaying={isPlaying}
-                        progress={progress}
+                        progress={currentTime}
                         duration={duration}
-                        onTogglePlay={togglePlay}
-                        onSkipToSong={handleGreetingEnded}
+                        onTogglePlay={handleTogglePlay}
+                        onSkipToSong={handleSkipToSong}
                         onSeek={handleSeek}
-                        onExpandVideo={dedication.video_message && !isVideoFullscreen ? () => setIsVideoFullscreen(true) : null}
+                        onExpandVideo={hasVideoGreeting && !isVideoFullscreen ? () => setIsVideoFullscreen(true) : null}
                     />
                 ) : (
                     <SongPhaseView
                         key="song"
                         dedication={dedication}
                         isPlaying={isPlaying}
-                        progress={progress}
+                        progress={currentTime}
                         duration={duration}
-                        onTogglePlay={togglePlay}
+                        onTogglePlay={handleTogglePlay}
                         onSeek={handleSeek}
                     />
                 )}
@@ -515,7 +489,7 @@ const MobileImmersivePlayer = ({
             <FooterNavigation
                 onPrevious={onPrevious}
                 onNext={() => {
-                    if (isGreeting) handleGreetingEnded();
+                    if (isGreeting) handleSkipToSong();
                     else onNext();
                 }}
                 isGreeting={isGreeting}

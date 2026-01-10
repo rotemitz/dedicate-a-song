@@ -123,11 +123,6 @@ const DesktopDedicationCard = ({
                     </p>
                 </div>
 
-                {/* Waveform Visual - always show */}
-                <div className="w-full h-12 my-2">
-                    <CardWaveform isPlaying={isInlinePlaying} />
-                </div>
-
                 {/* CTA Button - only when not inline playing */}
                 {!isInlinePlaying && (
                     <button className="w-full py-3 bg-rose-gold-100 text-rose-gold-600 rounded-full font-bold hover:bg-rose-gold-200 transition-colors">

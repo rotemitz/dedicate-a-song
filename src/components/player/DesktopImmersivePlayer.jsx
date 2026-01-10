@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { WaveformVisualizer, DedicationAvatar, VinylRecord } from './PlayerComponents';
+import { useAudioPlayer } from '../../context/AudioContext';
 
 // Helper function
 const formatTime = (time) => {
@@ -71,7 +72,6 @@ const DesktopHeader = ({ eventTitle, current, total, progress, duration, onClose
 const GreetingCard = ({
     dedication,
     videoRef,
-    audioRef,
     isPlaying,
     isGreeting,
     onEnded,
@@ -128,7 +128,6 @@ const GreetingCard = ({
                     />
                     {/* Waveform visualization */}
                     <WaveformVisualizer isPlaying={isPlaying && isGreeting} barCount={16} />
-                    <audio ref={audioRef} src={dedication.voice_message} onEnded={onEnded} />
                 </div>
             ) : (
                 <div className="text-center text-white/50">
@@ -151,10 +150,8 @@ const GreetingCard = ({
 // ============================================
 const VinylCard = ({
     dedication,
-    songRef,
     isPlaying,
     isGreeting,
-    onEnded,
     onSkipToSong,
     onTogglePlay
 }) => (
@@ -177,8 +174,6 @@ const VinylCard = ({
             size="w-64 h-64"
             onClick={isGreeting ? onSkipToSong : onTogglePlay}
         />
-
-        <audio ref={songRef} src={dedication.song?.local_file} onEnded={onEnded} />
 
         {/* Now Playing Info - Bottom Center */}
         <div className="absolute bottom-8 left-0 right-0 text-center px-8">
@@ -270,24 +265,26 @@ const DesktopImmersivePlayer = ({
     onNext,
     onPrevious,
 }) => {
-    const [mode, setMode] = useState('greeting');
-    const [isPlaying, setIsPlaying] = useState(false);
-    const [progress, setProgress] = useState(0);
-    const [duration, setDuration] = useState(0);
-    const [volume, setVolume] = useState(1);
+    // Use global audio context
+    const {
+        isPlaying,
+        currentTime,
+        duration,
+        phase,
+        volume,
+        togglePlay,
+        seek,
+        skipToSong,
+        changeVolume,
+        setCurrentTime,
+        setDuration,
+    } = useAudioPlayer();
 
+    // Video ref for video greetings (kept local for display)
     const videoRef = useRef(null);
-    const audioRef = useRef(null);
-    const songRef = useRef(null);
 
-    // Determine initial mode
-    useEffect(() => {
-        const hasGreeting = dedication.video_message || dedication.voice_message;
-        const newMode = hasGreeting ? 'greeting' : 'song';
-        setMode(newMode);
-        setIsPlaying(true);
-        setProgress(0);
-    }, [dedication]);
+    const isGreeting = phase === 'greeting';
+    const hasVideoGreeting = dedication.video_message != null;
 
     // Lock body scroll
     useEffect(() => {
@@ -295,84 +292,52 @@ const DesktopImmersivePlayer = ({
         return () => { document.body.style.overflow = ''; };
     }, []);
 
-    // Handle media playback sync
+    // Handle video playback sync with global state
     useEffect(() => {
-        let activeRef = null;
-        if (mode === 'greeting') {
-            if (dedication.video_message) activeRef = videoRef.current;
-            else if (dedication.voice_message) activeRef = audioRef.current;
+        if (!videoRef.current || !hasVideoGreeting || !isGreeting) return;
+
+        if (isPlaying) {
+            videoRef.current.play().catch(e => console.error("Video play error:", e));
         } else {
-            if (dedication.song?.local_file) activeRef = songRef.current;
+            videoRef.current.pause();
         }
+    }, [isPlaying, hasVideoGreeting, isGreeting]);
 
-        // Pause others
-        [videoRef, audioRef, songRef].forEach(ref => {
-            if (ref.current && ref.current !== activeRef) {
-                ref.current.pause();
-            }
-        });
-
-        if (isPlaying && activeRef) {
-            activeRef.volume = volume;
-            activeRef.play().catch(e => console.error("Play error:", e));
-        } else if (!isPlaying && activeRef) {
-            activeRef.pause();
-        }
-    }, [mode, isPlaying, dedication, volume]);
-
-    // Progress tracking with events (more efficient than polling)
+    // Video progress tracking
     useEffect(() => {
-        let activeRef = null;
-        if (mode === 'greeting') {
-            if (dedication.video_message) activeRef = videoRef.current;
-            else if (dedication.voice_message) activeRef = audioRef.current;
-        } else {
-            if (dedication.song?.local_file) activeRef = songRef.current;
-        }
+        if (!videoRef.current || !hasVideoGreeting || !isGreeting) return;
 
-        if (!activeRef) return;
-
-        const updateProgress = () => {
-            setProgress(activeRef.currentTime || 0);
-            setDuration(activeRef.duration || 0);
+        const video = videoRef.current;
+        const handleTimeUpdate = () => {
+            setCurrentTime(video.currentTime);
+        };
+        const handleLoadedMetadata = () => {
+            setDuration(video.duration);
         };
 
-        // Update on time change and when metadata loads
-        activeRef.addEventListener('timeupdate', updateProgress);
-        activeRef.addEventListener('loadedmetadata', updateProgress);
-
-        // Initial update
-        updateProgress();
+        video.addEventListener('timeupdate', handleTimeUpdate);
+        video.addEventListener('loadedmetadata', handleLoadedMetadata);
 
         return () => {
-            activeRef.removeEventListener('timeupdate', updateProgress);
-            activeRef.removeEventListener('loadedmetadata', updateProgress);
+            video.removeEventListener('timeupdate', handleTimeUpdate);
+            video.removeEventListener('loadedmetadata', handleLoadedMetadata);
         };
-    }, [mode, dedication]);
+    }, [hasVideoGreeting, isGreeting, setCurrentTime, setDuration]);
 
-    // Volume sync
+    // Sync volume to video
     useEffect(() => {
-        [videoRef, audioRef, songRef].forEach(ref => {
-            if (ref.current) ref.current.volume = volume;
-        });
+        if (videoRef.current) {
+            videoRef.current.volume = volume;
+        }
     }, [volume]);
 
-    const handleGreetingEnded = () => {
-        if (dedication.song?.local_file) {
-            setMode('song');
-            setIsPlaying(true);
-        } else {
-            onNext();
-        }
+    const handleVideoEnded = () => {
+        skipToSong();
     };
 
-    const handleSongEnded = () => {
-        onNext();
+    const handleTogglePlay = () => {
+        togglePlay();
     };
-
-    const togglePlay = () => setIsPlaying(!isPlaying);
-
-    const isGreeting = mode === 'greeting';
 
     return (
         <div
@@ -386,7 +351,7 @@ const DesktopImmersivePlayer = ({
                 eventTitle={eventTitle}
                 current={currentIndex}
                 total={totalCount}
-                progress={progress}
+                progress={currentTime}
                 duration={duration}
                 onClose={onClose}
             />
@@ -397,20 +362,17 @@ const DesktopImmersivePlayer = ({
                     <GreetingCard
                         dedication={dedication}
                         videoRef={videoRef}
-                        audioRef={audioRef}
                         isPlaying={isPlaying}
                         isGreeting={isGreeting}
-                        onEnded={handleGreetingEnded}
-                        onTogglePlay={togglePlay}
+                        onEnded={handleVideoEnded}
+                        onTogglePlay={handleTogglePlay}
                     />
                     <VinylCard
                         dedication={dedication}
-                        songRef={songRef}
                         isPlaying={isPlaying}
                         isGreeting={isGreeting}
-                        onEnded={handleSongEnded}
-                        onSkipToSong={handleGreetingEnded}
-                        onTogglePlay={togglePlay}
+                        onSkipToSong={skipToSong}
+                        onTogglePlay={handleTogglePlay}
                     />
                 </div>
             </div>
@@ -419,10 +381,10 @@ const DesktopImmersivePlayer = ({
             <DesktopFooterControls
                 onPrevious={onPrevious}
                 onNext={onNext}
-                onTogglePlay={togglePlay}
+                onTogglePlay={handleTogglePlay}
                 isPlaying={isPlaying}
                 volume={volume}
-                onVolumeChange={setVolume}
+                onVolumeChange={changeVolume}
             />
         </div>
     );

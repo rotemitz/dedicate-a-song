@@ -1,12 +1,12 @@
-import React, { useRef, useEffect } from 'react';
+import React from 'react';
 import MobileDedicationCard from './cards/MobileDedicationCard';
 import DesktopDedicationCard from './cards/DesktopDedicationCard';
 
 /**
  * DedicationCard - Main wrapper component
  * 
- * Renders mobile or desktop card based on viewport,
- * handles audio/video playback logic
+ * Renders mobile or desktop card based on viewport.
+ * Audio playback is now managed globally via AudioContext.
  */
 const DedicationCard = ({
     dedication,
@@ -24,37 +24,6 @@ const DedicationCard = ({
     onInlinePause,
     onOpenFullView
 }) => {
-    const greetingRef = useRef(null);
-    const audioRef = useRef(null);
-
-    useEffect(() => {
-        if (!isNowPlaying) {
-            if (greetingRef.current) {
-                greetingRef.current.pause();
-                greetingRef.current.currentTime = 0;
-            }
-            if (audioRef.current) {
-                audioRef.current.pause();
-                audioRef.current.currentTime = 0;
-            }
-            return;
-        }
-
-        if (activeMediaType === 'greeting') {
-            if (greetingRef.current) greetingRef.current.play().catch(e => console.log('Autoplay prevented:', e));
-            if (audioRef.current) {
-                audioRef.current.pause();
-                audioRef.current.currentTime = 0;
-            }
-        } else if (activeMediaType === 'song') {
-            if (audioRef.current) audioRef.current.play().catch(e => console.log('Autoplay prevented:', e));
-            if (greetingRef.current) {
-                greetingRef.current.pause();
-                greetingRef.current.currentTime = 0;
-            }
-        }
-    }, [isNowPlaying, activeMediaType]);
-
     const handlePlay = () => {
         onPlay(index);
     };
@@ -95,30 +64,7 @@ const DedicationCard = ({
                 />
             </div>
 
-            {/* Hidden Audio/Video elements for playback control */}
-            {dedication.video_message && (
-                <video
-                    ref={greetingRef}
-                    src={dedication.video_message}
-                    className="hidden"
-                    playsInline
-                    onEnded={() => onMediaEnded('greeting')}
-                />
-            )}
-            {dedication.voice_message && !dedication.video_message && (
-                <audio
-                    ref={greetingRef}
-                    src={dedication.voice_message}
-                    onEnded={() => onMediaEnded('greeting')}
-                />
-            )}
-            {dedication.song?.local_file && (
-                <audio
-                    ref={audioRef}
-                    src={dedication.song.local_file}
-                    onEnded={() => onMediaEnded('song')}
-                />
-            )}
+            {/* Audio elements removed - now managed globally via AudioContext */}
         </>
     );
 };

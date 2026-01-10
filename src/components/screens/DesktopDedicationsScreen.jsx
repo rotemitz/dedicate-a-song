@@ -39,6 +39,7 @@ const DesktopDedicationsScreen = ({
             <main
                 className={`py-12 ${showPlayer ? 'hidden' : ''}`}
                 style={{
+                    alignItems: 'center',
                     maxWidth: '1000px',
                     marginLeft: 'auto',
                     marginRight: 'auto',

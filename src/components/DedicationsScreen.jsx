@@ -1,20 +1,27 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { MobileDedicationsScreen, DesktopDedicationsScreen } from './screens';
+import { useAudioPlayer } from '../context/AudioContext';
 
 const DedicationsScreen = ({ dedications }) => {
     const [isMobile, setIsMobile] = useState(false);
     const [autoplayEnabled, setAutoplayEnabled] = useState(true);
-    const [currentCardIndex, setCurrentCardIndex] = useState(-1);
     const [showPlayer, setShowPlayer] = useState(false);
-    const [lastPlayedIndex, setLastPlayedIndex] = useState(-1);
 
-    // Inline play state
-    const [inlinePlayingIndex, setInlinePlayingIndex] = useState(-1);
-    const [inlineProgress, setInlineProgress] = useState(0);
-    const [inlineDuration, setInlineDuration] = useState(0);
-    const [inlineIsPlaying, setInlineIsPlaying] = useState(false);
-    const [inlinePhase, setInlinePhase] = useState('greeting'); // 'greeting' or 'song'
-    const inlineAudioRef = useRef(null);
+    // Use global audio context
+    const {
+        currentDedication,
+        currentDedicationIndex,
+        isPlaying,
+        currentTime,
+        duration,
+        phase,
+        loadDedication,
+        togglePlay,
+        pause,
+        skipToSong,
+        stop,
+        setOnDedicationEnd,
+    } = useAudioPlayer();
 
     // Viewport detection
     useEffect(() => {
@@ -27,140 +34,103 @@ const DedicationsScreen = ({ dedications }) => {
         return () => window.removeEventListener('resize', checkMobile);
     }, []);
 
+    // Register dedication end handler
+    useEffect(() => {
+        setOnDedicationEnd(() => {
+            // When a dedication ends, move to next or close player
+            if (currentDedicationIndex < dedications.length - 1) {
+                // Load next dedication
+                loadDedication(dedications[currentDedicationIndex + 1], currentDedicationIndex + 1);
+            } else {
+                // End of list
+                if (showPlayer) {
+                    setShowPlayer(false);
+                }
+            }
+        });
+    }, [currentDedicationIndex, dedications, showPlayer, loadDedication, setOnDedicationEnd]);
+
     // Sync scroll when returning from player
     useEffect(() => {
-        if (!showPlayer && currentCardIndex !== -1) {
+        if (!showPlayer && currentDedicationIndex !== -1) {
             setTimeout(() => {
-                document.getElementById(`card-${currentCardIndex}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                document.getElementById(`card-${currentDedicationIndex}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }, 100);
         }
-    }, [showPlayer, currentCardIndex]);
+    }, [showPlayer, currentDedicationIndex]);
 
-    // Inline play handlers
+    // Inline play handlers - now using global context
     const handleInlinePlay = (index) => {
         const dedication = dedications[index];
-        if (!dedication?.song?.local_file) return;
-
-        // If clicking same card, toggle play/pause
-        if (inlinePlayingIndex === index) {
-            if (inlineIsPlaying) {
-                inlineAudioRef.current?.pause();
-                setInlineIsPlaying(false);
-            } else {
-                inlineAudioRef.current?.play();
-                setInlineIsPlaying(true);
-            }
+        console.log('[handleInlinePlay] Called with index:', index, 'currentDedicationIndex:', currentDedicationIndex, 'isPlaying:', isPlaying);
+        if (!dedication) {
+            console.log('[handleInlinePlay] No dedication found at index', index);
             return;
         }
 
-        // Start playing new card - check for greeting first
-        setInlinePlayingIndex(index);
-        setLastPlayedIndex(index);
-        setInlineIsPlaying(true);
-        setInlineProgress(0);
-
-        const hasGreeting = dedication.video_message || dedication.voice_message;
-        const startPhase = hasGreeting ? 'greeting' : 'song';
-        setInlinePhase(startPhase);
-
-        // Load and play audio (greeting or song)
-        if (inlineAudioRef.current) {
-            if (startPhase === 'greeting') {
-                // Play greeting audio (from video or voice message)
-                inlineAudioRef.current.src = dedication.video_message || dedication.voice_message;
-            } else {
-                inlineAudioRef.current.src = dedication.song.local_file;
-            }
-            inlineAudioRef.current.load();
-            inlineAudioRef.current.play().catch(e => console.error("Inline play error:", e));
+        // If clicking same card, toggle play/pause
+        if (currentDedicationIndex === index) {
+            console.log('[handleInlinePlay] Same card - toggling play/pause');
+            togglePlay();
+            return;
         }
-    };
 
-    const handleInlineGreetingEnded = () => {
-        // Transition from greeting to song
-        const dedication = dedications[inlinePlayingIndex];
-        if (dedication?.song?.local_file && inlinePhase === 'greeting') {
-            setInlinePhase('song');
-            setInlineProgress(0);
-            if (inlineAudioRef.current) {
-                inlineAudioRef.current.src = dedication.song.local_file;
-                inlineAudioRef.current.load();
-                inlineAudioRef.current.play().catch(e => console.error("Inline play error:", e));
-            }
-        } else {
-            // No song after greeting, skip to next
-            handleInlineSkip();
-        }
+        // Start playing new dedication
+        console.log('[handleInlinePlay] New card - loading dedication:', dedication.name);
+        loadDedication(dedication, index);
     };
 
     const handleInlinePause = () => {
-        inlineAudioRef.current?.pause();
-        setInlineIsPlaying(false);
+        pause();
     };
 
     const handleInlineSkip = () => {
         // If in greeting phase, skip to song
-        if (inlinePhase === 'greeting') {
-            const dedication = dedications[inlinePlayingIndex];
-            if (dedication?.song?.local_file) {
-                handleInlineGreetingEnded();
-                return;
-            }
+        if (phase === 'greeting') {
+            skipToSong();
+            return;
         }
 
         // Skip to next dedication
-        const nextIndex = inlinePlayingIndex + 1;
+        const nextIndex = currentDedicationIndex + 1;
         if (nextIndex < dedications.length) {
-            handleInlinePlay(nextIndex);
+            loadDedication(dedications[nextIndex], nextIndex);
         } else {
-            setInlinePlayingIndex(-1);
-            setInlineIsPlaying(false);
-            setInlinePhase('greeting');
+            stop();
         }
     };
 
     const handleOpenFullView = (index) => {
-        // Stop inline playback
-        inlineAudioRef.current?.pause();
-        setInlinePlayingIndex(-1);
-        setInlineIsPlaying(false);
-
+        // If different dedication, load it first
+        if (currentDedicationIndex !== index) {
+            loadDedication(dedications[index], index);
+        }
         // Open immersive player
-        setCurrentCardIndex(index);
-        setLastPlayedIndex(index);
         setShowPlayer(true);
     };
 
     const handleCardClick = (index) => {
-        // For backward compatibility, open immersive player directly
-        // This will be overridden by inline play in updated cards
-        console.log('Card clicked:', index);
-        setCurrentCardIndex(index);
-        setLastPlayedIndex(index);
-        setShowPlayer(true);
+        // Open immersive player
+        handleOpenFullView(index);
     };
 
     const handleNowListeningClick = () => {
-        if (lastPlayedIndex >= 0) {
-            setCurrentCardIndex(lastPlayedIndex);
+        if (currentDedicationIndex >= 0) {
             setShowPlayer(true);
         }
     };
 
     const handleNext = () => {
-        if (currentCardIndex < dedications.length - 1) {
-            setCurrentCardIndex(prev => prev + 1);
-            setLastPlayedIndex(currentCardIndex + 1);
+        if (currentDedicationIndex < dedications.length - 1) {
+            loadDedication(dedications[currentDedicationIndex + 1], currentDedicationIndex + 1);
         } else {
             setShowPlayer(false);
-            setCurrentCardIndex(-1);
         }
     };
 
     const handlePrevious = () => {
-        if (currentCardIndex > 0) {
-            setCurrentCardIndex(prev => prev - 1);
-            setLastPlayedIndex(currentCardIndex - 1);
+        if (currentDedicationIndex > 0) {
+            loadDedication(dedications[currentDedicationIndex - 1], currentDedicationIndex - 1);
         }
     };
 
@@ -168,42 +138,14 @@ const DedicationsScreen = ({ dedications }) => {
         setShowPlayer(false);
     };
 
-    // Inline audio progress tracking
-    useEffect(() => {
-        const audio = inlineAudioRef.current;
-        if (!audio) return;
-
-        const updateProgress = () => {
-            setInlineProgress(audio.currentTime || 0);
-            setInlineDuration(audio.duration || 0);
-        };
-
-        const handleEnded = () => {
-            if (inlinePhase === 'greeting') {
-                handleInlineGreetingEnded();
-            } else {
-                handleInlineSkip();
-            }
-        };
-
-        audio.addEventListener('timeupdate', updateProgress);
-        audio.addEventListener('loadedmetadata', updateProgress);
-        audio.addEventListener('ended', handleEnded);
-
-        return () => {
-            audio.removeEventListener('timeupdate', updateProgress);
-            audio.removeEventListener('loadedmetadata', updateProgress);
-            audio.removeEventListener('ended', handleEnded);
-        };
-    }, [inlinePlayingIndex, inlinePhase]);
-
-    // Pause inline playback when immersive player opens
-    useEffect(() => {
-        if (showPlayer && inlinePlayingIndex !== -1) {
-            inlineAudioRef.current?.pause();
-            setInlineIsPlaying(false);
-        }
-    }, [showPlayer]);
+    // Map global state to props expected by screens
+    const inlinePlayingIndex = currentDedicationIndex;
+    const inlineProgress = currentTime;
+    const inlineDuration = duration;
+    const inlineIsPlaying = isPlaying;
+    const inlinePhase = phase;
+    const lastPlayedIndex = currentDedicationIndex;
+    const currentCardIndex = currentDedicationIndex;
 
     // Common props for both variants
     const screenProps = {
@@ -232,18 +174,6 @@ const DedicationsScreen = ({ dedications }) => {
 
     return (
         <>
-            {/* ARIA live region for screen reader announcements */}
-            <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">
-                {inlinePlayingIndex >= 0 && dedications[inlinePlayingIndex] && (
-                    inlineIsPlaying
-                        ? `Now playing ${inlinePhase === 'greeting' ? 'dedication' : 'song'} from ${dedications[inlinePlayingIndex].name}${inlinePhase === 'song' && dedications[inlinePlayingIndex].song ? ` - ${dedications[inlinePlayingIndex].song.title}` : ''}`
-                        : `Paused`
-                )}
-            </div>
-
-            {/* Hidden audio element for inline playback */}
-            <audio ref={inlineAudioRef} />
-
             {isMobile ? (
                 <MobileDedicationsScreen {...screenProps} />
             ) : (
