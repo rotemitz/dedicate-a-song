@@ -9,20 +9,18 @@
             "song": {
                 "title": "Cigarettes & Alcohol",
                 "artist": "Oasis",
-                "spotify_url": "https://open.spotify.com/track/2wKeVnM8OBoGjGm8Qvqhi5?si=8c39503be219470f",
                 "local_file": "songs/vicky.mp3",
                 "album_art": "songs/vicky.png"
             }
         },
         {
             "id": 10,
-            "name": "ליעד ועלווה",
-            "photo": null,
-            "voice_message": null,
+            "name": "ליעד עלווה והילדים",
+            "photo": "assets/images/liad-alva.png",
+            "video_message": "assets/videos/liad-alva.mp4",
             "song": {
                 "title": "טל",
                 "artist": "יהורם גאון",
-                "spotify_url": "https://open.spotify.com/track/2dQUqI5SfE750QgsZ3gVtL?si=f2e0e32bfcc24b88",
                 "local_file": "songs/liad.mp3",
                 "album_art": "songs/liad.png"
             }
@@ -35,7 +33,6 @@
             "song": {
                 "title": "באת לי פתאום",
                 "artist": "קרן פלס ורוני אלטר",
-                "spotify_url": "https://open.spotify.com/track/1QHK3rRp4PB3HhkXASTlNO?si=154b5214fd7c4d64",
                 "local_file": "songs/aliza.mp3",
                 "album_art": "songs/aliza.png"
             }
@@ -48,7 +45,6 @@
             "song": {
                 "title": "מנוף",
                 "artist": "בן ורד ויעל ארנון ורד",
-                "spotify_url": "https://open.spotify.com/track/2M5rT9JUyJEBcsSO3847Z9?si=ebed7b4dde354ef1",
                 "local_file": "songs/eyal-pozniak.mp3",
                 "album_art": "songs/eyal-pozniak.png"
             }
@@ -57,12 +53,10 @@
             "id": 5,
             "name": "קרן שלב",
             "photo": "assets/images/keren.jpg",
-            "voice_message": null,
             "video_message": "assets/videos/keren.mp4",
             "song": {
                 "title": "Hakuna Matata",
                 "artist": "The Lion King",
-                "spotify_url": "https://open.spotify.com/track/5k3U0OGYBccHdKJJu3HrUN?si=6d98d86aed3d4a79",
                 "local_file": "songs/keren.mp3",
                 "album_art": "songs/keren.png"
             }
@@ -71,14 +65,84 @@
             "id": 6,
             "name": "רותם שובל",
             "photo": "assets/images/rotem-shoval.jpeg",
-            "voice_message": null,
             "video_message": "assets/videos/rotem-shoval.mp4",
             "song": {
                 "title": "מה שאת אוהבת",
                 "artist": "גלי עטרי",
-                "spotify_url": "https://open.spotify.com/track/1Pgu858j6xB8mkKbQjODom?si=d1458a6caf614088",
                 "local_file": "songs/rotem-shoval.mp3",
                 "album_art": "songs/rotem-shoval.png"
+            }
+        },
+        {
+            "id": 7,
+            "name": "חן ונימי",
+            "photo": "assets/images/chen-nimi.jpeg",
+            "video_message": "assets/videos/chen-nimi.mp4",
+            "song": {
+                "title": "I'll be there for you",
+                "artist": "The rembrandts",
+                "local_file": "songs/chen-nimi.mp3",
+                "album_art": "songs/chen-nimi.png"
+            }
+        },
+        {
+            "id": 8,
+            "name": "גילי",
+            "photo": "assets/images/gili.jpg",
+            "video_message": "assets/videos/gili.mp4",
+            "song": {
+                "title": "לחיות נכון",
+                "artist": "רונה קינן",
+                "local_file": "songs/gili.mp3",
+                "album_art": "songs/gili.png"
+            }
+        },
+        {
+            "id": 9,
+            "name": "אמא ואבא",
+            "photo": "assets/images/ima-aba.jpeg",
+            "video_message": "assets/videos/ima-aba.mp4",
+            "song": {
+                "title": "מה שאת אוהבת",
+                "artist": "גלי עטרי",
+                "local_file": "songs/rotem-shoval.mp3",
+                "album_art": "songs/rotem-shoval.png"
+            }
+        },
+        {
+            "id": 10,
+            "name": "אייל לירון והילדים",
+            "photo": "assets/images/eyal-liron.jpeg",
+            "voice_message": "assets/recordings/eyal-liron.opus",
+            "song": {
+                "title": "איך זה שכוכב",
+                "artist": "מתי כספי",
+                "local_file": "songs/eyal-liron.mp3",
+                "album_art": "songs/eyal-liron.png"
+            }
+        },
+        {
+            "id": 11,
+            "name": "הילה",
+            "photo": "assets/images/hila.jpeg",
+            "voice_message": "assets/recordings/hila.opus",
+            "song": {
+                "title": "Don't Stop Me Now",
+                "artist": "Queen",
+                "local_file": "songs/hila.mp3",
+                "album_art": "songs/hila.png"
+            }
+        },
+        {
+            "id": 12,
+            "name": "גיל וטל",
+            "photo": "assets/images/gil-tal.jpeg",
+            "video_message": "assets/videos/gil-tal.mp4",
+            "song": {
+                "title": "אדון שוקו",
+                "artist": "אריק איינשטיין",
+                "local_file": "songs/gil-tal.mp3",
+                "album_art": "songs/gil-tal.png"
             }
         }
     ]
