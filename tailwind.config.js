@@ -8,11 +8,13 @@ export default {
     theme: {
         extend: {
             colors: {
-                primary: "#e8304f", // Updated from desktop design
-                "background-light": "#fcf8f9",
+                primary: "#D4907B", // Updated to Rose Gold Dark
+                cream: "#FFFBF5",
+                "background-light": "#FFFBF5", // Updated to Cream
                 "background-dark": "#211114",
-                "rose-gold": "#e7d0d4",
-                "deep-rose": "#974e5a",
+                "rose-gold-light": "#E5B2A3",
+                "rose-gold-dark": "#D4907B",
+                "deep-rose": "#9F3E50", // Keeping existing accent
             },
             fontFamily: {
                 display: ["Playfair Display", "serif"], // Keeping Playfair as originally requested, distinct from Jakarta

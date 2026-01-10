@@ -69,6 +69,8 @@ const DedicationsScreen = ({ dedications }) => {
             {showPlayer && currentCardIndex !== -1 && (
                 <ImmersivePlayer
                     dedication={dedications[currentCardIndex]}
+                    currentIndex={currentCardIndex}
+                    totalCount={dedications.length}
                     onClose={() => setShowPlayer(false)}
                     onNext={handleNext}
                     onPrevious={handlePrevious}
