@@ -1,6 +1,59 @@
 @import "tailwindcss";
 
 /* ============================================
+   TAILWIND v4 THEME CONFIGURATION
+   Custom colors for the celebration rose-gold theme
+   ============================================ */
+@theme {
+  /* Celebration Cream Background */
+  --color-celebration-cream: #FDF8F2;
+  --color-celebration-cream-light: #FFFBF5;
+
+  /* Rose Gold Palette */
+  --color-rose-gold-50: #F9F1EF;
+  --color-rose-gold-100: #F4E4E0;
+  --color-rose-gold-200: #EBCBC1;
+  --color-rose-gold-300: #E2B1A3;
+  --color-rose-gold-400: #D99884;
+  --color-rose-gold-500: #D4907B;
+  --color-rose-gold-600: #B8725E;
+  --color-rose-gold-700: #955444;
+
+  /* Typography Colors */
+  --color-celebration-charcoal: #2D2D2D;
+  --color-midnight-blue: #1A1F2C;
+
+  /* Rose Gold Gradient */
+  --background-image-rose-gradient: linear-gradient(135deg, #E5B2A3 0%, #D4907B 100%);
+  --background-image-immersive-gradient: linear-gradient(180deg, #FDF8F2 0%, #F4E4E0 100%);
+
+  /* Custom Shadows */
+  --shadow-floating: 0 20px 50px rgba(212, 144, 123, 0.15);
+  --shadow-premium: 0 10px 30px rgba(0, 0, 0, 0.05);
+
+  /* Custom Animations */
+  --animate-spin-slow: spin 6s linear infinite;
+  --animate-soft-pulse: soft-pulse 3s ease-in-out infinite;
+
+  /* Fonts */
+  --font-display: 'Playfair Display', Georgia, serif;
+  --font-serif: 'Playfair Display', Georgia, serif;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+@keyframes soft-pulse {
+
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.02);
+  }
+}
+
+/* ============================================
    COLOR CONFIGURATION
    Change these CSS variables to customize the theme
    ============================================ */
