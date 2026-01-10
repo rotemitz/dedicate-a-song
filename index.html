@@ -1,82 +1,24 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Happy 40th Birthday Tal! 🎂</title>
     <meta name="description"
         content="A special birthday celebration for Tal's 40th birthday with heartfelt messages and song dedications from loved ones.">
-
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
         href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap"
         rel="stylesheet">
-
-    <!-- Styles -->
-    <link rel="stylesheet" href="css/styles.css?v=1.1">
 </head>
 
 <body>
-    <!-- Welcome Screen -->
-    <section id="welcome-screen" class="screen active">
-        <div class="welcome-content">
-            <div class="sparkle-container">
-                <span class="sparkle">✨</span>
-                <span class="sparkle">✨</span>
-                <span class="sparkle">✨</span>
-            </div>
-            <h1 class="welcome-title">Happy 40th Birthday</h1>
-            <h2 class="welcome-name">Tal</h2>
-            <p class="welcome-subtitle">A collection of love, wishes & music<br>from those who cherish you most</p>
-            <button id="start-button" class="start-button">
-                <span class="button-text">Start Here</span>
-                <span class="button-icon">→</span>
-            </button>
-        </div>
-        <div class="welcome-footer">
-            Made with ❤️ for you
-        </div>
-    </section>
-
-    <!-- Confetti Canvas -->
-    <canvas id="confetti-canvas"></canvas>
-
-    <!-- Dedications Screen -->
-    <section id="dedications-screen" class="screen">
-        <header class="dedications-header">
-            <div class="header-main-row">
-                <h1>🎂 Birthday Wishes for <span class="highlight-name">Tal</span></h1>
-
-                <!-- Autoplay Toggle -->
-                <div class="autoplay-control">
-                    <label class="autoplay-label" for="autoplay-toggle">
-                        <span class="autoplay-icon">▶️</span>
-                        <span>Autoplay</span>
-                        <div class="toggle-switch">
-                            <input type="checkbox" id="autoplay-toggle" class="toggle-input">
-                            <span class="toggle-slider"></span>
-                        </div>
-                    </label>
-                </div>
-            </div>
-            <p class="dedications-intro">Scroll through messages from your loved ones</p>
-        </header>
-
-        <div id="dedications-container" class="dedications-container">
-            <!-- Cards will be dynamically inserted here -->
-        </div>
-
-        <footer class="dedications-footer">
-            <p>Happy Birthday! 🎉</p>
-        </footer>
-    </section>
-
-    <!-- Scripts -->
-    <script src="js/confetti.js?v=1.1"></script>
-    <script src="js/app.js?v=1.1"></script>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
 </body>
 
 </html>
