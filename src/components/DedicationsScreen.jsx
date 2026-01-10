@@ -1,56 +1,75 @@
 import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import Header from './Header';
 import DedicationCard from './DedicationCard';
 import ImmersivePlayer from './ImmersivePlayer';
 
-// Now Listening Mini-Player (Mobile Only)
-const NowListeningBar = ({ dedication, onOpen }) => {
+
+/**
+ * Floating Now Playing Component (Mobile Only)
+ * 
+ * Spec:
+ * - Position: fixed bottom-6 left-6 right-6
+ * - Layout: flex items-center p-3 h-16 bg-white/90 backdrop-blur-md rounded-full shadow-floating
+ * - Elements:
+ *   - Small rotating record icon (40px diameter) on the left
+ *   - Text stack: Song title (14px Bold) / Artist (12px Regular)
+ *   - Controls: Play/Pause and Skip icons in rose-gold-500
+ */
+const NowPlayingBar = ({ dedication, isPlaying = true, onOpen, onPlayPause, onSkip }) => {
     if (!dedication) return null;
 
     return (
-        <div
+        <motion.div
+            initial={{ y: 100, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 100, opacity: 0 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
             onClick={onOpen}
             className="
-                md:hidden fixed bottom-6 left-1/2 -translate-x-1/2
-                w-[92%] max-w-sm z-50 cursor-pointer
-                bg-white/70 backdrop-blur-md
-                border border-rose-gold-200/30
-                rounded-[2rem] p-3
-                flex items-center gap-4
-                shadow-floating
+                md:hidden fixed bottom-6 left-6 right-6 z-50 cursor-pointer
+                flex items-center p-3 h-16
+                bg-white/90 backdrop-blur-md
+                rounded-full shadow-floating
             "
         >
-            {/* Play Button */}
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-rose-gold-300 to-rose-gold-500 flex items-center justify-center text-white shadow-md">
-                <span className="material-symbols-outlined text-xl">play_arrow</span>
+            {/* Rotating Record Icon - 40px diameter */}
+            <motion.div
+                animate={isPlaying ? { rotate: 360 } : { rotate: 0 }}
+                transition={isPlaying ? { duration: 3, repeat: Infinity, ease: "linear" } : {}}
+                className="w-10 h-10 rounded-full bg-gradient-to-br from-rose-gold-400 to-rose-gold-600 flex items-center justify-center shadow-md flex-shrink-0"
+            >
+                <div className="w-3 h-3 rounded-full bg-white/90" />
+            </motion.div>
+
+            {/* Text Stack - Song title (14px Bold) / Artist (12px Regular) */}
+            <div className="flex-1 min-w-0 ml-3">
+                <p className="text-sm font-bold text-celebration-charcoal truncate">
+                    {dedication.song?.title || `${dedication.name}'s Dedication`}
+                </p>
+                <p className="text-xs text-celebration-charcoal/60 truncate">
+                    {dedication.song?.artist || dedication.name}
+                </p>
             </div>
 
-            {/* Info */}
-            <div className="flex-1 min-w-0">
-                <p className="text-[10px] font-bold text-rose-gold-500 uppercase tracking-tight">
-                    Now Listening
-                </p>
-                <p className="text-xs font-semibold text-celebration-charcoal truncate">
-                    {dedication.name}'s Dedication
-                </p>
-            </div>
-
-            {/* Controls */}
-            <div className="flex items-center gap-2 pr-2">
+            {/* Controls - Play/Pause and Skip in rose-gold-500 */}
+            <div className="flex items-center gap-1 ml-2">
                 <button
-                    className="text-rose-gold-400 hover:text-rose-gold-600 transition-colors"
-                    onClick={(e) => { e.stopPropagation(); }}
+                    className="w-9 h-9 flex items-center justify-center text-rose-gold-500 hover:text-rose-gold-600 transition-colors"
+                    onClick={(e) => { e.stopPropagation(); onPlayPause?.(); }}
+                >
+                    <span className="material-symbols-outlined text-2xl">
+                        {isPlaying ? 'pause' : 'play_arrow'}
+                    </span>
+                </button>
+                <button
+                    className="w-9 h-9 flex items-center justify-center text-rose-gold-500 hover:text-rose-gold-600 transition-colors"
+                    onClick={(e) => { e.stopPropagation(); onSkip?.(); }}
                 >
                     <span className="material-symbols-outlined text-2xl">skip_next</span>
                 </button>
-                <button
-                    className="text-rose-gold-400 hover:text-rose-gold-600 transition-colors"
-                    onClick={(e) => { e.stopPropagation(); }}
-                >
-                    <span className="material-symbols-outlined text-2xl">close</span>
-                </button>
             </div>
-        </div>
+        </motion.div>
     );
 };
 
@@ -208,13 +227,18 @@ const DedicationsScreen = ({ dedications }) => {
                 </footer>
             </main>
 
-            {/* Floating Now Listening Bar (Mobile Only) */}
-            {!showPlayer && lastPlayedIndex >= 0 && (
-                <NowListeningBar
-                    dedication={dedications[lastPlayedIndex]}
-                    onOpen={handleNowListeningClick}
-                />
-            )}
+            {/* Floating Now Playing Bar (Mobile Only) */}
+            <AnimatePresence>
+                {!showPlayer && lastPlayedIndex >= 0 && (
+                    <NowPlayingBar
+                        key="now-playing"
+                        dedication={dedications[lastPlayedIndex]}
+                        isPlaying={true}
+                        onOpen={handleNowListeningClick}
+                        onSkip={handleNext}
+                    />
+                )}
+            </AnimatePresence>
 
             {/* Full Screen Player */}
             {showPlayer && currentCardIndex !== -1 && (

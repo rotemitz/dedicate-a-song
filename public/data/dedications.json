@@ -33,8 +33,8 @@
             "photo": "assets/images/aliza.jpg",
             "voice_message": "assets/recordings/aliza.opus",
             "song": {
-                "title": "קרן פלס ורוני אלטר",
-                "artist": "באת לי פתאום",
+                "title": "באת לי פתאום",
+                "artist": "קרן פלס ורוני אלטר",
                 "spotify_url": "https://open.spotify.com/track/1QHK3rRp4PB3HhkXASTlNO?si=154b5214fd7c4d64",
                 "local_file": "songs/aliza.mp3",
                 "album_art": "songs/aliza.png"
