@@ -60,15 +60,14 @@ const MobileDedicationCard = ({
             layoutId={layoutId}
             onClick={handleCardClick}
             className={`
-                bg-white rounded-[40px] p-5 cursor-pointer
-                transition-all duration-300
+                bg-white rounded-[40px] cursor-pointer transition-all duration-300
                 ${(isNowPlaying || isInlinePlaying)
                     ? 'border-2 border-rose-gold-300 shadow-floating'
                     : 'border border-rose-gold-50 shadow-[0_10px_30px_rgba(212,144,123,0.1)] hover:shadow-floating hover:-translate-y-1'
                 }
             `}
         >
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-4 p-5">
                 {/* Avatar with Play Overlay - 64px diameter */}
                 <div className="relative flex-shrink-0">
                     <div className={`
@@ -199,16 +198,18 @@ const MobileDedicationCard = ({
 
                             {/* Open Full View Button */}
                             {onOpenFullView && (
-                                <button
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        onOpenFullView();
-                                    }}
-                                    className="w-full px-3 py-2 bg-gradient-to-r from-rose-gold-400 to-rose-gold-500 text-white rounded-full text-[11px] font-bold tracking-wide hover:shadow-md transition-all flex items-center justify-center gap-1.5"
-                                >
-                                    <span className="material-symbols-outlined text-sm">fullscreen</span>
-                                    Open Full View
-                                </button>
+                                <div className="flex justify-center py-3">
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            onOpenFullView();
+                                        }}
+                                        className="inline-flex px-4 py-2 bg-gradient-to-r from-rose-gold-400 to-rose-gold-500 text-white rounded-full text-[10px] font-bold tracking-wide hover:shadow-md transition-all items-center justify-center gap-1.5"
+                                    >
+                                        <span className="material-symbols-outlined text-xs">fullscreen</span>
+                                        Open Full View
+                                    </button>
+                                </div>
                             )}
                         </div>
                     </motion.div>

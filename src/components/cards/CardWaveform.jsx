@@ -1,20 +1,48 @@
 import React from 'react';
 
-// Static Waveform visual (matches Stitch design)
-const CardWaveform = () => {
-    // Heights in px matching the Stitch design pattern
-    const bars = [16, 32, 48, 40, 24, 32, 48, 40, 16, 32, 44, 36, 20];
+// Animated Waveform visual (reuses logic from WaveformVisualizer in PlayerComponents)
+const CardWaveform = ({ isPlaying = false }) => {
+    const barCount = 13;
+
+    // Generate unique random animation parameters for each bar
+    const barParams = React.useMemo(
+        () => [...Array(barCount)].map(() => ({
+            minHeight: Math.random() * 8 + 8,    // 8-16px min
+            maxHeight: Math.random() * 16 + 24,  // 24-40px max
+            duration: 0.3 + Math.random() * 0.4, // 0.3-0.7s duration
+        })),
+        [barCount]
+    );
 
     return (
-        <div className="flex items-center justify-center gap-1 h-full">
-            {bars.map((height, i) => (
-                <div
-                    key={i}
-                    className="w-[3px] rounded-full bg-gradient-to-t from-rose-gold-700 to-rose-gold-500"
-                    style={{ height: `${height}px` }}
-                />
-            ))}
-        </div>
+        <>
+            {/* Inject keyframes dynamically */}
+            <style>
+                {barParams.map((params, i) => `
+                    @keyframes card-waveform-bar-${i} {
+                        0%, 100% { height: ${params.minHeight}px; }
+                        50% { height: ${params.maxHeight}px; }
+                    }
+                `).join('\n')}
+            </style>
+            <div className="flex items-center justify-center gap-1 h-12">
+                {barParams.map((params, i) => (
+                    <div
+                        key={i}
+                        className="w-[3px] rounded-full bg-gradient-to-t from-rose-gold-700 to-rose-gold-500"
+                        style={{
+                            height: isPlaying ? undefined : `${(params.minHeight + params.maxHeight) / 2}px`,
+                            opacity: isPlaying ? 1 : 0.3,
+                            animation: isPlaying
+                                ? `card-waveform-bar-${i} ${params.duration}s ease-in-out infinite`
+                                : 'none',
+                            animationDelay: `${i * 0.05}s`,
+                            transition: 'opacity 0.3s ease'
+                        }}
+                    />
+                ))}
+            </div>
+        </>
     );
 };
 
