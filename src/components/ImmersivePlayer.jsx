@@ -17,9 +17,9 @@ const GreetingPanel = ({
     <div className={`relative w-full h-full flex flex-col items-center justify-center ${desktopMode ? '' : 'px-6'}`}>
         {!desktopMode && (
             <div className="text-center mb-10 mt-12">
-                <p className="text-sm font-medium tracking-[0.2em] text-[#B76E79]/80 uppercase mb-2">Voice Dedication</p>
+                <p className="text-sm font-medium tracking-[0.2em] text-[#D48C98]/80 uppercase mb-2">Voice Dedication</p>
                 <h1 className="font-display text-2xl md:text-3xl leading-tight text-slate-900 dark:text-white">
-                    A message from <span className="metallic-text italic font-semibold text-[#974e5a] dark:text-[#e7d0d4]">{dedication.name}</span>
+                    A message from <span className="metallic-text italic font-semibold text-[#9F3E50] dark:text-[#D48C98]">{dedication.name}</span>
                 </h1>
             </div>
         )}
@@ -27,7 +27,7 @@ const GreetingPanel = ({
         {/* Visualizer Area */}
         <div className={`relative w-full ${desktopMode ? 'h-full' : 'aspect-square flex items-center justify-center mb-10'}`}>
             {dedication.video_message ? (
-                <div className={`relative w-full h-full overflow-hidden ${desktopMode ? '' : 'rounded-full border-4 border-[#e7d0d4] shadow-2xl'}`}>
+                <div className={`relative w-full h-full overflow-hidden ${desktopMode ? '' : 'rounded-full border-4 border-[#D48C98] shadow-2xl'}`}>
                     <video
                         ref={videoRef}
                         src={dedication.video_message}
@@ -54,7 +54,7 @@ const GreetingPanel = ({
                 // Voice / Photo Mode
                 <div className="relative w-full h-full flex items-center justify-center">
                     {/* Avatar */}
-                    <div className={`relative ${desktopMode ? 'w-64 h-64' : 'w-[75%] aspect-square'} rounded-full overflow-hidden border-2 border-[#e7d0d4]/50 shadow-[0_0_30px_rgba(183,110,121,0.4)] ${isPlaying && isGreeting ? 'animate-soft-pulse' : ''}`}>
+                    <div className={`relative ${desktopMode ? 'w-64 h-64' : 'w-[75%] aspect-square'} rounded-full overflow-hidden border-2 border-[#D48C98]/50 shadow-[0_0_30px_rgba(159,62,80,0.4)] ${isPlaying && isGreeting ? 'animate-soft-pulse' : ''}`}>
                         <img
                             src={dedication.photo || 'assets/placeholder.png'}
                             alt={dedication.name}
@@ -79,10 +79,10 @@ const GreetingPanel = ({
             <div className="flex flex-col items-center gap-4 mb-auto">
                 <div className="flex items-center justify-center gap-[3px] h-12">
                     {[...Array(12)].map((_, i) => (
-                        <div key={i} className={`w-1.5 rounded-full bg-gradient-to-t from-[#974e5a] to-[#e7d0d4] ${isPlaying && isGreeting ? 'animate-pulse' : 'opacity-40'}`} style={{ height: Math.random() * 20 + 20 + 'px', animationDelay: i * 0.1 + 's' }}></div>
+                        <div key={i} className={`w-1.5 rounded-full bg-gradient-to-t from-[#9F3E50] to-[#D48C98] ${isPlaying && isGreeting ? 'animate-pulse' : 'opacity-40'}`} style={{ height: Math.random() * 20 + 20 + 'px', animationDelay: i * 0.1 + 's' }}></div>
                     ))}
                 </div>
-                <p className="text-[11px] font-bold tracking-widest text-[#B76E79]/60 uppercase">
+                <p className="text-[11px] font-bold tracking-widest text-[#D48C98]/60 uppercase">
                     {formatTime(progress)} / {formatTime(duration)}
                 </p>
             </div>
@@ -103,7 +103,7 @@ const VinylPanel = ({
             <div className="text-center mb-6 mt-8">
                 <h1 className="font-display text-2xl md:text-3xl leading-tight mb-1 text-slate-900 dark:text-white">
                     For My Lovely Wife –<br />
-                    <span className="metallic-text italic font-semibold text-[#974e5a]">40th Birthday</span>
+                    <span className="metallic-text italic font-semibold text-[#9F3E50]">40th Birthday</span>
                 </h1>
             </div>
         )}
@@ -136,9 +136,9 @@ const VinylPanel = ({
         {/* Track Info */}
         <div className={`text-center space-y-4 ${desktopMode ? 'absolute bottom-6 right-6 text-right' : 'mb-auto'}`}>
             <div className="space-y-1">
-                <p className={`text-xs font-bold tracking-widest uppercase ${desktopMode ? 'text-[#974e5a]' : 'text-[#B76E79]'}`}>Now Playing</p>
+                <p className={`text-xs font-bold tracking-widest uppercase ${desktopMode ? 'text-[#9F3E50]' : 'text-[#D48C98]'}`}>Now Playing</p>
                 <h2 className="font-display text-2xl font-semibold text-slate-900 dark:text-white">{dedication.song.title}</h2>
-                <p className="text-[#974e5a]/70 italic">{dedication.song.artist}</p>
+                <p className="text-[#9F3E50]/70 italic">{dedication.song.artist}</p>
             </div>
         </div>
     </div>
@@ -171,7 +171,7 @@ const Controls = ({
                         mediaRef.current.currentTime = p * duration;
                     }
                 }}>
-                    <div className="absolute left-0 top-0 h-full bg-gradient-to-r from-[#e7d0d4] to-[#974e5a] rounded-full" style={{ width: `${(progress / (duration || 1)) * 100}%` }}></div>
+                    <div className="absolute left-0 top-0 h-full bg-gradient-to-r from-[#D48C98] to-[#9F3E50] rounded-full" style={{ width: `${(progress / (duration || 1)) * 100}%` }}></div>
                 </div>
                 <div className="flex justify-between text-[10px] font-bold text-slate-400 mt-2">
                     <span>{formatTime(progress)}</span>
@@ -182,14 +182,14 @@ const Controls = ({
 
         <div className={`flex items-center ${desktopMode ? 'gap-10' : 'gap-6 justify-between w-full px-12'}`}>
             {/* Previous */}
-            <button onClick={onPrevious} className="text-[#974e5a] dark:text-[#e7d0d4] hover:text-[#B76E79] transition-colors">
+            <button onClick={onPrevious} className="text-[#9F3E50] dark:text-[#D48C98] hover:text-[#D48C98] transition-colors">
                 <span className="material-symbols-outlined !text-3xl">skip_previous</span>
             </button>
 
             {/* Play/Pause */}
             <button
                 onClick={onTogglePlay}
-                className={`flex items-center justify-center text-white shadow-lg shadow-[#B76E79]/30 hover:scale-105 transition-transform ${desktopMode ? 'w-16 h-16 bg-[#e8304f] rounded-full' : 'w-20 h-20 bg-[#e8304f] rounded-full'}`}
+                className={`flex items-center justify-center text-white shadow-lg shadow-[#D48C98]/30 hover:scale-105 transition-transform ${desktopMode ? 'w-16 h-16 bg-[#9F3E50] rounded-full' : 'w-20 h-20 bg-[#9F3E50] rounded-full'}`}
             >
                 <span className="material-symbols-outlined !text-4xl" style={{ fontVariationSettings: "'FILL' 1" }}>
                     {isPlaying ? 'pause' : 'play_arrow'}
@@ -197,7 +197,7 @@ const Controls = ({
             </button>
 
             {/* Next */}
-            <button onClick={onNext} className="text-[#974e5a] dark:text-[#e7d0d4] hover:text-[#B76E79] transition-colors">
+            <button onClick={onNext} className="text-[#9F3E50] dark:text-[#D48C98] hover:text-[#D48C98] transition-colors">
                 <span className="material-symbols-outlined !text-3xl">skip_next</span>
             </button>
         </div>
@@ -324,12 +324,12 @@ const ImmersivePlayer = ({
     }
 
     return (
-        <div className="fixed inset-0 z-[2000] bg-[#FFF9F6] dark:bg-[#1A1616] overflow-hidden font-display">
+        <div className="fixed inset-0 z-[2000] bg-[#FFF0F5] dark:bg-[#1A1616] overflow-hidden font-display">
             {/* Background Layer */}
-            <div className="absolute inset-0 bg-gradient-to-br from-[#FFF9F6] via-[#FDF2F0] to-[#B76E79]/20 dark:from-[#1A1616] dark:to-[#2D1F1F]"></div>
+            <div className="absolute inset-0 bg-gradient-to-br from-[#FFF0F5] via-[#FFE4E1] to-[#D48C98]/20 dark:from-[#1A1616] dark:to-[#2D1F1F]"></div>
 
             <button className="absolute top-6 right-6 z-50 p-2 rounded-full bg-black/5 hover:bg-black/10 transition-colors" onClick={onClose}>
-                <span className="material-symbols-outlined text-[#974e5a]">close</span>
+                <span className="material-symbols-outlined text-[#9F3E50]">close</span>
             </button>
 
             {/* Mobile View */}
