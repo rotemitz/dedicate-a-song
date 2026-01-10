@@ -144,6 +144,18 @@
                 "local_file": "songs/gil-tal.mp3",
                 "album_art": "songs/gil-tal.png"
             }
+        },
+        {
+            "id": 13,
+            "name": "אסתי וחיים",
+            "photo": "assets/images/esti-haim.jpeg",
+            "video_message": "assets/videos/esti-haim.mp4",
+            "song": {
+                "title": "",
+                "artist": "",
+                "local_file": "songs/esti-haim.mp3",
+                "album_art": "songs/esti-haim.png"
+            }
         }
     ]
 }
