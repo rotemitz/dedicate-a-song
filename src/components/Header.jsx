@@ -61,7 +61,10 @@ const Header = ({ autoplayEnabled, setAutoplayEnabled }) => {
             </div>
 
             {/* Mobile Layout */}
-            <div className="md:hidden pt-12 px-6 pb-6 flex justify-between items-center">
+            <div
+                className="md:hidden flex justify-between items-center"
+                style={{ paddingTop: '48px', paddingLeft: '24px', paddingRight: '24px', paddingBottom: '20px' }}
+            >
                 {/* Title Section */}
                 <div className="space-y-0.5">
                     <h1

@@ -29,11 +29,17 @@ const MobileDedicationsScreen = ({
 
             {/* Main Content Area */}
             <main
-                className={`px-4 py-6 pb-24 ${showPlayer ? 'hidden' : ''}`}
-                style={showPlayer ? { display: 'none' } : {}}
+                className={`${showPlayer ? 'hidden' : ''}`}
+                style={{
+                    paddingLeft: '24px',
+                    paddingRight: '24px',
+                    paddingTop: '8px',
+                    paddingBottom: '112px',
+                    ...(showPlayer ? { display: 'none' } : {})
+                }}
             >
                 {/* Mobile: Vertical list */}
-                <div className="space-y-4 px-2">
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                     {dedications.map((dedication, index) => (
                         <div id={`card-${index}`} key={dedication.id}>
                             <DedicationCard
