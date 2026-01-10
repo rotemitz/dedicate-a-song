@@ -1,3 +1,5 @@
+@import "tailwindcss";
+
 /* ============================================
    COLOR CONFIGURATION
    Change these CSS variables to customize the theme
@@ -11,6 +13,13 @@
   /* Secondary/Accent Colors */
   --color-accent: #f9a825;
   --color-accent-light: #ffd95a;
+
+  /* Rose Gold Theme for Immersive Player */
+  --rose-gold: #B76E79;
+  --rose-gold-light: #E2A0A1;
+  --rose-gold-dark: #8E525B;
+  --background-light: #FFF9F6;
+  --background-dark: #1A1616;
 
   /* Background Gradients */
   --gradient-welcome: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);

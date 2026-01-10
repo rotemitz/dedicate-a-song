@@ -10,7 +10,8 @@
                 "title": "Cigarettes & Alcohol",
                 "artist": "Oasis",
                 "spotify_url": "https://open.spotify.com/track/2wKeVnM8OBoGjGm8Qvqhi5?si=8c39503be219470f",
-                "local_file": "songs/vicky.mp3"
+                "local_file": "songs/vicky.mp3",
+                "album_art": "songs/vicky.png"
             }
         },
         {
@@ -22,7 +23,8 @@
                 "title": "טל",
                 "artist": "יהורם גאון",
                 "spotify_url": "https://open.spotify.com/track/2dQUqI5SfE750QgsZ3gVtL?si=f2e0e32bfcc24b88",
-                "local_file": "songs/liad.mp3"
+                "local_file": "songs/liad.mp3",
+                "album_art": "songs/liad.png"
             }
         },
         {
@@ -53,7 +55,8 @@
             "id": 5,
             "name": "קרן שלב",
             "photo": "assets/images/keren.jpg",
-            "voice_message": "assets/videos/keren.mp4",
+            "voice_message": null,
+            "video_message": "assets/videos/keren.mp4",
             "song": {
                 "title": "Hakuna Matata",
                 "artist": "The Lion King",
