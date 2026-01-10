@@ -153,6 +153,7 @@ const SongPhaseView = ({
         <div className="my-6 flex flex-col items-center">
             <VinylRecord
                 albumArt={dedication.song?.album_art || dedication.photo}
+                songTitle={dedication.song?.title}
                 isPlaying={isPlaying}
                 size="w-72 h-72"
             />

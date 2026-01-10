@@ -107,51 +107,73 @@ export const DedicationAvatar = ({
 };
 
 // ============================================
-// VINYL RECORD (Song Phase)
+// VINYL RECORD (Song Phase) - Record Player with Antigravity Tonearm
+// Uses Framer Motion for smooth spring physics animations
 // ============================================
-export const VinylRecord = ({ albumArt, isPlaying, size = 'w-72 h-72' }) => (
-    <div className={`relative ${size} flex items-center justify-center`}>
-        {/* Record Disc */}
-        <div
-            className={`absolute inset-0 rounded-full bg-black shadow-2xl flex items-center justify-center ${isPlaying ? 'animate-spin-slow' : ''}`}
-            style={{
-                background: 'radial-gradient(circle at 50% 50%, #333 0%, #111 30%, #1a1a1a 60%, #0a0a0a 100%)'
-            }}
-        >
-            {/* Vinyl grooves */}
-            <div className="absolute inset-4 rounded-full border border-white/5" />
-            <div className="absolute inset-8 rounded-full border border-white/5" />
-            <div className="absolute inset-12 rounded-full border border-white/5" />
-            <div className="absolute inset-16 rounded-full border border-white/5" />
-            <div className="absolute inset-20 rounded-full border border-white/5" />
+export const VinylRecord = ({ albumArt, isPlaying, songTitle, size = 'w-72 h-72' }) => {
+    // Parse size for responsive container
+    const sizeClasses = size.includes('md:') ? size : `${size} md:w-96 md:h-96`;
 
-            {/* Center Label / Album Art */}
-            <div className="relative w-20 h-20 rounded-sm overflow-hidden shadow-inner">
-                <img
-                    src={albumArt || 'assets/placeholder.png'}
-                    alt="Album Art"
-                    className="w-full h-full object-cover"
-                />
-                {/* Center hole */}
-                <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-2 h-2 rounded-full bg-black/80" />
-                </div>
+    return (
+        <div className="relative flex flex-col items-center justify-center p-8">
+            {/* Container for the Record and Tonearm */}
+            <div className={`relative ${sizeClasses}`}>
+
+                {/* The Vinyl Record */}
+                <motion.div
+                    animate={{ rotate: isPlaying ? 360 : 0 }}
+                    transition={{
+                        repeat: isPlaying ? Infinity : 0,
+                        duration: 4,
+                        ease: "linear"
+                    }}
+                    className="relative w-full h-full rounded-full bg-[#121212] shadow-2xl flex items-center justify-center overflow-hidden border-[12px] border-[#1a1a1a]"
+                    style={{
+                        backgroundImage: `repeating-radial-gradient(circle, #1a1a1a 0%, #121212 2%, #1a1a1a 4%)`,
+                    }}
+                >
+                    {/* Record Grooves (Subtle Gloss) */}
+                    <div className="absolute inset-0 w-full h-full opacity-20 bg-[conic-gradient(from_0deg,transparent_0%,white_25%,transparent_50%,white_75%,transparent_100%)]" />
+
+                    {/* Central Label (Album Art) */}
+                    <div className="relative w-1/3 h-1/3 rounded-full bg-white border-4 border-[#121212] overflow-hidden z-10 shadow-inner">
+                        {albumArt ? (
+                            <img src={albumArt} alt={songTitle || 'Album Art'} className="w-full h-full object-cover" />
+                        ) : (
+                            <div className="w-full h-full bg-rose-gold-200 flex items-center justify-center">
+                                <span className="text-[10px] text-rose-gold-700 font-serif">SONG</span>
+                            </div>
+                        )}
+                        {/* Center Hole */}
+                        <div className="absolute inset-0 m-auto w-3 h-3 bg-[#121212] rounded-full shadow-inner" />
+                    </div>
+                </motion.div>
+
+                {/* The Tonearm with Spring Physics */}
+                <motion.div
+                    initial={{ rotate: -45 }}
+                    animate={{ rotate: isPlaying ? 0 : -45 }}
+                    transition={{ type: "spring", stiffness: 50, damping: 15 }}
+                    className="absolute -top-4 -right-4 w-1/2 h-full pointer-events-none z-20 origin-top-right"
+                >
+                    {/* Base of Tonearm */}
+                    <div className="absolute top-0 right-8 w-12 h-12 bg-rose-gold-500 rounded-full border-4 border-white shadow-lg" />
+
+                    {/* Arm Shaft */}
+                    <div className="absolute top-6 right-12 w-1 h-48 bg-gradient-to-b from-rose-gold-500 to-rose-gold-300 rounded-full origin-top transform rotate-[15deg] shadow-sm">
+                        {/* Needle Head */}
+                        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4 h-8 bg-rose-gold-600 rounded-sm transform -rotate-[15deg]">
+                            <div className="w-0.5 h-2 bg-gray-400 mx-auto mt-6" />
+                        </div>
+                    </div>
+                </motion.div>
             </div>
-        </div>
 
-        {/* Tonearm */}
-        <div
-            className="absolute -top-2 -right-8 w-32 h-40 pointer-events-none transition-transform duration-700 origin-top-right"
-            style={{
-                transform: isPlaying ? 'rotate(28deg)' : 'rotate(0deg)'
-            }}
-        >
-            <div className="absolute top-0 right-0 w-5 h-5 rounded-full bg-gray-400 shadow-lg" />
-            <div className="absolute top-2.5 right-1.5 w-1.5 h-24 bg-gradient-to-b from-gray-300 to-gray-400 rounded-full shadow-md origin-top" style={{ transform: 'rotate(-15deg)' }} />
-            <div className="absolute top-24 right-[-6px] w-2 h-6 bg-gray-600 rounded-sm shadow-md origin-top" style={{ transform: 'rotate(-15deg)' }} />
+            {/* Shadow under the record for the "Floating" effect */}
+            <div className="w-64 h-4 bg-black/10 blur-xl rounded-[100%] mt-8 animate-pulse" />
         </div>
-    </div>
-);
+    );
+};
 
 // ============================================
 // TIMELINE SLIDER
