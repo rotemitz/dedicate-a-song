@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import CardWaveform from './CardWaveform';
+import { useDedicationDuration } from '../../hooks/useMediaDuration';
 
 /**
  * Mobile Dedication Card Component
@@ -24,6 +25,7 @@ const MobileDedicationCard = ({
 }) => {
     const hasMedia = dedication.voice_message || dedication.video_message;
     const isPaused = !isNowPlaying;
+    const duration = useDedicationDuration(dedication);
 
     return (
         <motion.div
@@ -110,7 +112,7 @@ const MobileDedicationCard = ({
                             )}
                         </div>
                         <span className="text-[10px] font-medium text-celebration-charcoal/40">
-                            {dedication.duration || '0:45'}
+                            {duration || '--:--'}
                         </span>
                     </div>
 
@@ -155,7 +157,7 @@ const MobileDedicationCard = ({
                                     </div>
                                     <div className="flex justify-between text-[10px] font-bold text-rose-gold-400">
                                         <span>0:28</span>
-                                        <span>{dedication.duration || '0:45'}</span>
+                                        <span>{duration || '--:--'}</span>
                                     </div>
                                 </div>
                             </div>

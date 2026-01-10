@@ -1,5 +1,6 @@
 import React from 'react';
 import CardWaveform from './CardWaveform';
+import { useDedicationDuration } from '../../hooks/useMediaDuration';
 
 /**
  * Desktop Dedication Card Component
@@ -13,6 +14,7 @@ const DesktopDedicationCard = ({
     const hasMedia = dedication.voice_message || dedication.video_message;
     const mediaType = dedication.video_message ? 'video' : 'audio';
     const mediaIcon = dedication.video_message ? 'videocam' : 'mic';
+    const duration = useDedicationDuration(dedication);
 
     return (
         <div
@@ -51,7 +53,7 @@ const DesktopDedicationCard = ({
                     </p>
                     <p className="text-rose-gold-600 text-sm font-medium">
                         {mediaType === 'video' ? 'Video Message' : 'Audio Dedication'}
-                        {dedication.duration && ` • ${dedication.duration}`}
+                        {duration && ` • ${duration}`}
                     </p>
                 </div>
 
