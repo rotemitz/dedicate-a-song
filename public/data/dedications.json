@@ -113,7 +113,7 @@
             "id": 10,
             "name": "אייל לירון והילדים",
             "photo": "assets/images/eyal-liron.jpeg",
-            "voice_message": "assets/recordings/eyal-liron.opus",
+            "voice_message": "assets/recordings/eyal-liron.mp3",
             "song": {
                 "title": "איך זה שכוכב",
                 "artist": "מתי כספי",
