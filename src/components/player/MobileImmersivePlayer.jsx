@@ -5,7 +5,8 @@ import {
     WaveformVisualizer,
     VinylRecord,
     TimelineSlider,
-    PrimaryActionButton
+    PrimaryActionButton,
+    DedicationAvatar
 } from './PlayerComponents';
 
 // ============================================
@@ -55,24 +56,26 @@ const VoicePhaseView = ({
         </div>
 
         {/* Hero Profile */}
-        <div className="my-8 flex flex-col items-center">
+        <div className="my-8 flex flex-col items-center gap-4">
             <motion.div
-                className={`w-64 h-64 rounded-full overflow-hidden border-4 border-white shadow-floating ${isPlaying ? 'animate-soft-pulse' : ''}`}
                 initial={{ scale: 0.9, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ duration: 0.5 }}
             >
                 {dedication.video_message ? (
-                    <video
-                        src={dedication.video_message}
-                        className="w-full h-full object-cover"
-                        playsInline
-                    />
+                    <div className="w-64 h-64 rounded-full overflow-hidden border-4 border-white shadow-floating">
+                        <video
+                            src={dedication.video_message}
+                            className="w-full h-full object-cover"
+                            playsInline
+                        />
+                    </div>
                 ) : (
-                    <img
-                        src={dedication.photo || 'assets/placeholder.png'}
+                    <DedicationAvatar
+                        src={dedication.photo}
                         alt={dedication.name}
-                        className={`w-full h-full object-cover ${!isPlaying ? 'blur-sm grayscale' : ''} transition-all duration-500`}
+                        isPlaying={isPlaying}
+                        size="large"
                     />
                 )}
             </motion.div>

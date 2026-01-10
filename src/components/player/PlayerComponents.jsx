@@ -78,6 +78,35 @@ export const WaveformVisualizer = ({ isPlaying, barCount = 16 }) => {
 };
 
 // ============================================
+// DEDICATION AVATAR
+// Reusable avatar component for player views
+// ============================================
+export const DedicationAvatar = ({
+    src,
+    alt,
+    isPlaying = false,
+    size = 'large'
+}) => {
+    // Size configurations
+    const sizeClasses = {
+        large: 'w-48 h-48 md:w-64 md:h-64 border-4',
+        small: 'w-16 h-16 border-2'
+    };
+
+    return (
+        <div
+            className={`${sizeClasses[size]} rounded-full overflow-hidden border-white/20 shadow-2xl`}
+        >
+            <img
+                src={src || 'assets/placeholder.png'}
+                alt={alt}
+                className={`w-full h-full object-cover transition-all duration-500 ${!isPlaying ? 'blur-sm' : ''}`}
+            />
+        </div>
+    );
+};
+
+// ============================================
 // VINYL RECORD (Song Phase)
 // ============================================
 export const VinylRecord = ({ albumArt, isPlaying, size = 'w-72 h-72' }) => (

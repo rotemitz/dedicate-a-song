@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { WaveformVisualizer } from './PlayerComponents';
+import { WaveformVisualizer, DedicationAvatar } from './PlayerComponents';
 
 // Helper function
 const formatTime = (time) => {
@@ -118,29 +118,17 @@ const GreetingCard = ({
                     </AnimatePresence>
                 </div>
             ) : dedication.voice_message ? (
-                <div className="relative flex flex-col items-center justify-center gap-6">
+                <div className="flex flex-col items-center justify-center gap-6">
                     {/* Avatar */}
-                    <div className={`w-48 h-48 rounded-full overflow-hidden border-4 border-white/20 shadow-2xl ${isPlaying && isGreeting ? 'animate-soft-pulse' : ''}`}>
-                        <img
-                            src={dedication.photo || 'assets/placeholder.png'}
-                            alt={dedication.name}
-                            className={`w-full h-full object-cover ${!isPlaying ? 'blur-sm grayscale' : ''} transition-all duration-700`}
-                        />
-                    </div>
+                    <DedicationAvatar
+                        src={dedication.photo}
+                        alt={dedication.name}
+                        isPlaying={isPlaying && isGreeting}
+                        size="large"
+                    />
                     {/* Waveform visualization */}
-                    <WaveformVisualizer isPlaying={isPlaying} barCount={16} />
+                    <WaveformVisualizer isPlaying={isPlaying && isGreeting} barCount={16} />
                     <audio ref={audioRef} src={dedication.voice_message} onEnded={onEnded} />
-                    {/* Clickable overlay for play */}
-                    {!isPlaying && (
-                        <div
-                            className="absolute inset-0 flex items-center justify-center cursor-pointer"
-                            onClick={onTogglePlay}
-                        >
-                            <span className="material-symbols-outlined text-white !text-8xl opacity-80" style={{ fontVariationSettings: "'FILL' 1" }}>
-                                play_circle
-                            </span>
-                        </div>
-                    )}
                 </div>
             ) : (
                 <div className="text-center text-white/50">
