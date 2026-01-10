@@ -20,15 +20,25 @@ const Header = ({ autoplayEnabled, setAutoplayEnabled }) => {
     return (
         <header
             className={`
-                sticky top-0 z-50 transition-all duration-300
+                sticky top-0 z-50 w-full transition-all duration-300
+                border-b border-rose-gold-100/50
                 ${scrolled
-                    ? 'bg-celebration-cream/90 backdrop-blur-md shadow-premium'
-                    : 'bg-celebration-cream'
+                    ? 'bg-celebration-cream/80 backdrop-blur-md'
+                    : 'bg-celebration-cream/80 backdrop-blur-md'
                 }
             `}
         >
             {/* Desktop Layout */}
-            <div className="hidden md:flex w-full mx-auto items-center justify-between px-4 md:px-6 py-4 lg:py-6">
+            <div
+                className="hidden md:flex items-center justify-between py-4 md:py-6"
+                style={{
+                    maxWidth: '1000px',
+                    marginLeft: 'auto',
+                    marginRight: 'auto',
+                    paddingLeft: '48px',
+                    paddingRight: '48px'
+                }}
+            >
                 {/* Back Button */}
                 <button className="flex items-center gap-2 text-rose-gold-600 hover:text-rose-gold-700 transition-colors">
                     <span className="material-symbols-outlined">chevron_left</span>
@@ -36,25 +46,16 @@ const Header = ({ autoplayEnabled, setAutoplayEnabled }) => {
                 </button>
 
                 {/* Title */}
-                <h2 className="text-celebration-charcoal text-lg lg:text-xl font-bold tracking-tight">
+                <h2 className="text-celebration-charcoal text-lg md:text-xl font-bold leading-tight tracking-tight text-center">
                     For Your 40th
                 </h2>
 
                 {/* Continuous Play Button */}
                 <button
                     onClick={() => setAutoplayEnabled(!autoplayEnabled)}
-                    className={`
-                        flex items-center gap-2 px-4 py-2 rounded-full
-                        transition-all shadow-lg
-                        ${autoplayEnabled
-                            ? 'bg-gradient-to-r from-rose-gold-300 to-rose-gold-500 text-white shadow-rose-gold-500/20'
-                            : 'bg-rose-gold-100 text-rose-gold-600 hover:bg-rose-gold-200'
-                        }
-                    `}
+                    className="flex items-center gap-2 bg-gradient-to-r from-rose-gold-400 to-rose-gold-600 text-white px-4 py-2 rounded-full hover:shadow-lg shadow-md shadow-rose-gold-500/20 hover:shadow-rose-gold-500/30 transition-all"
                 >
-                    <span className="material-symbols-outlined text-sm">
-                        {autoplayEnabled ? 'pause' : 'play_arrow'}
-                    </span>
+                    <span className="material-symbols-outlined text-sm">play_arrow</span>
                     <span className="text-sm font-bold tracking-wide">Continuous Play</span>
                 </button>
             </div>
