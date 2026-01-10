@@ -39,7 +39,7 @@ const Header = ({ autoplayEnabled, setAutoplayEnabled, title = "Birthday Dedicat
                     className="flex items-center gap-2 text-rose-gold-600 hover:text-rose-gold-700 transition-colors focus:outline-none focus:ring-2 focus:ring-rose-gold-400 focus:ring-offset-2 rounded-lg px-2 py-1"
                     aria-label="Back to top"
                 >
-                    <span className="material-symbols-outlined">chevron_left</span>
+                    <span className="material-symbols-outlined" aria-hidden="true">chevron_left</span>
                     <span className="font-medium">Back to Top</span>
                 </button>
 
@@ -52,8 +52,10 @@ const Header = ({ autoplayEnabled, setAutoplayEnabled, title = "Birthday Dedicat
                 <button
                     onClick={() => setAutoplayEnabled(!autoplayEnabled)}
                     className="flex items-center gap-2 bg-gradient-to-r from-rose-gold-400 to-rose-gold-600 text-white px-4 py-2 rounded-full hover:shadow-lg shadow-md shadow-rose-gold-500/20 hover:shadow-rose-gold-500/30 transition-all"
+                    aria-label={autoplayEnabled ? 'Disable continuous play' : 'Enable continuous play'}
+                    aria-pressed={autoplayEnabled}
                 >
-                    <span className="material-symbols-outlined text-sm">play_arrow</span>
+                    <span className="material-symbols-outlined text-sm" aria-hidden="true">play_arrow</span>
                     <span className="text-sm font-bold tracking-wide">Continuous Play</span>
                 </button>
             </div>

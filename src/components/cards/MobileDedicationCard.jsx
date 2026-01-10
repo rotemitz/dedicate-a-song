@@ -55,10 +55,23 @@ const MobileDedicationCard = ({
         }
     };
 
+    const handleKeyDown = (e) => {
+        // Trigger play on Enter or Space
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            handleCardClick(e);
+        }
+    };
+
     return (
         <motion.div
             layoutId={layoutId}
             onClick={handleCardClick}
+            onKeyDown={handleKeyDown}
+            tabIndex={0}
+            role="button"
+            aria-label={`${isInlinePlaying ? 'Pause' : 'Play'} dedication from ${dedication.name}${dedication.song ? ` - ${dedication.song.title}` : ''}`}
+            aria-pressed={isInlinePlaying}
             className={`
                 bg-white rounded-[40px] cursor-pointer transition-all duration-300
                 ${(isNowPlaying || isInlinePlaying)
@@ -205,8 +218,9 @@ const MobileDedicationCard = ({
                                             onOpenFullView();
                                         }}
                                         className="inline-flex px-4 py-2 bg-gradient-to-r from-rose-gold-400 to-rose-gold-500 text-white rounded-full text-[10px] font-bold tracking-wide hover:shadow-md transition-all items-center justify-center gap-1.5"
+                                        aria-label={`Open full player for ${dedication.name}'s dedication`}
                                     >
-                                        <span className="material-symbols-outlined text-xs">fullscreen</span>
+                                        <span className="material-symbols-outlined text-xs" aria-hidden="true">fullscreen</span>
                                         Open Full View
                                     </button>
                                 </div>

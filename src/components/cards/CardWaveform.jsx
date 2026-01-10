@@ -35,7 +35,8 @@ const CardWaveform = ({ isPlaying = false }) => {
                             animation: `card-waveform-bar-${i} ${params.duration}s ease-in-out infinite`,
                             animationDelay: `${i * 0.05}s`,
                             animationPlayState: isPlaying ? 'running' : 'paused',
-                            transition: 'opacity 0.3s ease'
+                            transition: 'opacity 0.3s ease',
+                            willChange: isPlaying ? 'height' : 'auto'
                         }}
                     />
                 ))}

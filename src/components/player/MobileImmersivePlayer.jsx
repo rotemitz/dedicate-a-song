@@ -374,16 +374,27 @@ const MobileImmersivePlayer = ({
         }
     }, [mode, isPlaying, dedication]);
 
-    // Progress loop
+    // Progress tracking with events (more efficient than polling)
     useEffect(() => {
-        const interval = setInterval(() => {
-            const activeRef = getActiveRef();
-            if (activeRef) {
-                setProgress(activeRef.currentTime || 0);
-                setDuration(activeRef.duration || 0);
-            }
-        }, 100);
-        return () => clearInterval(interval);
+        const activeRef = getActiveRef();
+        if (!activeRef) return;
+
+        const updateProgress = () => {
+            setProgress(activeRef.currentTime || 0);
+            setDuration(activeRef.duration || 0);
+        };
+
+        // Update on time change and when metadata loads
+        activeRef.addEventListener('timeupdate', updateProgress);
+        activeRef.addEventListener('loadedmetadata', updateProgress);
+
+        // Initial update
+        updateProgress();
+
+        return () => {
+            activeRef.removeEventListener('timeupdate', updateProgress);
+            activeRef.removeEventListener('loadedmetadata', updateProgress);
+        };
     }, [mode, dedication]);
 
     const handleGreetingEnded = () => {

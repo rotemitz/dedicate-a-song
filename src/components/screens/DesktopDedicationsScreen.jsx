@@ -13,7 +13,17 @@ const DesktopDedicationsScreen = ({
     onCardClick,
     onClosePlayer,
     onNext,
-    onPrevious
+    onPrevious,
+    // Inline play props
+    inlinePlayingIndex,
+    inlineProgress,
+    inlineDuration,
+    inlineIsPlaying,
+    inlinePhase,
+    onInlinePlay,
+    onInlinePause,
+    onInlineSkip,
+    onOpenFullView
 }) => {
     return (
         <section id="dedications-screen" className="min-h-screen w-full bg-celebration-cream">
@@ -61,6 +71,14 @@ const DesktopDedicationsScreen = ({
                                 activeMediaType={null}
                                 onPlay={() => onCardClick(index)}
                                 onMediaEnded={() => { }}
+                                // Inline play props
+                                isInlinePlaying={inlinePlayingIndex === index}
+                                inlineProgress={inlineProgress}
+                                inlineDuration={inlineDuration}
+                                inlinePhase={inlinePhase}
+                                onInlinePlay={() => onInlinePlay(index)}
+                                onInlinePause={onInlinePause}
+                                onOpenFullView={() => onOpenFullView(index)}
                             />
                         </div>
                     ))}

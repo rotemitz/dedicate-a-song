@@ -48,9 +48,22 @@ const DesktopDedicationCard = ({
         }
     };
 
+    const handleKeyDown = (e) => {
+        // Trigger play on Enter or Space
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            handleCardClick(e);
+        }
+    };
+
     return (
         <div
             onClick={handleCardClick}
+            onKeyDown={handleKeyDown}
+            tabIndex={0}
+            role="button"
+            aria-label={`${isInlinePlaying ? 'Pause' : 'Play'} dedication from ${dedication.name}${dedication.song ? ` - ${dedication.song.title}` : ''}`}
+            aria-pressed={isInlinePlaying}
             className={`
                 bg-white p-6 rounded-xl cursor-pointer transition-all duration-300
                 ${(isNowPlaying || isInlinePlaying)
@@ -196,8 +209,9 @@ const DesktopDedicationCard = ({
                                         onOpenFullView();
                                     }}
                                     className="w-full px-4 py-3 bg-gradient-to-r from-rose-gold-400 to-rose-gold-500 text-white rounded-full text-sm font-bold tracking-wide hover:shadow-md transition-all flex items-center justify-center gap-2"
+                                    aria-label={`Open full player for ${dedication.name}'s dedication`}
                                 >
-                                    <span className="material-symbols-outlined text-base">fullscreen</span>
+                                    <span className="material-symbols-outlined text-base" aria-hidden="true">fullscreen</span>
                                     Open Full View
                                 </button>
                             )}

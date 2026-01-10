@@ -45,16 +45,18 @@ export const NowPlayingBar = ({ dedication, isPlaying = true, onOpen, onPlayPaus
                 <button
                     className="w-9 h-9 flex items-center justify-center text-rose-gold-500 hover:text-rose-gold-600 transition-colors"
                     onClick={(e) => { e.stopPropagation(); onPlayPause?.(); }}
+                    aria-label={isPlaying ? 'Pause' : 'Play'}
                 >
-                    <span className="material-symbols-outlined text-2xl">
+                    <span className="material-symbols-outlined text-2xl" aria-hidden="true">
                         {isPlaying ? 'pause' : 'play_arrow'}
                     </span>
                 </button>
                 <button
                     className="w-9 h-9 flex items-center justify-center text-rose-gold-500 hover:text-rose-gold-600 transition-colors"
                     onClick={(e) => { e.stopPropagation(); onSkip?.(); }}
+                    aria-label="Skip to next dedication"
                 >
-                    <span className="material-symbols-outlined text-2xl">skip_next</span>
+                    <span className="material-symbols-outlined text-2xl" aria-hidden="true">skip_next</span>
                 </button>
             </div>
         </motion.div>

@@ -88,6 +88,7 @@ const DedicationCard = ({
                     isInlinePlaying={isInlinePlaying}
                     inlineProgress={inlineProgress}
                     inlineDuration={inlineDuration}
+                    inlinePhase={inlinePhase}
                     onInlinePlay={onInlinePlay}
                     onInlinePause={onInlinePause}
                     onOpenFullView={onOpenFullView}

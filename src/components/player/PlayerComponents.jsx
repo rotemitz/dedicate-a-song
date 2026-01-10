@@ -68,7 +68,8 @@ export const WaveformVisualizer = ({ isPlaying, barCount = 16 }) => {
                                 ? `waveform-bar-${i} ${params.duration}s ease-in-out infinite`
                                 : 'none',
                             animationDelay: `${i * 0.05}s`,
-                            transition: 'opacity 0.3s ease'
+                            transition: 'opacity 0.3s ease',
+                            willChange: isPlaying ? 'height' : 'auto'
                         }}
                     />
                 ))}

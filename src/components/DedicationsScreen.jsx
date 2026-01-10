@@ -232,6 +232,15 @@ const DedicationsScreen = ({ dedications }) => {
 
     return (
         <>
+            {/* ARIA live region for screen reader announcements */}
+            <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">
+                {inlinePlayingIndex >= 0 && dedications[inlinePlayingIndex] && (
+                    inlineIsPlaying
+                        ? `Now playing ${inlinePhase === 'greeting' ? 'dedication' : 'song'} from ${dedications[inlinePlayingIndex].name}${inlinePhase === 'song' && dedications[inlinePlayingIndex].song ? ` - ${dedications[inlinePlayingIndex].song.title}` : ''}`
+                        : `Paused`
+                )}
+            </div>
+
             {/* Hidden audio element for inline playback */}
             <audio ref={inlineAudioRef} />
 

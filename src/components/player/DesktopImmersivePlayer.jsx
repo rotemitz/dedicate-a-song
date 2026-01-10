@@ -320,23 +320,34 @@ const DesktopImmersivePlayer = ({
         }
     }, [mode, isPlaying, dedication, volume]);
 
-    // Progress loop
+    // Progress tracking with events (more efficient than polling)
     useEffect(() => {
-        const interval = setInterval(() => {
-            let activeRef = null;
-            if (mode === 'greeting') {
-                if (dedication.video_message) activeRef = videoRef.current;
-                else if (dedication.voice_message) activeRef = audioRef.current;
-            } else {
-                if (dedication.song?.local_file) activeRef = songRef.current;
-            }
+        let activeRef = null;
+        if (mode === 'greeting') {
+            if (dedication.video_message) activeRef = videoRef.current;
+            else if (dedication.voice_message) activeRef = audioRef.current;
+        } else {
+            if (dedication.song?.local_file) activeRef = songRef.current;
+        }
 
-            if (activeRef) {
-                setProgress(activeRef.currentTime || 0);
-                setDuration(activeRef.duration || 0);
-            }
-        }, 100);
-        return () => clearInterval(interval);
+        if (!activeRef) return;
+
+        const updateProgress = () => {
+            setProgress(activeRef.currentTime || 0);
+            setDuration(activeRef.duration || 0);
+        };
+
+        // Update on time change and when metadata loads
+        activeRef.addEventListener('timeupdate', updateProgress);
+        activeRef.addEventListener('loadedmetadata', updateProgress);
+
+        // Initial update
+        updateProgress();
+
+        return () => {
+            activeRef.removeEventListener('timeupdate', updateProgress);
+            activeRef.removeEventListener('loadedmetadata', updateProgress);
+        };
     }, [mode, dedication]);
 
     // Volume sync
