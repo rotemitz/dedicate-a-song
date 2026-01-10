@@ -137,7 +137,7 @@ const SongPhaseView = ({
         animate="animate"
         exit="exit"
         transition={{ duration: 0.4 }}
-        className="flex-1 flex flex-col items-center justify-center px-6"
+        className="flex-1 flex flex-col items-center justify-center px-6 gap-4"
     >
         {/* Header */}
         <div className="text-center">
@@ -150,7 +150,7 @@ const SongPhaseView = ({
         </div>
 
         {/* Hero Vinyl */}
-        <div className="my-6 flex flex-col items-center">
+        <div className="my-8 flex flex-col items-center">
             <VinylRecord
                 albumArt={dedication.song?.album_art || dedication.photo}
                 songTitle={dedication.song?.title}
@@ -161,8 +161,8 @@ const SongPhaseView = ({
         </div>
 
         {/* Song Info */}
-        <div className="text-center mb-4">
-            <h2 className="text-3xl font-serif text-celebration-charcoal mb-1">
+        <div className="text-center mb-6">
+            <h2 className="text-3xl font-serif text-celebration-charcoal mb-2">
                 {dedication.song?.title}
             </h2>
             <p className="text-lg text-rose-gold-600 font-sans">
@@ -170,12 +170,15 @@ const SongPhaseView = ({
             </p>
         </div>
 
-        {/* Play/Pause Button */}
-        <PrimaryActionButton onClick={onTogglePlay}>
-            <span className="material-symbols-outlined !text-4xl" style={{ fontVariationSettings: "'FILL' 1" }}>
-                {isPlaying ? 'pause' : 'play_arrow'}
-            </span>
-        </PrimaryActionButton>
+        {/* Controls */}
+        <div className="flex flex-col items-center gap-6">
+            {/* Play/Pause Button */}
+            <PrimaryActionButton onClick={onTogglePlay}>
+                <span className="material-symbols-outlined !text-4xl" style={{ fontVariationSettings: "'FILL' 1" }}>
+                    {isPlaying ? 'pause' : 'play_arrow'}
+                </span>
+            </PrimaryActionButton>
+        </div>
 
         {/* Timeline */}
         <div className="w-full mt-8">
