@@ -66,6 +66,20 @@
                 "local_file": "songs/keren.mp3",
                 "album_art": "songs/keren.png"
             }
+        },
+        {
+            "id": 6,
+            "name": "רותם שובל",
+            "photo": "assets/images/rotem-shoval.jpeg",
+            "voice_message": null,
+            "video_message": "assets/videos/rotem-shoval.mp4",
+            "song": {
+                "title": "מה שאת אוהבת",
+                "artist": "גלי עטרי",
+                "spotify_url": "https://open.spotify.com/track/1Pgu858j6xB8mkKbQjODom?si=d1458a6caf614088",
+                "local_file": "songs/rotem-shoval.mp3",
+                "album_art": "songs/rotem-shoval.png"
+            }
         }
     ]
 }
