@@ -42,7 +42,7 @@ const VoicePhaseView = ({
         animate="animate"
         exit="exit"
         transition={{ duration: 0.4 }}
-        className="flex-1 flex flex-col items-center justify-center px-6"
+        className="flex-1 flex flex-col items-center justify-center px-6 gap-4"
     >
         {/* Header */}
         <div className="text-center">
@@ -84,7 +84,7 @@ const VoicePhaseView = ({
         </div>
 
         {/* Controls */}
-        <div className="flex flex-col items-center gap-4">
+        <div className="flex flex-col items-center gap-6">
             {/* Play/Pause Button */}
             <PrimaryActionButton onClick={onTogglePlay}>
                 <span className="material-symbols-outlined !text-4xl" style={{ fontVariationSettings: "'FILL' 1" }}>
@@ -105,12 +105,14 @@ const VoicePhaseView = ({
                     </PrimaryActionButton>
                 </motion.div>
             )}
+
+            {/* Timeline */}
+            <div className="w-full mt-8">
+                <TimelineSlider progress={progress} duration={duration} onSeek={onSeek} />
+            </div>
         </div>
 
-        {/* Timeline */}
-        <div className="w-full mt-8">
-            <TimelineSlider progress={progress} duration={duration} onSeek={onSeek} />
-        </div>
+
     </motion.div>
 );
 

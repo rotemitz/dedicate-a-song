@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { WaveformVisualizer } from './PlayerComponents';
 
 // Helper function
 const formatTime = (time) => {
@@ -127,18 +128,7 @@ const GreetingCard = ({
                         />
                     </div>
                     {/* Waveform visualization */}
-                    <div className="flex items-center justify-center gap-1 h-12">
-                        {[...Array(16)].map((_, i) => (
-                            <div
-                                key={i}
-                                className={`w-1 rounded-full bg-gradient-to-t from-[#D4907B] to-[#E5B2A3] ${isPlaying && isGreeting ? 'animate-pulse' : 'opacity-30'}`}
-                                style={{
-                                    height: Math.random() * 24 + 12 + 'px',
-                                    animationDelay: i * 0.08 + 's'
-                                }}
-                            />
-                        ))}
-                    </div>
+                    <WaveformVisualizer isPlaying={isPlaying} barCount={16} />
                     <audio ref={audioRef} src={dedication.voice_message} onEnded={onEnded} />
                     {/* Clickable overlay for play */}
                     {!isPlaying && (

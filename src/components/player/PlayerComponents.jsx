@@ -32,27 +32,50 @@ export const SegmentProgressBar = ({ current, total, progress, duration }) => {
 
 // ============================================
 // WAVEFORM VISUALIZER (Voice Phase)
+// Uses CSS animations for dynamic height animation
 // ============================================
-export const WaveformVisualizer = ({ isPlaying, barCount = 16 }) => (
-    <div className="h-20 flex items-center justify-center gap-1">
-        {[...Array(barCount)].map((_, i) => (
-            <motion.div
-                key={i}
-                className="w-1.5 rounded-full bg-rose-gold-300"
-                initial={{ height: 12 }}
-                animate={{
-                    height: isPlaying ? [12, 24 + Math.random() * 40, 12] : 12,
-                }}
-                transition={{
-                    duration: 0.6,
-                    repeat: isPlaying ? Infinity : 0,
-                    delay: i * 0.05,
-                    ease: "easeInOut"
-                }}
-            />
-        ))}
-    </div>
-);
+export const WaveformVisualizer = ({ isPlaying, barCount = 16 }) => {
+    // Generate unique random animation parameters for each bar
+    const barParams = React.useMemo(
+        () => [...Array(barCount)].map(() => ({
+            minHeight: Math.random() * 8 + 8,    // 8-16px min
+            maxHeight: Math.random() * 16 + 24,  // 24-40px max
+            duration: 0.3 + Math.random() * 0.4, // 0.3-0.7s duration
+        })),
+        [barCount]
+    );
+
+    return (
+        <>
+            {/* Inject keyframes dynamically */}
+            <style>
+                {barParams.map((params, i) => `
+                    @keyframes waveform-bar-${i} {
+                        0%, 100% { height: ${params.minHeight}px; }
+                        50% { height: ${params.maxHeight}px; }
+                    }
+                `).join('\n')}
+            </style>
+            <div className="flex items-center justify-center gap-1 h-12">
+                {barParams.map((params, i) => (
+                    <div
+                        key={i}
+                        className="w-1 rounded-full bg-gradient-to-t from-rose-gold-500 to-rose-gold-300"
+                        style={{
+                            height: isPlaying ? undefined : `${(params.minHeight + params.maxHeight) / 2}px`,
+                            opacity: isPlaying ? 1 : 0.3,
+                            animation: isPlaying
+                                ? `waveform-bar-${i} ${params.duration}s ease-in-out infinite`
+                                : 'none',
+                            animationDelay: `${i * 0.05}s`,
+                            transition: 'opacity 0.3s ease'
+                        }}
+                    />
+                ))}
+            </div>
+        </>
+    );
+};
 
 // ============================================
 // VINYL RECORD (Song Phase)
