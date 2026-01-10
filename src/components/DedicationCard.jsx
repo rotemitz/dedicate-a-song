@@ -27,10 +27,20 @@ const DedicationCard = ({
         }
 
         // If we ARE now playing, check what part should play
-        if (activeMediaType === 'greeting' && greetingRef.current) {
-            greetingRef.current.play().catch(e => console.log('Autoplay prevented:', e));
-        } else if (activeMediaType === 'song' && audioRef.current) {
-            audioRef.current.play().catch(e => console.log('Autoplay prevented:', e));
+        if (activeMediaType === 'greeting') {
+            if (greetingRef.current) greetingRef.current.play().catch(e => console.log('Autoplay prevented:', e));
+            // Stop song
+            if (audioRef.current) {
+                audioRef.current.pause();
+                audioRef.current.currentTime = 0;
+            }
+        } else if (activeMediaType === 'song') {
+            if (audioRef.current) audioRef.current.play().catch(e => console.log('Autoplay prevented:', e));
+            // Stop greeting
+            if (greetingRef.current) {
+                greetingRef.current.pause();
+                greetingRef.current.currentTime = 0;
+            }
         }
 
     }, [isNowPlaying, activeMediaType]);
