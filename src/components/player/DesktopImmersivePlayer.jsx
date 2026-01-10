@@ -21,8 +21,7 @@ const DesktopSegmentBar = ({ current, total, progress, duration }) => {
             {Array.from({ length: total }).map((_, i) => (
                 <div
                     key={i}
-                    className="h-1.5 flex-1 rounded-full overflow-hidden"
-                    className="bg-rose-gold-200/30"
+                    className="h-1.5 flex-1 rounded-full overflow-hidden bg-rose-gold-200/30"
                 >
                     {i < current ? (
                         // Completed segments
@@ -366,7 +365,10 @@ const DesktopImmersivePlayer = ({
 
     return (
         <div
-            className="fixed inset-0 z-[2000] flex flex-col overflow-hidden font-sans bg-gradient-to-b from-celebration-cream to-rose-gold-100"
+            className="fixed inset-0 z-[2000] flex flex-col overflow-hidden font-sans"
+            style={{
+                background: 'linear-gradient(180deg, #FDF8F2 0%, #F4E4E0 100%)'
+            }}
         >
             {/* Header */}
             <DesktopHeader
