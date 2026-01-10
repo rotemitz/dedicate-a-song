@@ -42,10 +42,10 @@ const VoicePhaseView = ({
         animate="animate"
         exit="exit"
         transition={{ duration: 0.4 }}
-        className="flex-1 flex flex-col items-center"
+        className="flex-1 flex flex-col items-center justify-center px-6"
     >
         {/* Header */}
-        <div className="text-center mt-10">
+        <div className="text-center">
             <p className="text-sm uppercase tracking-widest text-rose-gold-500 font-medium mb-2">
                 Voice Dedication
             </p>
@@ -55,7 +55,7 @@ const VoicePhaseView = ({
         </div>
 
         {/* Hero Profile */}
-        <div className="my-12 flex flex-col items-center">
+        <div className="my-8 flex flex-col items-center">
             <motion.div
                 className={`w-64 h-64 rounded-full overflow-hidden border-4 border-white shadow-floating ${isPlaying ? 'animate-soft-pulse' : ''}`}
                 initial={{ scale: 0.9, opacity: 0 }}
@@ -78,35 +78,37 @@ const VoicePhaseView = ({
             </motion.div>
 
             {/* Waveform */}
-            <div className="mt-8">
+            <div className="mt-6">
                 <WaveformVisualizer isPlaying={isPlaying} barCount={16} />
             </div>
         </div>
 
-        {/* Play/Pause Button */}
-        <PrimaryActionButton onClick={onTogglePlay}>
-            <span className="material-symbols-outlined !text-4xl" style={{ fontVariationSettings: "'FILL' 1" }}>
-                {isPlaying ? 'pause' : 'play_arrow'}
-            </span>
-        </PrimaryActionButton>
+        {/* Controls */}
+        <div className="flex flex-col items-center gap-4">
+            {/* Play/Pause Button */}
+            <PrimaryActionButton onClick={onTogglePlay}>
+                <span className="material-symbols-outlined !text-4xl" style={{ fontVariationSettings: "'FILL' 1" }}>
+                    {isPlaying ? 'pause' : 'play_arrow'}
+                </span>
+            </PrimaryActionButton>
 
-        {/* Skip to Song Button */}
-        {dedication.song?.local_file && (
-            <motion.div
-                className="mt-6"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.5 }}
-            >
-                <PrimaryActionButton variant="skip" onClick={onSkipToSong}>
-                    <span className="material-symbols-outlined !text-xl">skip_next</span>
-                    Skip to Song
-                </PrimaryActionButton>
-            </motion.div>
-        )}
+            {/* Skip to Song Button */}
+            {dedication.song?.local_file && (
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.5 }}
+                >
+                    <PrimaryActionButton variant="skip" onClick={onSkipToSong}>
+                        <span className="material-symbols-outlined !text-xl">skip_next</span>
+                        Skip to Song
+                    </PrimaryActionButton>
+                </motion.div>
+            )}
+        </div>
 
         {/* Timeline */}
-        <div className="w-full mt-auto mb-6">
+        <div className="w-full mt-8">
             <TimelineSlider progress={progress} duration={duration} onSeek={onSeek} />
         </div>
     </motion.div>
@@ -130,10 +132,10 @@ const SongPhaseView = ({
         animate="animate"
         exit="exit"
         transition={{ duration: 0.4 }}
-        className="flex-1 flex flex-col items-center"
+        className="flex-1 flex flex-col items-center justify-center px-6"
     >
         {/* Header */}
-        <div className="text-center mt-8">
+        <div className="text-center">
             <p className="text-sm uppercase tracking-widest text-rose-gold-500 font-medium mb-2">
                 40th Birthday
             </p>
@@ -143,7 +145,7 @@ const SongPhaseView = ({
         </div>
 
         {/* Hero Vinyl */}
-        <div className="my-8 flex flex-col items-center">
+        <div className="my-6 flex flex-col items-center">
             <VinylRecord
                 albumArt={dedication.song?.album_art || dedication.photo}
                 isPlaying={isPlaying}
@@ -152,7 +154,7 @@ const SongPhaseView = ({
         </div>
 
         {/* Song Info */}
-        <div className="text-center mb-6">
+        <div className="text-center mb-4">
             <h2 className="text-3xl font-serif text-celebration-charcoal mb-1">
                 {dedication.song?.title}
             </h2>
@@ -169,7 +171,7 @@ const SongPhaseView = ({
         </PrimaryActionButton>
 
         {/* Timeline */}
-        <div className="w-full mt-auto mb-6">
+        <div className="w-full mt-8">
             <TimelineSlider progress={progress} duration={duration} onSeek={onSeek} />
         </div>
     </motion.div>
@@ -297,6 +299,7 @@ const MobileImmersivePlayer = ({
             animate="animate"
             exit="exit"
             className="fixed inset-0 z-[2000] min-h-screen w-full flex flex-col items-center bg-celebration-cream"
+            style={{ paddingTop: 'max(16px, env(safe-area-inset-top))' }}
         >
             {/* Segment Progress Bar */}
             <SegmentProgressBar
