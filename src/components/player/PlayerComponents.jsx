@@ -177,6 +177,146 @@ export const VinylRecord = ({ albumArt, isPlaying, songTitle, size = 'w-72 h-72'
 };
 
 // ============================================
+// INTERACTIVE PROGRESS BAR
+// Reusable component with tap-to-seek and drag-to-scrub functionality
+// ============================================
+export const InteractiveProgressBar = ({
+    progress,
+    duration,
+    onSeek,
+    height = 'h-1',
+    showThumb = true,
+    className = ''
+}) => {
+    const [isDragging, setIsDragging] = React.useState(false);
+    const [hoverPosition, setHoverPosition] = React.useState(null);
+    const barRef = React.useRef(null);
+
+    const percentage = duration > 0 ? (progress / duration) * 100 : 0;
+
+    const calculateTimeFromPosition = (clientX) => {
+        if (!barRef.current) return 0;
+        const rect = barRef.current.getBoundingClientRect();
+        const position = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+        return position * duration;
+    };
+
+    const handleSeek = (clientX) => {
+        const time = calculateTimeFromPosition(clientX);
+        onSeek?.(time);
+    };
+
+    const handleMouseDown = (e) => {
+        setIsDragging(true);
+        handleSeek(e.clientX);
+    };
+
+    const handleMouseMove = (e) => {
+        if (isDragging) {
+            handleSeek(e.clientX);
+        }
+        // Update hover position for preview
+        if (barRef.current && !isDragging) {
+            const rect = barRef.current.getBoundingClientRect();
+            const position = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+            setHoverPosition(position);
+        }
+    };
+
+    const handleMouseUp = () => {
+        setIsDragging(false);
+    };
+
+    const handleMouseLeave = () => {
+        setHoverPosition(null);
+    };
+
+    const handleClick = (e) => {
+        if (!isDragging) {
+            handleSeek(e.clientX);
+        }
+    };
+
+    // Touch event handlers
+    const handleTouchStart = (e) => {
+        setIsDragging(true);
+        const touch = e.touches[0];
+        handleSeek(touch.clientX);
+    };
+
+    const handleTouchMove = (e) => {
+        if (isDragging) {
+            const touch = e.touches[0];
+            handleSeek(touch.clientX);
+        }
+    };
+
+    const handleTouchEnd = () => {
+        setIsDragging(false);
+    };
+
+    // Global mouse up listener when dragging
+    React.useEffect(() => {
+        if (isDragging) {
+            const handleGlobalMouseMove = (e) => handleSeek(e.clientX);
+            const handleGlobalMouseUp = () => setIsDragging(false);
+
+            window.addEventListener('mousemove', handleGlobalMouseMove);
+            window.addEventListener('mouseup', handleGlobalMouseUp);
+
+            return () => {
+                window.removeEventListener('mousemove', handleGlobalMouseMove);
+                window.removeEventListener('mouseup', handleGlobalMouseUp);
+            };
+        }
+    }, [isDragging, duration]);
+
+    return (
+        <div
+            ref={barRef}
+            className={`relative w-full ${height} bg-rose-gold-100 rounded-full cursor-pointer ${className}`}
+            onMouseDown={handleMouseDown}
+            onMouseMove={handleMouseMove}
+            onMouseUp={handleMouseUp}
+            onMouseLeave={handleMouseLeave}
+            onClick={handleClick}
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
+            role="slider"
+            aria-valuemin={0}
+            aria-valuemax={duration}
+            aria-valuenow={progress}
+            tabIndex={0}
+        >
+            {/* Filled portion */}
+            <div
+                className="absolute left-0 top-0 h-full bg-rose-gold-500 rounded-full transition-all duration-75"
+                style={{ width: `${percentage}%` }}
+            />
+
+            {/* Hover preview indicator */}
+            {hoverPosition !== null && !isDragging && (
+                <div
+                    className="absolute top-1/2 -translate-y-1/2 w-0.5 h-4 bg-rose-gold-300 opacity-50"
+                    style={{ left: `${hoverPosition * 100}%` }}
+                />
+            )}
+
+            {/* Draggable thumb */}
+            {showThumb && (
+                <div
+                    className={`absolute top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-white border-2 border-rose-gold-500 shadow-md transition-transform ${
+                        isDragging ? 'scale-125' : 'scale-100'
+                    }`}
+                    style={{ left: `calc(${percentage}% - 8px)` }}
+                />
+            )}
+        </div>
+    );
+};
+
+// ============================================
 // TIMELINE SLIDER
 // ============================================
 export const TimelineSlider = ({ progress, duration, onSeek }) => {
@@ -187,27 +327,15 @@ export const TimelineSlider = ({ progress, duration, onSeek }) => {
         return `${min}:${sec < 10 ? '0' + sec : sec}`;
     };
 
-    const percentage = duration > 0 ? (progress / duration) * 100 : 0;
-
     return (
         <div className="w-full px-6">
-            <div
-                className="relative w-full h-1 bg-rose-gold-100 rounded-full cursor-pointer"
-                onClick={(e) => {
-                    const rect = e.currentTarget.getBoundingClientRect();
-                    const p = (e.clientX - rect.left) / rect.width;
-                    onSeek(p * duration);
-                }}
-            >
-                <div
-                    className="absolute left-0 top-0 h-full bg-rose-gold-500 rounded-full"
-                    style={{ width: `${percentage}%` }}
-                />
-                <div
-                    className="absolute top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-white border-2 border-rose-gold-500 shadow-md"
-                    style={{ left: `calc(${percentage}% - 8px)` }}
-                />
-            </div>
+            <InteractiveProgressBar
+                progress={progress}
+                duration={duration}
+                onSeek={onSeek}
+                height="h-1"
+                showThumb={true}
+            />
             <div className="flex justify-between mt-2">
                 <span className="text-[10px] text-rose-gold-400">{formatTime(progress)}</span>
                 <span className="text-[10px] text-rose-gold-400">{formatTime(duration)}</span>

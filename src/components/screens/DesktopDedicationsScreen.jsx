@@ -22,6 +22,7 @@ const DesktopDedicationsScreen = ({
     inlinePhase,
     onInlinePlay,
     onInlinePause,
+    onInlineSeek,
     onInlineSkip,
     onOpenFullView
 }) => {
@@ -79,6 +80,7 @@ const DesktopDedicationsScreen = ({
                                 inlinePhase={inlinePhase}
                                 onInlinePlay={() => onInlinePlay(index)}
                                 onInlinePause={onInlinePause}
+                                onInlineSeek={onInlineSeek}
                                 onOpenFullView={() => onOpenFullView(index)}
                             />
                         </div>

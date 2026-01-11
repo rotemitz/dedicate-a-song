@@ -24,6 +24,7 @@ const MobileDedicationsScreen = ({
     inlinePhase,
     onInlinePlay,
     onInlinePause,
+    onInlineSeek,
     onInlineSkip,
     onOpenFullView
 }) => {
@@ -66,6 +67,7 @@ const MobileDedicationsScreen = ({
                                 inlinePhase={inlinePhase}
                                 onInlinePlay={() => onInlinePlay(index)}
                                 onInlinePause={onInlinePause}
+                                onInlineSeek={onInlineSeek}
                                 onOpenFullView={() => onOpenFullView(index)}
                             />
                         </div>

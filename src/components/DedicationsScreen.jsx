@@ -22,6 +22,7 @@ const DedicationsScreen = ({ dedications }) => {
         loadDedication,
         togglePlay,
         pause,
+        seek,
         skipToSong,
         stop,
         setOnDedicationEnd,
@@ -88,6 +89,14 @@ const DedicationsScreen = ({ dedications }) => {
 
     const handleInlinePause = () => {
         pause();
+    };
+
+    const handleInlineSeek = (time) => {
+        seek(time);
+        // Also seek inline video if in video greeting mode
+        if (inlineVideoRef.current && hasVideoGreeting && isInlineMode) {
+            inlineVideoRef.current.currentTime = time;
+        }
     };
 
     const handleInlineSkip = () => {
@@ -261,6 +270,7 @@ const DedicationsScreen = ({ dedications }) => {
         inlinePhase,
         onInlinePlay: handleInlinePlay,
         onInlinePause: handleInlinePause,
+        onInlineSeek: handleInlineSeek,
         onInlineSkip: handleInlineSkip,
         onOpenFullView: handleOpenFullView
     };

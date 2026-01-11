@@ -2,6 +2,7 @@ import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import CardWaveform from './CardWaveform';
 import { useDedicationDuration } from '../../hooks/useMediaDuration';
+import { InteractiveProgressBar } from '../player/PlayerComponents';
 
 /**
  * Mobile Dedication Card Component
@@ -29,6 +30,7 @@ const MobileDedicationCard = ({
     inlinePhase = 'greeting',
     onInlinePlay,
     onInlinePause,
+    onInlineSeek,
     onOpenFullView
 }) => {
     const hasMedia = dedication.voice_message || dedication.video_message;
@@ -152,7 +154,7 @@ const MobileDedicationCard = ({
                         animate={{ height: 'auto', opacity: 1 }}
                         exit={{ height: 0, opacity: 0 }}
                         transition={{ duration: 0.3, ease: 'easeInOut' }}
-                        className="overflow-hidden inline-controls"
+                        className="overflow-hidden inline-controls px-5"
                     >
                         <div className="mt-4 pt-4 border-t border-rose-gold-100">
                             {/* Info - changes based on phase */}
@@ -194,14 +196,15 @@ const MobileDedicationCard = ({
                             <div className="bg-rose-gold-50/50 rounded-2xl p-3 border border-rose-gold-100/50 mb-3">
                                 <CardWaveform isPlaying={isInlinePlaying} />
 
-                                {/* Progress Bar with Real Progress */}
+                                {/* Interactive Progress Bar with Real Progress */}
                                 <div className="mt-3 space-y-1">
-                                    <div className="w-full h-1.5 bg-rose-gold-200/50 rounded-full overflow-hidden">
-                                        <div
-                                            className="h-full bg-gradient-to-r from-rose-gold-400 to-rose-gold-500 rounded-full transition-all duration-100"
-                                            style={{ width: `${inlineDuration > 0 ? (inlineProgress / inlineDuration) * 100 : 0}%` }}
-                                        />
-                                    </div>
+                                    <InteractiveProgressBar
+                                        progress={inlineProgress}
+                                        duration={inlineDuration}
+                                        onSeek={onInlineSeek}
+                                        height="h-1.5"
+                                        showThumb={false}
+                                    />
                                     <div className="flex justify-between text-[10px] font-bold text-rose-gold-400 tabular-nums">
                                         <span>{formatTime(inlineProgress)}</span>
                                         <span>{formatTime(inlineDuration)}</span>
@@ -211,7 +214,7 @@ const MobileDedicationCard = ({
 
                             {/* Open Full View Button */}
                             {onOpenFullView && (
-                                <div className="flex justify-center py-3">
+                                <div className="flex justify-center pb-1">
                                     <button
                                         onClick={(e) => {
                                             e.stopPropagation();

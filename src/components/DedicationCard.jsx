@@ -22,6 +22,7 @@ const DedicationCard = ({
     inlinePhase,
     onInlinePlay,
     onInlinePause,
+    onInlineSeek,
     onOpenFullView
 }) => {
     const handlePlay = () => {
@@ -41,8 +42,10 @@ const DedicationCard = ({
                     isInlinePlaying={isInlinePlaying}
                     inlineProgress={inlineProgress}
                     inlineDuration={inlineDuration}
+                    inlinePhase={inlinePhase}
                     onInlinePlay={onInlinePlay}
                     onInlinePause={onInlinePause}
+                    onInlineSeek={onInlineSeek}
                     onOpenFullView={onOpenFullView}
                 />
             </div>
@@ -60,6 +63,7 @@ const DedicationCard = ({
                     inlinePhase={inlinePhase}
                     onInlinePlay={onInlinePlay}
                     onInlinePause={onInlinePause}
+                    onInlineSeek={onInlineSeek}
                     onOpenFullView={onOpenFullView}
                 />
             </div>

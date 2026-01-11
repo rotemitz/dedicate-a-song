@@ -1,6 +1,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import CardWaveform from './CardWaveform';
 import { useDedicationDuration } from '../../hooks/useMediaDuration';
+import { InteractiveProgressBar } from '../player/PlayerComponents';
 
 /**
  * Desktop Dedication Card Component
@@ -18,6 +19,7 @@ const DesktopDedicationCard = ({
     inlineDuration = 0,
     inlinePhase = 'greeting',
     onInlinePlay,
+    onInlineSeek,
     onOpenFullView
 }) => {
     const mediaType = dedication.video_message ? 'video' : 'audio';
@@ -178,14 +180,15 @@ const DesktopDedicationCard = ({
                             <div className="bg-rose-gold-50/50 rounded-2xl p-4 border border-rose-gold-100/50 mb-4">
                                 <CardWaveform isPlaying={isInlinePlaying} />
 
-                                {/* Progress Bar with Real Progress */}
+                                {/* Interactive Progress Bar with Real Progress */}
                                 <div className="mt-4 space-y-1.5">
-                                    <div className="w-full h-2 bg-rose-gold-200/50 rounded-full overflow-hidden">
-                                        <div
-                                            className="h-full bg-gradient-to-r from-rose-gold-400 to-rose-gold-500 rounded-full transition-all duration-100"
-                                            style={{ width: `${inlineDuration > 0 ? (inlineProgress / inlineDuration) * 100 : 0}%` }}
-                                        />
-                                    </div>
+                                    <InteractiveProgressBar
+                                        progress={inlineProgress}
+                                        duration={inlineDuration}
+                                        onSeek={onInlineSeek}
+                                        height="h-2"
+                                        showThumb={false}
+                                    />
                                     <div className="flex justify-between text-xs font-bold text-rose-gold-400 tabular-nums">
                                         <span>{formatTime(inlineProgress)}</span>
                                         <span>{formatTime(inlineDuration)}</span>
@@ -195,17 +198,19 @@ const DesktopDedicationCard = ({
 
                             {/* Open Full View Button */}
                             {onOpenFullView && (
-                                <button
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        onOpenFullView();
-                                    }}
-                                    className="w-full px-4 py-3 bg-gradient-to-r from-rose-gold-400 to-rose-gold-500 text-white rounded-full text-sm font-bold tracking-wide hover:shadow-md transition-all flex items-center justify-center gap-2"
-                                    aria-label={`Open full player for ${dedication.name}'s dedication`}
-                                >
-                                    <span className="material-symbols-outlined text-base" aria-hidden="true">fullscreen</span>
-                                    Open Full View
-                                </button>
+                                <div className="pb-2">
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            onOpenFullView();
+                                        }}
+                                        className="w-full px-4 py-3 bg-gradient-to-r from-rose-gold-400 to-rose-gold-500 text-white rounded-full text-sm font-bold tracking-wide hover:shadow-md transition-all flex items-center justify-center gap-2"
+                                        aria-label={`Open full player for ${dedication.name}'s dedication`}
+                                    >
+                                        <span className="material-symbols-outlined text-base" aria-hidden="true">fullscreen</span>
+                                        Open Full View
+                                    </button>
+                                </div>
                             )}
                         </div>
                     </motion.div>
