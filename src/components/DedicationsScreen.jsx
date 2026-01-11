@@ -9,6 +9,7 @@ const DedicationsScreen = ({ dedications }) => {
 
     // Inline video ref for playing video audio in inline mode
     const inlineVideoRef = useRef(null);
+    const previousShowPlayer = useRef(showPlayer);
 
     // Use global audio context
     const {
@@ -206,18 +207,29 @@ const DedicationsScreen = ({ dedications }) => {
     useEffect(() => {
         if (!inlineVideoRef.current || !hasVideoGreeting) return;
 
-        if (showPlayer) {
-            // Opening immersive player - pause inline video
+        // Only act on showPlayer transitions
+        const wasShowingPlayer = previousShowPlayer.current;
+        const isShowingPlayer = showPlayer;
+
+        if (isShowingPlayer && !wasShowingPlayer) {
+            // Transitioning to immersive player - pause inline video
             inlineVideoRef.current.pause();
-        } else if (isInlineMode && currentDedicationIndex >= 0) {
-            // Closing immersive player - resume inline video from current position
+        } else if (!isShowingPlayer && wasShowingPlayer && currentDedicationIndex >= 0) {
+            // Transitioning from immersive to inline - resume inline video
             const video = inlineVideoRef.current;
+            // Set position from global state
             video.currentTime = currentTime;
+            // Resume playback if it was playing
             if (isPlaying) {
                 video.play().catch(e => console.error("Resume inline video error:", e));
             }
         }
-    }, [showPlayer, hasVideoGreeting, isInlineMode, currentTime, isPlaying, currentDedicationIndex]);
+
+        // Update previous state
+        previousShowPlayer.current = showPlayer;
+    // Only depend on showPlayer to avoid running on every currentTime update
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [showPlayer, hasVideoGreeting, currentDedicationIndex]);
 
     // Map global state to props expected by screens
     const inlinePlayingIndex = currentDedicationIndex;
