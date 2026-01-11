@@ -39,7 +39,7 @@ const MobileDedicationsScreen = ({
                     paddingLeft: '24px',
                     paddingRight: '24px',
                     paddingTop: '0px',
-                    paddingBottom: '112px',
+                    paddingBottom: inlinePlayingIndex >= 0 ? '112px' : '24px',
                     ...(showPlayer ? { display: 'none' } : {})
                 }}
             >
