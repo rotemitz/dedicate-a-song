@@ -6,7 +6,7 @@ import { useAudioPlayer } from '../context/AudioContext';
 // Set to true to re-enable inline playback
 const ENABLE_INLINE_PLAYER = false;
 
-const DedicationsScreen = ({ dedications }) => {
+const DedicationsScreen = ({ dedications, onBack }) => {
     const [isMobile, setIsMobile] = useState(false);
     const [showPlayer, setShowPlayer] = useState(false);
 
@@ -268,6 +268,7 @@ const DedicationsScreen = ({ dedications }) => {
         currentCardIndex,
         showPlayer,
         lastPlayedIndex,
+        onBack,
         onCardClick: handleCardClick,
         onNowListeningClick: handleNowListeningClick,
         onNext: handleNext,

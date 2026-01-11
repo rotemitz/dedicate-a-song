@@ -46,6 +46,10 @@ function App() {
     }, 1500);
   };
 
+  const handleBackToWelcome = () => {
+    setShowDedications(false);
+  };
+
   if (loading) {
     return (
       <AudioProvider>
@@ -110,7 +114,7 @@ function App() {
   return (
     <AudioProvider>
       {showDedications ? (
-        <DedicationsScreen dedications={dedications} />
+        <DedicationsScreen dedications={dedications} onBack={handleBackToWelcome} />
       ) : (
         <WelcomeScreen onStart={handleStart} />
       )}

@@ -1,6 +1,7 @@
 import { AnimatePresence } from 'framer-motion';
 import DedicationCard from '../DedicationCard';
 import ImmersivePlayer from '../ImmersivePlayer';
+import Banner from '../Banner';
 import { NowPlayingBar, MobileFooter } from './SharedComponents';
 
 const MobileDedicationsScreen = ({
@@ -8,6 +9,7 @@ const MobileDedicationsScreen = ({
     currentCardIndex,
     showPlayer,
     lastPlayedIndex,
+    onBack,
     onCardClick,
     onNowListeningClick,
     onNext,
@@ -27,13 +29,16 @@ const MobileDedicationsScreen = ({
 }) => {
     return (
         <section id="dedications-screen" className="min-h-screen bg-celebration-cream">
+            {/* Banner - only show when NOT in player mode */}
+            {!showPlayer && <Banner onBack={onBack} />}
+
             {/* Main Content Area */}
             <main
                 className={`${showPlayer ? 'hidden' : ''}`}
                 style={{
                     paddingLeft: '24px',
                     paddingRight: '24px',
-                    paddingTop: '8px',
+                    paddingTop: '0px',
                     paddingBottom: '112px',
                     ...(showPlayer ? { display: 'none' } : {})
                 }}
