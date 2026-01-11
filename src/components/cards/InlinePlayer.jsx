@@ -30,10 +30,15 @@ const InlinePlayer = ({
 
     return (
         <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.3, ease: 'easeInOut' }}
+            initial={{ opacity: 0, scaleY: 0.8 }}
+            animate={{ opacity: 1, scaleY: 1 }}
+            exit={{ opacity: 0, scaleY: 0.9 }}
+            transition={{
+                duration: 0.2,
+                ease: [0.4, 0, 0.2, 1],
+                opacity: { duration: 0.15 }
+            }}
+            style={{ originY: 0, willChange: 'transform, opacity' }}
             className={`overflow-hidden inline-controls ${paddingClass}`}
         >
             <div className="mt-4 pt-4 border-t border-rose-gold-100 flex flex-col gap-4">

@@ -69,12 +69,15 @@ const MobileDedicationCard = ({
     return (
         <motion.div
             layoutId={layoutId}
+            layout
             onClick={handleCardClick}
             onKeyDown={handleKeyDown}
             tabIndex={0}
             role="button"
             aria-label={`${isInlinePlaying ? 'Pause' : 'Play'} dedication from ${dedication.name}${dedication.song ? ` - ${dedication.song.title}` : ''}`}
             aria-pressed={isInlinePlaying}
+            style={{ willChange: 'transform' }}
+            transition={{ layout: { duration: 0.2, ease: [0.4, 0, 0.2, 1] } }}
             className={`
                 bg-white rounded-celebration cursor-pointer transition-all duration-300
                 ${(isNowPlaying || isInlinePlaying)

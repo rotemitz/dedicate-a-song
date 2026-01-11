@@ -57,15 +57,18 @@ const DesktopDedicationCard = ({
     };
 
     return (
-        <div
+        <motion.div
+            layout
             onClick={handleCardClick}
             onKeyDown={handleKeyDown}
             tabIndex={0}
             role="button"
             aria-label={`${isInlinePlaying ? 'Pause' : 'Play'} dedication from ${dedication.name}${dedication.song ? ` - ${dedication.song.title}` : ''}`}
             aria-pressed={isInlinePlaying}
+            style={{ willChange: 'transform' }}
+            transition={{ layout: { duration: 0.2, ease: [0.4, 0, 0.2, 1] } }}
             className={`
-                bg-white p-6 rounded-xl cursor-pointer transition-all duration-300
+                overflow-hidden bg-white p-6 rounded-xl cursor-pointer transition-all duration-300
                 ${(isNowPlaying || isInlinePlaying)
                     ? 'border-2 border-rose-gold-300 shadow-[0_20px_25px_-5px_rgba(151,78,90,0.2)]'
                     : 'border border-rose-gold-100 hover:-translate-y-2 hover:shadow-[0_20px_25px_-5px_rgba(151,78,90,0.2)]'
@@ -146,7 +149,7 @@ const DesktopDedicationCard = ({
                     />
                 )}
             </AnimatePresence>
-        </div>
+        </motion.div>
     );
 };
 

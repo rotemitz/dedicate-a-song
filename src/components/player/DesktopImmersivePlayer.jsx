@@ -80,13 +80,14 @@ const GreetingCard = ({
     <motion.div
         initial={{ y: 50, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.6, ease: "easeOut" }}
-        className="relative flex-1 bg-celebration-charcoal overflow-hidden flex flex-col"
+        transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
         style={{
             borderRadius: '80px',
             boxShadow: '0 20px 50px rgba(0,0,0,0.15)',
-            minHeight: '400px'
+            minHeight: '400px',
+            willChange: 'transform, opacity'
         }}
+        className="relative flex-1 bg-celebration-charcoal overflow-hidden flex flex-col"
     >
         {/* Content Area */}
         <div className="flex-1 relative flex items-center justify-center p-10">
@@ -158,13 +159,14 @@ const VinylCard = ({
     <motion.div
         initial={{ y: 50, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.6, ease: "easeOut", delay: 0.1 }}
-        className="relative flex-1 bg-celebration-cream-light overflow-hidden flex flex-col items-center justify-center"
+        transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1], delay: 0.05 }}
         style={{
             borderRadius: '80px',
             boxShadow: '0 20px 50px rgba(0,0,0,0.08)',
-            minHeight: '400px'
+            minHeight: '400px',
+            willChange: 'transform, opacity'
         }}
+        className="relative flex-1 bg-celebration-cream-light overflow-hidden flex flex-col items-center justify-center"
     >
         {/* Vinyl Record - Clickable for skip/play-pause */}
         <VinylRecord

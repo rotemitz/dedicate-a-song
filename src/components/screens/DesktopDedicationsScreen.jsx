@@ -38,7 +38,7 @@ const DesktopDedicationsScreen = ({
 
             {/* Main Content Area */}
             <main
-                className={`py-12 mx-auto px-12 max-w-[1000px] flex flex-col items-center ${showPlayer ? 'hidden' : ''}`}
+                className={`py-12 mx-auto px-12 max-w-[1300px] xl:max-w-full flex flex-col items-center ${showPlayer ? 'hidden' : ''}`}
             >
                 {/* Desktop Headline Section */}
                 <section className="mb-12">
@@ -54,9 +54,9 @@ const DesktopDedicationsScreen = ({
                 <SectionDivider title="Rose Gold Audio Tracks" />
 
                 {/* Cards Grid */}
-                <div className="grid grid-cols-2 xl:grid-cols-3 gap-8 lg:gap-10">
+                <div className="w-full grid grid-cols-2 xl:grid-cols-3 gap-8 lg:gap-10">
                     {dedications.map((dedication, index) => (
-                        <div id={`card-${index}`} key={dedication.id}>
+                        <div id={`card-${index}`} key={dedication.id} className="min-w-0">
                             <DedicationCard
                                 dedication={dedication}
                                 index={index}

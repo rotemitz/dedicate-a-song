@@ -20,9 +20,9 @@ const pageTransition = {
 };
 
 const contentTransition = {
-    initial: { opacity: 0, y: 20 },
-    animate: { opacity: 1, y: 0 },
-    exit: { opacity: 0, y: -20 }
+    initial: { opacity: 0, y: 20, scale: 0.95 },
+    animate: { opacity: 1, y: 0, scale: 1 },
+    exit: { opacity: 0, y: -20, scale: 0.95 }
 };
 
 // ============================================
@@ -145,7 +145,8 @@ const VoicePhaseView = ({
         initial="initial"
         animate="animate"
         exit="exit"
-        transition={{ duration: 0.4 }}
+        transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
+        style={{ willChange: 'transform, opacity' }}
         className="flex-1 flex flex-col items-center justify-center px-6 gap-4"
     >
         {/* Header */}
@@ -242,7 +243,8 @@ const SongPhaseView = ({
         initial="initial"
         animate="animate"
         exit="exit"
-        transition={{ duration: 0.4 }}
+        transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
+        style={{ willChange: 'transform, opacity' }}
         className="flex-1 flex flex-col items-center justify-center px-6 gap-4"
     >
         {/* Header */}
