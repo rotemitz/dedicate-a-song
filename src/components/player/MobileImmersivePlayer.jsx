@@ -298,13 +298,23 @@ const SongPhaseView = ({
 // ============================================
 // FOOTER NAVIGATION
 // ============================================
-const FooterNavigation = ({ onPrevious, onNext, isGreeting }) => (
-    <div className="w-full px-8 pb-10 flex justify-between">
-        <button onClick={onPrevious} className="text-left">
+const FooterNavigation = ({ onPrevious, onNext, onClose, isGreeting }) => (
+    <div className="w-full px-8 py-6 flex items-center justify-between">
+        <button onClick={onPrevious} className="text-left flex-1">
             <p className="text-[10px] uppercase tracking-tighter text-rose-gold-400">Previous</p>
             <p className="text-sm font-medium text-celebration-charcoal mt-1">Dedication</p>
         </button>
-        <button onClick={onNext} className="text-right">
+
+        {/* Close button - centered */}
+        <button
+            onClick={onClose}
+            className="w-12 h-12 rounded-full bg-white/80 hover:bg-white transition-colors shadow-md mx-4 flex items-center justify-center"
+            aria-label="Close player"
+        >
+            <span className="material-symbols-outlined text-celebration-charcoal leading-none">close</span>
+        </button>
+
+        <button onClick={onNext} className="text-right flex-1">
             <p className="text-[10px] uppercase tracking-tighter text-rose-gold-400">Next</p>
             <p className="text-sm font-medium text-celebration-charcoal mt-1">
                 {isGreeting ? 'Song' : 'Dedication'}
@@ -432,14 +442,6 @@ const MobileImmersivePlayer = ({
                 duration={duration}
             />
 
-            {/* Close Button */}
-            <button
-                className="absolute top-4 right-4 z-50 p-2 rounded-full bg-white/50 hover:bg-white/80 transition-colors shadow-premium"
-                onClick={onClose}
-            >
-                <span className="material-symbols-outlined text-celebration-charcoal">close</span>
-            </button>
-
             {/* Fullscreen Video Player (for video greetings) */}
             {isGreeting && hasVideoGreeting && isVideoFullscreen && (
                 <FullscreenVideoPlayer
@@ -499,6 +501,7 @@ const MobileImmersivePlayer = ({
                     if (isGreeting) handleSkipToSong();
                     else onNext();
                 }}
+                onClose={onClose}
                 isGreeting={isGreeting}
             />
         </motion.div>
