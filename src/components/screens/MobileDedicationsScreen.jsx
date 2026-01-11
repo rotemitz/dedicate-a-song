@@ -60,7 +60,7 @@ const MobileDedicationsScreen = ({
                                 onPlay={() => onCardClick(index)}
                                 onMediaEnded={() => { }}
                                 // Inline play props
-                                isInlinePlaying={inlinePlayingIndex === index}
+                                isInlinePlaying={inlinePlayingIndex === index && inlineIsPlaying}
                                 inlineProgress={inlineProgress}
                                 inlineDuration={inlineDuration}
                                 inlinePhase={inlinePhase}

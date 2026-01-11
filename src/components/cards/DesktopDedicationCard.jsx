@@ -1,4 +1,3 @@
-import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import CardWaveform from './CardWaveform';
 import { useDedicationDuration } from '../../hooks/useMediaDuration';
@@ -19,10 +18,8 @@ const DesktopDedicationCard = ({
     inlineDuration = 0,
     inlinePhase = 'greeting',
     onInlinePlay,
-    onInlinePause,
     onOpenFullView
 }) => {
-    const hasMedia = dedication.voice_message || dedication.video_message;
     const mediaType = dedication.video_message ? 'video' : 'audio';
     const mediaIcon = dedication.video_message ? 'videocam' : 'mic';
     const duration = useDedicationDuration(dedication);

@@ -31,11 +31,13 @@ const CardWaveform = ({ isPlaying = false }) => {
                         key={i}
                         className="w-[3px] rounded-full bg-gradient-to-t from-rose-gold-700 to-rose-gold-500"
                         style={{
+                            height: isPlaying ? undefined : `${(params.minHeight + params.maxHeight) / 2}px`,
                             opacity: isPlaying ? 1 : 0.3,
-                            animation: `card-waveform-bar-${i} ${params.duration}s ease-in-out infinite`,
+                            animation: isPlaying
+                                ? `card-waveform-bar-${i} ${params.duration}s ease-in-out infinite`
+                                : 'none',
                             animationDelay: `${i * 0.05}s`,
-                            animationPlayState: isPlaying ? 'running' : 'paused',
-                            transition: 'opacity 0.3s ease',
+                            transition: 'opacity 0.3s ease, height 0.3s ease',
                             willChange: isPlaying ? 'height' : 'auto'
                         }}
                     />

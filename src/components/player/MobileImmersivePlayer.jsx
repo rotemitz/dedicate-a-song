@@ -360,12 +360,17 @@ const MobileImmersivePlayer = ({
     useEffect(() => {
         if (!videoRef.current || !hasVideoGreeting || !isGreeting) return;
 
+        // Sync video time with global currentTime
+        if (Math.abs(videoRef.current.currentTime - currentTime) > 0.5) {
+            videoRef.current.currentTime = currentTime;
+        }
+
         if (isPlaying) {
             videoRef.current.play().catch(e => console.error("Video play error:", e));
         } else {
             videoRef.current.pause();
         }
-    }, [isPlaying, hasVideoGreeting, isGreeting]);
+    }, [isPlaying, hasVideoGreeting, isGreeting, currentTime]);
 
     // Video progress tracking
     useEffect(() => {

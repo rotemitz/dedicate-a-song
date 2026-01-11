@@ -76,13 +76,10 @@ export const AudioProvider = ({ children }) => {
         // Determine source
         let source = null;
         if (newPhase === 'greeting') {
-            // For video, we don't load into audio element
-            if (dedication.video_message) {
-                source = null; // Video handled separately
-                console.log('[loadDedication] Video greeting - audio element cleared, video will handle playback');
-            } else {
-                source = dedication.voice_message;
-            }
+            // Only load voice messages into audio element
+            // Video messages are handled by video elements (to avoid dual playback)
+            source = dedication.voice_message;
+            console.log('[loadDedication] Greeting source:', source);
         } else {
             source = dedication.song?.local_file;
         }
@@ -104,8 +101,6 @@ export const AudioProvider = ({ children }) => {
                     });
                 }
             }, 50);
-        } else if (!source && newPhase === 'greeting' && dedication.video_message) {
-            console.log('[loadDedication] Video mode - audio cleared, video element should handle playback');
         } else {
             console.log('[loadDedication] No source available');
         }

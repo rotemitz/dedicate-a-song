@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { MobileDedicationsScreen, DesktopDedicationsScreen } from './screens';
 import { useAudioPlayer } from '../context/AudioContext';
 
@@ -6,6 +6,9 @@ const DedicationsScreen = ({ dedications }) => {
     const [isMobile, setIsMobile] = useState(false);
     const [autoplayEnabled, setAutoplayEnabled] = useState(true);
     const [showPlayer, setShowPlayer] = useState(false);
+
+    // Inline video ref for playing video audio in inline mode
+    const inlineVideoRef = useRef(null);
 
     // Use global audio context
     const {
@@ -21,6 +24,8 @@ const DedicationsScreen = ({ dedications }) => {
         skipToSong,
         stop,
         setOnDedicationEnd,
+        setCurrentTime,
+        setDuration,
     } = useAudioPlayer();
 
     // Viewport detection
@@ -138,6 +143,82 @@ const DedicationsScreen = ({ dedications }) => {
         setShowPlayer(false);
     };
 
+    // Inline video management for video greetings
+    const hasVideoGreeting = currentDedication?.video_message && phase === 'greeting';
+    const isInlineMode = !showPlayer && currentDedicationIndex >= 0;
+
+    // Load inline video when dedication changes
+    useEffect(() => {
+        if (!inlineVideoRef.current || !hasVideoGreeting || !isInlineMode) return;
+
+        const video = inlineVideoRef.current;
+        video.src = currentDedication.video_message;
+        video.load();
+
+        if (isPlaying) {
+            video.play().catch(e => console.error("Inline video play error:", e));
+        }
+    }, [currentDedicationIndex, hasVideoGreeting, isInlineMode, currentDedication]);
+
+    // Sync inline video play/pause with global state
+    useEffect(() => {
+        if (!inlineVideoRef.current || !hasVideoGreeting || !isInlineMode) return;
+
+        const video = inlineVideoRef.current;
+        if (isPlaying) {
+            video.play().catch(e => console.error("Inline video play error:", e));
+        } else {
+            video.pause();
+        }
+    }, [isPlaying, hasVideoGreeting, isInlineMode]);
+
+    // Track inline video progress and sync to global state
+    useEffect(() => {
+        if (!inlineVideoRef.current || !hasVideoGreeting || !isInlineMode) return;
+
+        const video = inlineVideoRef.current;
+
+        const handleTimeUpdate = () => {
+            setCurrentTime(video.currentTime);
+        };
+
+        const handleLoadedMetadata = () => {
+            setDuration(video.duration);
+        };
+
+        const handleEnded = () => {
+            // Video greeting ended, skip to song
+            skipToSong();
+        };
+
+        video.addEventListener('timeupdate', handleTimeUpdate);
+        video.addEventListener('loadedmetadata', handleLoadedMetadata);
+        video.addEventListener('ended', handleEnded);
+
+        return () => {
+            video.removeEventListener('timeupdate', handleTimeUpdate);
+            video.removeEventListener('loadedmetadata', handleLoadedMetadata);
+            video.removeEventListener('ended', handleEnded);
+        };
+    }, [hasVideoGreeting, isInlineMode, setCurrentTime, setDuration, skipToSong]);
+
+    // Pause inline video when opening immersive player, resume when closing
+    useEffect(() => {
+        if (!inlineVideoRef.current || !hasVideoGreeting) return;
+
+        if (showPlayer) {
+            // Opening immersive player - pause inline video
+            inlineVideoRef.current.pause();
+        } else if (isInlineMode && currentDedicationIndex >= 0) {
+            // Closing immersive player - resume inline video from current position
+            const video = inlineVideoRef.current;
+            video.currentTime = currentTime;
+            if (isPlaying) {
+                video.play().catch(e => console.error("Resume inline video error:", e));
+            }
+        }
+    }, [showPlayer, hasVideoGreeting, isInlineMode, currentTime, isPlaying, currentDedicationIndex]);
+
     // Map global state to props expected by screens
     const inlinePlayingIndex = currentDedicationIndex;
     const inlineProgress = currentTime;
@@ -174,6 +255,9 @@ const DedicationsScreen = ({ dedications }) => {
 
     return (
         <>
+            {/* Hidden video element for inline video audio playback */}
+            <video ref={inlineVideoRef} className="hidden" playsInline />
+
             {isMobile ? (
                 <MobileDedicationsScreen {...screenProps} />
             ) : (
