@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 
 const Banner = ({ onBack }) => {
     return (
-        <header className="w-full bg-celebration-cream pt-4 pb-6 px-6 md:px-14 md:pt-8 md:pb-10">
+        <header className="w-full bg-celebration-cream pt-4 pb-6 ps-2 pe-8 md:px-14 md:pt-8 md:pb-10">
             <div className="max-w-full mx-auto px-6 md:px-12 relative">
                 {/* Back button - top right */}
                 <motion.button
