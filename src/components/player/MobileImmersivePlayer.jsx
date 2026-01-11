@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     SegmentProgressBar,
@@ -38,91 +38,93 @@ const VideoPhaseView = ({
     onSkipToSong,
     onSeek,
     onEnded
-}) => (
-    <motion.div
-        key="video-phase"
-        variants={contentTransition}
-        initial="initial"
-        animate="animate"
-        exit="exit"
-        transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
-        style={{ willChange: 'transform, opacity' }}
-        className="flex-1 flex flex-col items-center justify-center px-6 gap-4"
-    >
-        {/* Header */}
-        <div className="text-center">
-            <p className="text-sm uppercase tracking-widest text-rose-gold-500 font-medium mb-2">
-                Video Dedication
-            </p>
-            <h1 className="text-2xl font-serif text-celebration-charcoal">
-                A message from <span className="italic">{dedication.name}</span>
-            </h1>
-        </div>
+}) => {
+    const [isPortrait, setIsPortrait] = useState(false);
 
-        {/* Video Card */}
-        <div className="my-6 w-full flex justify-center">
-            <motion.div
-                initial={{ scale: 0.9, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ duration: 0.5 }}
-                className="relative w-[90%] max-w-sm aspect-video rounded-2xl overflow-hidden shadow-floating bg-celebration-charcoal"
-            >
-                <video
-                    ref={videoRef}
-                    src={dedication.video_message}
-                    className="w-full h-full object-cover"
-                    playsInline
-                    muted={false}
-                    onEnded={onEnded}
-                    onClick={onTogglePlay}
-                />
+    const handleLoadedMetadata = () => {
+        if (videoRef.current) {
+            const { videoWidth, videoHeight } = videoRef.current;
+            setIsPortrait(videoHeight > videoWidth);
+        }
+    };
 
-                {/* Play/Pause Overlay (when paused) */}
-                {!isPlaying && (
-                    <div
-                        className="absolute inset-0 flex items-center justify-center bg-black/20 cursor-pointer"
-                        onClick={onTogglePlay}
-                    >
-                        <div className="p-4 rounded-full bg-white/30 backdrop-blur-sm">
-                            <span className="material-symbols-outlined text-white !text-5xl" style={{ fontVariationSettings: "'FILL' 1" }}>
-                                play_arrow
-                            </span>
-                        </div>
-                    </div>
-                )}
-            </motion.div>
-        </div>
-
-        {/* Controls */}
-        <div className="flex flex-col items-center gap-6">
-            {/* Play/Pause Button */}
-            <PrimaryActionButton onClick={onTogglePlay}>
-                <span className="material-symbols-outlined !text-4xl" style={{ fontVariationSettings: "'FILL' 1" }}>
-                    {isPlaying ? 'pause' : 'play_arrow'}
-                </span>
-            </PrimaryActionButton>
-
-            {/* Skip to Song Button */}
-            {dedication.song?.local_file && (
-                <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.5 }}
-                >
-                    <PrimaryActionButton variant="skip" onClick={onSkipToSong}>
-                        <span className="material-symbols-outlined !text-xl">skip_next</span>
-                        Skip to Song
-                    </PrimaryActionButton>
-                </motion.div>
-            )}
-
-            {/* Timeline */}
-            <div className="w-full mt-4">
-                <TimelineSlider progress={progress} duration={duration} onSeek={onSeek} />
+    return (
+        <motion.div
+            key="video-phase"
+            variants={contentTransition}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
+            style={{ willChange: 'transform, opacity' }}
+            className="flex-1 flex flex-col items-center justify-center px-6 gap-4"
+        >
+            {/* Header */}
+            <div className="text-center">
+                <p className="text-sm uppercase tracking-widest text-rose-gold-500 font-medium mb-2">
+                    Video Dedication
+                </p>
+                <h1 className="text-2xl font-serif text-celebration-charcoal">
+                    A message from <span className="italic">{dedication.name}</span>
+                </h1>
             </div>
-        </div>
-    </motion.div>
-);
+
+            {/* Video Card - adapts to portrait or landscape */}
+            <div className="my-6 w-full flex justify-center">
+                <motion.div
+                    initial={{ scale: 0.9, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ duration: 0.5 }}
+                    className={`relative rounded-2xl overflow-hidden shadow-floating bg-celebration-charcoal ${
+                        isPortrait
+                            ? 'w-[55%] max-w-[240px] aspect-[9/16]'
+                            : 'w-[90%] max-w-sm aspect-video'
+                    }`}
+                >
+                    <video
+                        ref={videoRef}
+                        src={dedication.video_message}
+                        className={`w-full h-full object-cover transition-all duration-500 ${!isPlaying ? 'blur-sm' : ''}`}
+                        playsInline
+                        muted={false}
+                        onEnded={onEnded}
+                        onClick={onTogglePlay}
+                        onLoadedMetadata={handleLoadedMetadata}
+                    />
+                </motion.div>
+            </div>
+
+            {/* Controls */}
+            <div className="flex flex-col items-center gap-6">
+                {/* Play/Pause Button */}
+                <PrimaryActionButton onClick={onTogglePlay}>
+                    <span className="material-symbols-outlined !text-4xl" style={{ fontVariationSettings: "'FILL' 1" }}>
+                        {isPlaying ? 'pause' : 'play_arrow'}
+                    </span>
+                </PrimaryActionButton>
+
+                {/* Skip to Song Button */}
+                {dedication.song?.local_file && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 0.5 }}
+                    >
+                        <PrimaryActionButton variant="skip" onClick={onSkipToSong}>
+                            <span className="material-symbols-outlined !text-xl">skip_next</span>
+                            Skip to Song
+                        </PrimaryActionButton>
+                    </motion.div>
+                )}
+
+                {/* Timeline */}
+                <div className="w-full mt-4">
+                    <TimelineSlider progress={progress} duration={duration} onSeek={onSeek} />
+                </div>
+            </div>
+        </motion.div>
+    );
+};
 
 // ============================================
 // VOICE PHASE VIEW (for voice-only dedications)
