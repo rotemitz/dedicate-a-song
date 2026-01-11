@@ -42,6 +42,12 @@
 
   /* Spacing Base for p-* utilities */
   --spacing: 0.25rem;
+
+  /* Border Radii */
+  --radius-xl: 24px;
+  --radius-2xl: 2rem;
+  --radius-3xl: 3rem;
+  --radius-celebration: 40px;
 }
 
 @keyframes soft-pulse {
@@ -344,220 +350,6 @@ body {
   min-height: 100vh;
 }
 
-.dedications-header {
-  position: sticky;
-  top: 0;
-  background: rgba(253, 248, 242, 0.8);
-  /* celebration-cream with transparency */
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  padding: var(--spacing-lg) var(--spacing-md);
-  padding-bottom: var(--spacing-xl);
-  z-index: 100;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  will-change: transform, padding, background;
-}
-
-.dedications-header.scrolled {
-  padding: 0.8rem var(--spacing-md);
-  background: rgba(253, 248, 242, 0.95);
-  /* celebration-cream more opaque */
-  backdrop-filter: blur(15px);
-  -webkit-backdrop-filter: blur(15px);
-  box-shadow: 0 4px 20px rgba(212, 144, 123, 0.1);
-  /* rose-gold shadow */
-
-  /* Layout change without switching flex-direction row */
-  align-items: stretch;
-}
-
-.header-main-row {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-  transition: all 0.4s ease;
-}
-
-.dedications-header.scrolled .header-main-row {
-  flex-direction: row;
-  justify-content: space-between;
-}
-
-.dedications-header h1 {
-  font-family: var(--font-display);
-  font-size: clamp(1.5rem, 5vw, 2rem);
-  font-weight: 600;
-  margin-bottom: var(--spacing-xs);
-  transition: all 0.4s ease;
-  text-align: center;
-  flex-shrink: 0;
-}
-
-.dedications-header.scrolled h1 {
-  font-size: 1.1rem;
-  margin-bottom: 0;
-  text-align: left;
-}
-
-.highlight-name {
-  background: linear-gradient(135deg, #E2B1A3 0%, #D4907B 100%);
-  /* rose-gold gradient */
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.dedications-intro {
-  font-size: 0.9rem;
-  color: rgba(45, 45, 45, 0.6);
-  /* celebration-charcoal muted */
-  transition: all 0.3s ease;
-  max-height: 50px;
-  opacity: 1;
-  overflow: hidden;
-}
-
-.dedications-header.scrolled .dedications-intro {
-  opacity: 0;
-  max-height: 0;
-  margin: 0;
-  pointer-events: none;
-}
-
-/* Autoplay Toggle Control */
-.autoplay-control {
-  margin-top: var(--spacing-md);
-  transition: all 0.4s ease;
-}
-
-.dedications-header.scrolled .autoplay-control {
-  margin-top: 0;
-}
-
-.autoplay-label {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--spacing-xs);
-  padding: 0.5rem 1rem;
-  background: rgba(212, 144, 123, 0.1);
-  /* rose-gold tint */
-  border-radius: var(--radius-full);
-  cursor: pointer;
-  font-size: 0.9rem;
-  color: rgba(45, 45, 45, 0.8);
-  /* celebration-charcoal secondary */
-  transition: all 0.3s ease;
-}
-
-.dedications-header.scrolled .autoplay-label {
-  background: transparent;
-  padding: 0;
-}
-
-.dedications-header.scrolled .autoplay-label>span:not(.toggle-switch),
-.dedications-header.scrolled .autoplay-icon {
-  display: none;
-}
-
-.autoplay-label:hover {
-  background: rgba(212, 144, 123, 0.2);
-  /* rose-gold tint darker */
-}
-
-.autoplay-icon {
-  font-size: 1rem;
-}
-
-.toggle-switch {
-  position: relative;
-  width: 44px;
-  height: 24px;
-  margin-left: var(--spacing-xs);
-}
-
-.toggle-input {
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-
-.toggle-slider {
-  position: absolute;
-  cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(212, 144, 123, 0.3);
-  /* rose-gold inactive */
-  border-radius: 24px;
-  transition: 0.3s;
-}
-
-.toggle-slider::before {
-  position: absolute;
-  content: "";
-  height: 18px;
-  width: 18px;
-  left: 3px;
-  bottom: 3px;
-  background: white;
-  border-radius: 50%;
-  transition: 0.3s;
-}
-
-.toggle-input:checked+.toggle-slider {
-  background: #D4907B;
-  /* rose-gold-500 active */
-}
-
-.toggle-input:checked+.toggle-slider::before {
-  transform: translateX(20px);
-}
-
-.toggle-input:focus+.toggle-slider {
-  box-shadow: 0 0 0 2px #E2B1A3;
-  /* rose-gold-300 focus */
-}
-
-.dedications-container {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-md);
-  padding: 0 var(--spacing-md) var(--spacing-lg);
-  max-width: 600px;
-  margin: 0 auto;
-}
-
-/* ============================================
-   DEDICATION CARD
-   ============================================ */
-.dedication-card {
-  background: var(--card-background);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid var(--card-border);
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-md);
-  box-shadow: 0 8px 32px var(--card-shadow);
-  /* opacity: 0; */
-  /* transform: translateY(30px); */
-  /* animation: card-appear 0.6s ease forwards; */
-  transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
-  cursor: pointer;
-  /* Layout consistency */
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-
-  /* Animation initial state handled by Framer Motion or JS */
-  animation: fade-up 0.6s ease-out forwards;
-}
-
 @keyframes fade-up {
   from {
     opacity: 0;
@@ -570,64 +362,7 @@ body {
   }
 }
 
-.dedication-card:hover:not(.now-playing) {
-  border-color: rgba(255, 255, 255, 0.3);
-  transform: translateY(-2px);
-  box-shadow: 0 12px 40px var(--card-shadow);
-}
 
-/* Now Playing Highlight */
-.dedication-card.now-playing {
-  border-color: var(--color-primary);
-  box-shadow:
-    0 8px 32px var(--card-shadow),
-    0 0 20px rgba(232, 93, 117, 0.4),
-    0 0 40px rgba(232, 93, 117, 0.2);
-  animation: none;
-  /* Reset appear animation */
-  /* animation: card-appear 0.6s ease forwards, now-playing-pulse 2s ease-in-out infinite; */
-  animation: now-playing-pulse 2s ease-in-out infinite;
-}
-
-@keyframes now-playing-pulse {
-
-  0%,
-  100% {
-    box-shadow:
-      0 8px 32px var(--card-shadow),
-      0 0 20px rgba(232, 93, 117, 0.4),
-      0 0 40px rgba(232, 93, 117, 0.2);
-  }
-
-  50% {
-    box-shadow:
-      0 8px 32px var(--card-shadow),
-      0 0 30px rgba(232, 93, 117, 0.6),
-      0 0 60px rgba(232, 93, 117, 0.3);
-  }
-}
-
-/* Stagger animations via child index in CSS is hard with dynamic lists, 
-   but we can keep default delays for first few items or use React inline styles */
-.dedication-card:nth-child(1) {
-  animation-delay: 0.1s;
-}
-
-.dedication-card:nth-child(2) {
-  animation-delay: 0.2s;
-}
-
-.dedication-card:nth-child(3) {
-  animation-delay: 0.3s;
-}
-
-.dedication-card:nth-child(4) {
-  animation-delay: 0.4s;
-}
-
-.dedication-card:nth-child(5) {
-  animation-delay: 0.5s;
-}
 
 /* Card Header - Avatar on top, name below, centered */
 .card-header {
@@ -798,39 +533,7 @@ audio::-webkit-media-controls-panel {
   font-size: 1.5rem;
 }
 
-/* ============================================
-   RESPONSIVE DESIGN
-   ============================================ */
 
-/* Tablet - 2 column grid */
-@media (min-width: 768px) {
-  .dedications-container {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: var(--spacing-md);
-    padding: var(--spacing-lg);
-    max-width: 900px;
-  }
-
-  .dedication-card {
-    padding: var(--spacing-lg);
-  }
-
-  .card-avatar,
-  .card-avatar-placeholder {
-    width: 80px;
-    height: 80px;
-  }
-}
-
-/* Large desktop - 3 column grid */
-@media (min-width: 1200px) {
-  .dedications-container {
-    grid-template-columns: repeat(3, 1fr);
-    max-width: 1400px;
-    gap: var(--spacing-lg);
-  }
-}
 
 /* ============================================
    ACCESSIBILITY

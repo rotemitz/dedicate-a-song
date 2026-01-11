@@ -38,16 +38,7 @@ const DesktopDedicationsScreen = ({
 
             {/* Main Content Area */}
             <main
-                className={`py-12 ${showPlayer ? 'hidden' : ''}`}
-                style={{
-                    alignItems: 'center',
-                    maxWidth: '1000px',
-                    marginLeft: 'auto',
-                    marginRight: 'auto',
-                    paddingLeft: '48px',
-                    paddingRight: '48px',
-                    ...(showPlayer ? { display: 'none' } : {})
-                }}
+                className={`py-12 mx-auto px-12 max-w-[1000px] flex flex-col items-center ${showPlayer ? 'hidden' : ''}`}
             >
                 {/* Desktop Headline Section */}
                 <section className="mb-12">
