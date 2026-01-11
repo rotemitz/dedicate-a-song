@@ -151,8 +151,8 @@
             "photo": "assets/images/esti-haim.jpeg",
             "video_message": "assets/videos/esti-haim.mp4",
             "song": {
-                "title": "",
-                "artist": "",
+                "title": "ילדותי השניה",
+                "artist": "מתי כספי",
                 "local_file": "songs/esti-haim.mp3",
                 "album_art": "songs/esti-haim.png"
             }
@@ -163,8 +163,8 @@
             "photo": "assets/images/yuval.png",
             "voice_message": "assets/recordings/yuval.opus",
             "song": {
-                "title": "",
-                "artist": "",
+                "title": "וידוי",
+                "artist": "יהודית רביץ",
                 "local_file": "songs/yuval.mp3",
                 "album_art": "songs/yuval.png"
             }
