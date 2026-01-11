@@ -1,13 +1,10 @@
 import { AnimatePresence } from 'framer-motion';
-import Header from '../Header';
 import DedicationCard from '../DedicationCard';
 import ImmersivePlayer from '../ImmersivePlayer';
 import { NowPlayingBar, MobileFooter } from './SharedComponents';
 
 const MobileDedicationsScreen = ({
     dedications,
-    autoplayEnabled,
-    setAutoplayEnabled,
     currentCardIndex,
     showPlayer,
     lastPlayedIndex,
@@ -30,14 +27,6 @@ const MobileDedicationsScreen = ({
 }) => {
     return (
         <section id="dedications-screen" className="min-h-screen bg-celebration-cream">
-            {/* Header - only show when NOT in player mode */}
-            {!showPlayer && (
-                <Header
-                    autoplayEnabled={autoplayEnabled}
-                    setAutoplayEnabled={setAutoplayEnabled}
-                />
-            )}
-
             {/* Main Content Area */}
             <main
                 className={`${showPlayer ? 'hidden' : ''}`}

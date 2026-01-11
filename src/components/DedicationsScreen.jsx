@@ -2,9 +2,12 @@ import { useState, useEffect, useRef } from 'react';
 import { MobileDedicationsScreen, DesktopDedicationsScreen } from './screens';
 import { useAudioPlayer } from '../context/AudioContext';
 
+// Feature flag: Set to false to skip inline player and go directly to immersive player
+// Set to true to re-enable inline playback
+const ENABLE_INLINE_PLAYER = false;
+
 const DedicationsScreen = ({ dedications }) => {
     const [isMobile, setIsMobile] = useState(false);
-    const [autoplayEnabled, setAutoplayEnabled] = useState(true);
     const [showPlayer, setShowPlayer] = useState(false);
 
     // Inline video ref for playing video audio in inline mode
@@ -68,6 +71,12 @@ const DedicationsScreen = ({ dedications }) => {
 
     // Inline play handlers - now using global context
     const handleInlinePlay = (index) => {
+        // Feature flag check - go directly to immersive player when disabled
+        if (!ENABLE_INLINE_PLAYER) {
+            handleOpenFullView(index);
+            return;
+        }
+
         const dedication = dedications[index];
         console.log('[handleInlinePlay] Called with index:', index, 'currentDedicationIndex:', currentDedicationIndex, 'isPlaying:', isPlaying);
         if (!dedication) {
@@ -151,6 +160,10 @@ const DedicationsScreen = ({ dedications }) => {
 
     const handleClosePlayer = () => {
         setShowPlayer(false);
+        // When inline player is disabled, also stop playback completely
+        if (!ENABLE_INLINE_PLAYER) {
+            stop();
+        }
     };
 
     // Inline video management for video greetings
@@ -252,8 +265,6 @@ const DedicationsScreen = ({ dedications }) => {
     // Common props for both variants
     const screenProps = {
         dedications,
-        autoplayEnabled,
-        setAutoplayEnabled,
         currentCardIndex,
         showPlayer,
         lastPlayedIndex,

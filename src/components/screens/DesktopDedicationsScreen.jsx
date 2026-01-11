@@ -1,12 +1,9 @@
-import Header from '../Header';
 import DedicationCard from '../DedicationCard';
 import ImmersivePlayer from '../ImmersivePlayer';
 import { SectionDivider, FooterQuote } from './SharedComponents';
 
 const DesktopDedicationsScreen = ({
     dedications,
-    autoplayEnabled,
-    setAutoplayEnabled,
     currentCardIndex,
     showPlayer,
     lastPlayedIndex,
@@ -28,14 +25,6 @@ const DesktopDedicationsScreen = ({
 }) => {
     return (
         <section id="dedications-screen" className="min-h-screen w-full bg-celebration-cream">
-            {/* Header - only show when NOT in player mode */}
-            {!showPlayer && (
-                <Header
-                    autoplayEnabled={autoplayEnabled}
-                    setAutoplayEnabled={setAutoplayEnabled}
-                />
-            )}
-
             {/* Main Content Area */}
             <main
                 className={`py-12 mx-auto px-12 max-w-[1300px] xl:max-w-full flex flex-col items-center ${showPlayer ? 'hidden' : ''}`}
