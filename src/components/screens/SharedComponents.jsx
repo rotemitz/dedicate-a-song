@@ -80,18 +80,10 @@ export const SectionDivider = ({ title }) => (
  * Footer Quote Section (Desktop)
  */
 export const FooterQuote = () => (
-    <footer className="mt-24 pt-16 pb-20 border-t border-rose-gold-100/50 text-center">
-        <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-rose-gold-100 mb-6">
-            <span className="material-symbols-outlined text-rose-gold-500">auto_fix_high</span>
-        </div>
+    <footer className="mt-12 pt-8 border-t border-rose-gold-100/50 text-center">
         <p className="text-rose-gold-600 font-serif italic text-xl">
             "A lifetime of memories, just beginning at 40."
         </p>
-        <div className="mt-8 flex justify-center gap-4">
-            <div className="w-2 h-2 rounded-full bg-rose-gold-200" />
-            <div className="w-2 h-2 rounded-full bg-rose-gold-200" />
-            <div className="w-2 h-2 rounded-full bg-rose-gold-200" />
-        </div>
     </footer>
 );
 
