@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import CardWaveform from './CardWaveform';
+import InlinePlayer from './InlinePlayer';
 import { useDedicationDuration } from '../../hooks/useMediaDuration';
 import { InteractiveProgressBar } from '../player/PlayerComponents';
 
@@ -75,7 +76,7 @@ const MobileDedicationCard = ({
             aria-label={`${isInlinePlaying ? 'Pause' : 'Play'} dedication from ${dedication.name}${dedication.song ? ` - ${dedication.song.title}` : ''}`}
             aria-pressed={isInlinePlaying}
             className={`
-                bg-white rounded-[40px] cursor-pointer transition-all duration-300
+                bg-white rounded-celebration cursor-pointer transition-all duration-300
                 ${(isNowPlaying || isInlinePlaying)
                     ? 'border-2 border-rose-gold-300 shadow-floating'
                     : 'border border-rose-gold-50 shadow-[0_10px_30px_rgba(212,144,123,0.1)] hover:shadow-floating hover:-translate-y-1'
@@ -149,87 +150,16 @@ const MobileDedicationCard = ({
             {/* Expanded State - Inline Mini-Player */}
             <AnimatePresence>
                 {isInlinePlaying && (
-                    <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: 'auto', opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.3, ease: 'easeInOut' }}
-                        className="overflow-hidden inline-controls px-5"
-                    >
-                        <div className="mt-4 pt-4 border-t border-rose-gold-100">
-                            {/* Info - changes based on phase */}
-                            <div className="flex items-center gap-3 mb-4">
-                                {inlinePhase === 'song' && dedication.song?.album_art && (
-                                    <img
-                                        src={dedication.song.album_art}
-                                        alt={`${dedication.song.title} album art`}
-                                        className="w-16 h-16 rounded-xl object-cover shadow-md"
-                                    />
-                                )}
-                                <div className="flex-1 min-w-0">
-                                    <p className="text-[10px] uppercase font-bold text-rose-gold-400 tracking-tight mb-0.5">
-                                        {inlinePhase === 'greeting' ? 'Playing Dedication' : 'Now Playing'}
-                                    </p>
-                                    {inlinePhase === 'greeting' ? (
-                                        <>
-                                            <p className="text-sm font-semibold text-celebration-charcoal truncate">
-                                                Message from {dedication.name}
-                                            </p>
-                                            <p className="text-xs text-celebration-charcoal/60 truncate">
-                                                {dedication.video_message ? 'Video Message' : 'Voice Message'}
-                                            </p>
-                                        </>
-                                    ) : (
-                                        <>
-                                            <p className="text-sm font-semibold text-celebration-charcoal truncate">
-                                                {dedication.song?.title}
-                                            </p>
-                                            <p className="text-xs text-celebration-charcoal/60 truncate">
-                                                {dedication.song?.artist}
-                                            </p>
-                                        </>
-                                    )}
-                                </div>
-                            </div>
-
-                            {/* Waveform Visualization */}
-                            <div className="bg-rose-gold-50/50 rounded-2xl p-3 border border-rose-gold-100/50 mb-3">
-                                <CardWaveform isPlaying={isInlinePlaying} />
-
-                                {/* Interactive Progress Bar with Real Progress */}
-                                <div className="mt-3 space-y-1">
-                                    <InteractiveProgressBar
-                                        progress={inlineProgress}
-                                        duration={inlineDuration}
-                                        onSeek={onInlineSeek}
-                                        height="h-1.5"
-                                        showThumb={false}
-                                    />
-                                    <div className="flex justify-between text-[10px] font-bold text-rose-gold-400 tabular-nums">
-                                        <span>{formatTime(inlineProgress)}</span>
-                                        <span>{formatTime(inlineDuration)}</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Open Full View Button */}
-                            {onOpenFullView && (
-                                <div className="flex justify-center pb-1">
-                                    <button
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            onOpenFullView();
-                                        }}
-                                        className="inline-flex px-4 py-2 bg-gradient-to-r from-rose-gold-400 to-rose-gold-500 text-white rounded-full text-[10px] font-bold tracking-wide hover:shadow-md transition-all items-center justify-center gap-1.5"
-                                        aria-label={`Open full player for ${dedication.name}'s dedication`}
-                                    >
-                                        <span className="material-symbols-outlined text-xs" aria-hidden="true">fullscreen</span>
-                                        Open Full View
-                                    </button>
-                                </div>
-                            )}
-                        </div>
-                    </motion.div>
+                    <InlinePlayer
+                        dedication={dedication}
+                        isInlinePlaying={isInlinePlaying}
+                        inlineProgress={inlineProgress}
+                        inlineDuration={inlineDuration}
+                        inlinePhase={inlinePhase}
+                        onInlineSeek={onInlineSeek}
+                        onOpenFullView={onOpenFullView}
+                        variant="mobile"
+                    />
                 )}
             </AnimatePresence>
         </motion.div>
