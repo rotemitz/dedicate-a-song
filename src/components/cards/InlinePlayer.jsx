@@ -36,9 +36,9 @@ const InlinePlayer = ({
             transition={{ duration: 0.3, ease: 'easeInOut' }}
             className={`overflow-hidden inline-controls ${paddingClass}`}
         >
-            <div className="mt-4 pt-4 border-t border-rose-gold-100">
+            <div className="mt-4 pt-4 border-t border-rose-gold-100 flex flex-col gap-4">
                 {/* Info Section */}
-                <div className={`flex items-center gap-3 mb-4 ${isDesktop ? 'text-left' : ''}`}>
+                <div className={`flex items-center gap-3 ${isDesktop ? 'text-left' : ''}`}>
                     {inlinePhase === 'song' && dedication.song?.album_art && (
                         <img
                             src={dedication.song.album_art}
@@ -73,7 +73,7 @@ const InlinePlayer = ({
                 </div>
 
                 {/* Waveform visualization box */}
-                <div className={`${isDesktop ? 'p-4 mb-4' : 'p-3 mb-3'} bg-rose-gold-50/50 rounded-2xl border border-rose-gold-100/50`}>
+                <div className={`${isDesktop ? 'p-4' : 'p-3'} bg-rose-gold-50/50 rounded-2xl border border-rose-gold-100/50`}>
                     <CardWaveform isPlaying={isInlinePlaying} />
 
                     {/* Interactive Progress Bar */}
@@ -94,7 +94,7 @@ const InlinePlayer = ({
 
                 {/* Full View Action */}
                 {onOpenFullView && (
-                    <div className={isDesktop ? 'pb-2' : 'pb-1 flex justify-center'}>
+                    <div className={isDesktop ? '' : 'flex justify-center'}>
                         <button
                             onClick={(e) => {
                                 e.stopPropagation();
