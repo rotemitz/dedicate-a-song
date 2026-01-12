@@ -410,11 +410,8 @@ const MobileImmersivePlayer = ({
             initial="initial"
             animate="animate"
             exit="exit"
-            className="fixed inset-0 z-[2000] h-[100dvh] w-full flex flex-col items-center bg-celebration-cream overflow-hidden"
-            style={{
-                paddingTop: 'max(16px, env(safe-area-inset-top))',
-                paddingBottom: 'env(safe-area-inset-bottom)'
-            }}
+            className="fixed inset-0 z-[2000] min-h-screen w-full flex flex-col items-center bg-celebration-cream"
+            style={{ paddingTop: 'max(16px, env(safe-area-inset-top))' }}
         >
             {/* Segment Progress Bar */}
             <SegmentProgressBar
