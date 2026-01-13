@@ -75,11 +75,10 @@ const VideoPhaseView = ({
                     initial={{ scale: 0.9, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     transition={{ duration: 0.5 }}
-                    className={`relative rounded-2xl overflow-hidden shadow-floating bg-celebration-charcoal ${
-                        isPortrait
-                            ? 'w-[55%] max-w-[240px] aspect-[9/16]'
-                            : 'w-[90%] max-w-sm aspect-video'
-                    }`}
+                    className={`relative rounded-2xl overflow-hidden shadow-floating bg-celebration-charcoal ${isPortrait
+                        ? 'w-[55%] max-w-[240px] aspect-[9/16]'
+                        : 'w-[90%] max-w-sm aspect-video'
+                        }`}
                 >
                     <video
                         ref={videoRef}
@@ -249,7 +248,7 @@ const SongPhaseView = ({
                 albumArt={dedication.song?.album_art || dedication.photo}
                 songTitle={dedication.song?.title}
                 isPlaying={isPlaying}
-                size="w-72 h-72"
+                size="w-60 h-60"
                 onClick={onTogglePlay}
             />
         </div>

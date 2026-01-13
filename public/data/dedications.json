@@ -168,6 +168,18 @@
                 "local_file": "songs/yuval.mp3",
                 "album_art": "songs/yuval.png"
             }
+        },
+        {
+            "id": 15,
+            "name": "לירון ולירון",
+            "photo": "assets/images/liron-liron.jpeg",
+            "voice_message": "assets/recordings/liron-liron.opus",
+            "song": {
+                "title": "משהו חדש מתחיל",
+                "artist": "דני רובס",
+                "local_file": "songs/liron-liron.mp3",
+                "album_art": "songs/liron-liron.png"
+            }
         }
     ]
 }
