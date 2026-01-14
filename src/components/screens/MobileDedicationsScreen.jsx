@@ -28,7 +28,7 @@ const MobileDedicationsScreen = ({
     onOpenFullView
 }) => {
     return (
-        <section id="dedications-screen" className="min-h-screen bg-celebration-cream">
+        <section id="dedications-screen" className="min-h-screen min-h-dvh bg-celebration-cream">
             {/* Banner - only show when NOT in player mode */}
             {!showPlayer && <Banner onBack={onBack} />}
 

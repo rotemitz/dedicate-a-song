@@ -248,7 +248,7 @@ const SongPhaseView = ({
                 albumArt={dedication.song?.album_art || dedication.photo}
                 songTitle={dedication.song?.title}
                 isPlaying={isPlaying}
-                size="w-60 h-60"
+                size="w-56 h-56"
                 onClick={onTogglePlay}
             />
         </div>
@@ -284,7 +284,10 @@ const SongPhaseView = ({
 // FOOTER NAVIGATION
 // ============================================
 const FooterNavigation = ({ onPrevious, onNext, onClose, isGreeting }) => (
-    <div className="w-full px-8 py-6 flex items-center justify-between">
+    <div
+        className="w-full px-8 pt-6 flex items-center justify-between"
+        style={{ paddingBottom: 'max(24px, calc(16px + env(safe-area-inset-bottom)))' }}
+    >
         <button onClick={onPrevious} className="text-left flex-1">
             <p className="text-[10px] uppercase tracking-tighter text-rose-gold-400">Previous</p>
             <p className="text-sm font-medium text-celebration-charcoal mt-1">Dedication</p>
@@ -409,8 +412,11 @@ const MobileImmersivePlayer = ({
             initial="initial"
             animate="animate"
             exit="exit"
-            className="fixed inset-0 z-[2000] min-h-screen w-full flex flex-col items-center bg-celebration-cream"
-            style={{ paddingTop: 'max(16px, env(safe-area-inset-top))' }}
+            className="fixed inset-0 z-[2000] h-[100dvh] w-full flex flex-col items-center bg-celebration-cream overflow-hidden"
+            style={{
+                paddingTop: 'max(16px, env(safe-area-inset-top))',
+                paddingBottom: 'env(safe-area-inset-bottom)'
+            }}
         >
             {/* Segment Progress Bar */}
             <SegmentProgressBar

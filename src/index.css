@@ -127,6 +127,7 @@ body {
    ============================================ */
 .screen {
   min-height: 100vh;
+  min-height: 100dvh;
   /* display: none; */
   /* Handled by React conditional rendering */
   /* opacity: 0; */
@@ -165,6 +166,7 @@ body {
   position: relative;
   overflow: hidden;
   min-height: 100vh;
+  min-height: 100dvh;
 }
 
 /* Animated background particles */
@@ -319,7 +321,7 @@ body {
 
 .welcome-footer {
   position: absolute;
-  bottom: var(--spacing-lg);
+  bottom: max(var(--spacing-lg), calc(var(--spacing-lg) + env(safe-area-inset-bottom)));
   left: 50%;
   transform: translateX(-50%);
   font-size: 0.875rem;
