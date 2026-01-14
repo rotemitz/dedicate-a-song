@@ -2,6 +2,15 @@ import React, { useEffect } from 'react';
 import confetti from 'canvas-confetti';
 
 const WelcomeScreen = ({ onStart }) => {
+    // Lock scroll on welcome screen
+    useEffect(() => {
+        document.body.style.overflow = 'hidden';
+        document.documentElement.style.overflow = 'hidden';
+        return () => {
+            document.body.style.overflow = '';
+            document.documentElement.style.overflow = '';
+        };
+    }, []);
 
     // Twinkle effect (handled by CSS, but we can enhance if needed)
 

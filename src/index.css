@@ -165,8 +165,8 @@ body {
   padding: var(--spacing-lg);
   position: relative;
   overflow: hidden;
-  min-height: 100vh;
-  min-height: 100dvh;
+  height: 100vh;
+  height: 100dvh;
 }
 
 /* Animated background particles */
