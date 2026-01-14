@@ -85,7 +85,10 @@ const DesktopDedicationCard = ({
                             : 'border-2 border-rose-gold-200/50'
                         }
                     `}>
-                        <div className="w-full h-full rounded-full overflow-hidden bg-center bg-no-repeat bg-cover border-2 border-white relative">
+                        <div
+                            className="w-full h-full rounded-full overflow-hidden bg-center bg-no-repeat bg-cover border-2 border-white relative isolate"
+                            style={{ WebkitMaskImage: '-webkit-radial-gradient(white, black)' }}
+                        >
                             {dedication.photo ? (
                                 <img
                                     src={dedication.photo}

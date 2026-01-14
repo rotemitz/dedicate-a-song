@@ -96,7 +96,10 @@ const MobileDedicationCard = ({
                             : 'bg-rose-gold-100/50'
                         }
                     `}>
-                        <div className="w-full h-full rounded-full border-2 border-white overflow-hidden relative">
+                        <div
+                            className="w-full h-full rounded-full border-2 border-white overflow-hidden relative isolate"
+                            style={{ WebkitMaskImage: '-webkit-radial-gradient(white, black)' }}
+                        >
                             {dedication.photo ? (
                                 <img
                                     src={dedication.photo}

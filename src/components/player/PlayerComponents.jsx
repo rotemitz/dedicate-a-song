@@ -96,7 +96,8 @@ export const DedicationAvatar = ({
 
     return (
         <div
-            className={`${sizeClasses[size]} rounded-full overflow-hidden border-white/20 shadow-2xl`}
+            className={`${sizeClasses[size]} rounded-full overflow-hidden border-white/20 shadow-2xl isolate`}
+            style={{ WebkitMaskImage: '-webkit-radial-gradient(white, black)' }}
         >
             <img
                 src={src || 'assets/placeholder.png'}
@@ -306,9 +307,8 @@ export const InteractiveProgressBar = ({
             {/* Draggable thumb */}
             {showThumb && (
                 <div
-                    className={`absolute top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-white border-2 border-rose-gold-500 shadow-md transition-transform ${
-                        isDragging ? 'scale-125' : 'scale-100'
-                    }`}
+                    className={`absolute top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-white border-2 border-rose-gold-500 shadow-md transition-transform ${isDragging ? 'scale-125' : 'scale-100'
+                        }`}
                     style={{ left: `calc(${percentage}% - 8px)` }}
                 />
             )}
