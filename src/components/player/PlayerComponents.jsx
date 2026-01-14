@@ -1,5 +1,36 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
+
+// ============================================
+// LOADING SPINNER
+// ============================================
+export const MediaLoadingSpinner = ({ size = 'md' }) => {
+    const sizeClasses = {
+        sm: 'w-6 h-6',
+        md: 'w-10 h-10',
+        lg: 'w-16 h-16'
+    };
+    return (
+        <div className={`${sizeClasses[size]} animate-spin`}>
+            <svg viewBox="0 0 24 24" fill="none" className="w-full h-full">
+                <circle
+                    cx="12" cy="12" r="10"
+                    stroke="currentColor"
+                    strokeWidth="3"
+                    strokeLinecap="round"
+                    className="text-rose-gold-200"
+                />
+                <path
+                    d="M12 2a10 10 0 0 1 10 10"
+                    stroke="currentColor"
+                    strokeWidth="3"
+                    strokeLinecap="round"
+                    className="text-rose-gold-500"
+                />
+            </svg>
+        </div>
+    );
+};
 
 // ============================================
 // SEGMENT PROGRESS BAR
@@ -88,6 +119,8 @@ export const DedicationAvatar = ({
     isPlaying = false,
     size = 'large'
 }) => {
+    const [isLoading, setIsLoading] = useState(true);
+
     // Size configurations
     const sizeClasses = {
         large: 'w-48 h-48 md:w-64 md:h-64 border-4',
@@ -96,15 +129,56 @@ export const DedicationAvatar = ({
 
     return (
         <div
-            className={`${sizeClasses[size]} rounded-full overflow-hidden border-white/20 shadow-2xl isolate`}
+            className={`${sizeClasses[size]} rounded-full overflow-hidden border-white/20 shadow-2xl isolate relative`}
             style={{ WebkitMaskImage: '-webkit-radial-gradient(white, black)' }}
         >
+            {/* Loading skeleton */}
+            {isLoading && (
+                <div className="absolute inset-0 bg-rose-gold-100 animate-pulse flex items-center justify-center">
+                    <MediaLoadingSpinner size={size === 'large' ? 'lg' : 'sm'} />
+                </div>
+            )}
             <img
                 src={src || 'assets/placeholder.png'}
                 alt={alt}
-                className={`w-full h-full object-cover transition-all duration-500 ${!isPlaying ? 'blur-sm' : ''}`}
+                className={`w-full h-full object-cover transition-all duration-500 ${!isPlaying ? 'blur-sm' : ''} ${isLoading ? 'opacity-0' : 'opacity-100'}`}
+                onLoad={() => setIsLoading(false)}
+                onError={() => setIsLoading(false)}
             />
         </div>
+    );
+};
+
+// ============================================
+// ALBUM ART WITH LOADER
+// Helper component for VinylRecord
+// ============================================
+const AlbumArtWithLoader = ({ albumArt, songTitle }) => {
+    const [isLoading, setIsLoading] = useState(true);
+
+    if (!albumArt) {
+        return (
+            <div className="w-full h-full bg-rose-gold-200 flex items-center justify-center">
+                <span className="text-[10px] text-rose-gold-700 font-serif">SONG</span>
+            </div>
+        );
+    }
+
+    return (
+        <>
+            {isLoading && (
+                <div className="absolute inset-0 bg-rose-gold-100 animate-pulse flex items-center justify-center">
+                    <MediaLoadingSpinner size="sm" />
+                </div>
+            )}
+            <img
+                src={albumArt}
+                alt={songTitle || 'Album Art'}
+                className={`w-full h-full object-cover transition-opacity duration-300 ${isLoading ? 'opacity-0' : 'opacity-100'}`}
+                onLoad={() => setIsLoading(false)}
+                onError={() => setIsLoading(false)}
+            />
+        </>
     );
 };
 
@@ -139,13 +213,7 @@ export const VinylRecord = ({ albumArt, isPlaying, songTitle, size = 'w-72 h-72'
 
                     {/* Central Label (Album Art) */}
                     <div className="relative w-1/3 h-1/3 rounded-full bg-white border-4 border-[#121212] overflow-hidden z-10 shadow-inner">
-                        {albumArt ? (
-                            <img src={albumArt} alt={songTitle || 'Album Art'} className="w-full h-full object-cover" />
-                        ) : (
-                            <div className="w-full h-full bg-rose-gold-200 flex items-center justify-center">
-                                <span className="text-[10px] text-rose-gold-700 font-serif">SONG</span>
-                            </div>
-                        )}
+                        <AlbumArtWithLoader albumArt={albumArt} songTitle={songTitle} />
                         {/* Center Hole */}
                         <div className="absolute inset-0 m-auto w-3 h-3 bg-[#121212] rounded-full shadow-inner" />
                     </div>

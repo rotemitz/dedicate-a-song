@@ -4,181 +4,181 @@
         {
             "id": 4,
             "name": "ויקי מיירס",
-            "photo": "assets/images/vicky.png",
+            "photo": "assets/images/vicky.webp",
             "voice_message": "assets/recordings/vicky.opus",
             "song": {
                 "title": "Cigarettes & Alcohol",
                 "artist": "Oasis",
-                "local_file": "songs/vicky.mp3",
-                "album_art": "songs/vicky.png"
+                "local_file": "songs/vicky.m4a",
+                "album_art": "songs/vicky.webp"
             }
         },
         {
             "id": 3,
             "name": "ליעד עלווה והילדים",
-            "photo": "assets/images/liad-alva.png",
+            "photo": "assets/images/liad-alva.webp",
             "video_message": "assets/videos/liad-alva.mp4",
             "song": {
                 "title": "טל",
                 "artist": "יהורם גאון",
-                "local_file": "songs/liad.mp3",
-                "album_art": "songs/liad.png"
+                "local_file": "songs/liad.m4a",
+                "album_art": "songs/liad.webp"
             }
         },
         {
             "id": 1,
             "name": "עליזה רום-פוזניאק",
-            "photo": "assets/images/aliza.jpg",
+            "photo": "assets/images/aliza.webp",
             "voice_message": "assets/recordings/aliza.opus",
             "song": {
                 "title": "באת לי פתאום",
                 "artist": "קרן פלס ורוני אלטר",
-                "local_file": "songs/aliza.mp3",
-                "album_art": "songs/aliza.png"
+                "local_file": "songs/aliza.m4a",
+                "album_art": "songs/aliza.webp"
             }
         },
         {
             "id": 2,
             "name": "אייל פוזניאק",
-            "photo": "assets/images/eyal-pozniak.jpg",
+            "photo": "assets/images/eyal-pozniak.webp",
             "voice_message": "assets/recordings/eyal-pozniak.opus",
             "song": {
                 "title": "מנוף",
                 "artist": "בן ורד ויעל ארנון ורד",
-                "local_file": "songs/eyal-pozniak.mp3",
-                "album_art": "songs/eyal-pozniak.png"
+                "local_file": "songs/eyal-pozniak.m4a",
+                "album_art": "songs/eyal-pozniak.webp"
             }
         },
         {
             "id": 5,
             "name": "קרן שלב",
-            "photo": "assets/images/keren.jpg",
+            "photo": "assets/images/keren.webp",
             "video_message": "assets/videos/keren.mp4",
             "song": {
                 "title": "Hakuna Matata",
                 "artist": "The Lion King",
-                "local_file": "songs/keren.mp3",
-                "album_art": "songs/keren.png"
+                "local_file": "songs/keren.m4a",
+                "album_art": "songs/keren.webp"
             }
         },
         {
             "id": 6,
             "name": "רותם שובל",
-            "photo": "assets/images/rotem-shoval.jpeg",
+            "photo": "assets/images/rotem-shoval.webp",
             "video_message": "assets/videos/rotem-shoval.mp4",
             "song": {
                 "title": "מה שאת אוהבת",
                 "artist": "גלי עטרי",
-                "local_file": "songs/rotem-shoval.mp3",
-                "album_art": "songs/rotem-shoval.png"
+                "local_file": "songs/rotem-shoval.m4a",
+                "album_art": "songs/rotem-shoval.webp"
             }
         },
         {
             "id": 7,
             "name": "חן ונימי",
-            "photo": "assets/images/chen-nimi.jpeg",
+            "photo": "assets/images/chen-nimi.webp",
             "video_message": "assets/videos/chen-nimi.mp4",
             "song": {
                 "title": "I'll be there for you",
                 "artist": "The rembrandts",
-                "local_file": "songs/chen-nimi.mp3",
-                "album_art": "songs/chen-nimi.png"
+                "local_file": "songs/chen-nimi.m4a",
+                "album_art": "songs/chen-nimi.webp"
             }
         },
         {
             "id": 8,
             "name": "גילי",
-            "photo": "assets/images/gili.jpg",
+            "photo": "assets/images/gili.webp",
             "video_message": "assets/videos/gili.mp4",
             "song": {
                 "title": "לחיות נכון",
                 "artist": "רונה קינן",
-                "local_file": "songs/gili.mp3",
-                "album_art": "songs/gili.png"
+                "local_file": "songs/gili.m4a",
+                "album_art": "songs/gili.webp"
             }
         },
         {
             "id": 9,
             "name": "אמא ואבא",
-            "photo": "assets/images/ima-aba.jpeg",
+            "photo": "assets/images/ima-aba.webp",
             "video_message": "assets/videos/ima-aba.mp4",
             "song": {
                 "title": "מה שאת אוהבת",
                 "artist": "גלי עטרי",
-                "local_file": "songs/rotem-shoval.mp3",
-                "album_art": "songs/rotem-shoval.png"
+                "local_file": "songs/rotem-shoval.m4a",
+                "album_art": "songs/rotem-shoval.webp"
             }
         },
         {
             "id": 10,
             "name": "אייל לירון והילדים",
-            "photo": "assets/images/eyal-liron.jpeg",
+            "photo": "assets/images/eyal-liron.webp",
             "voice_message": "assets/recordings/eyal-liron.mp3",
             "song": {
                 "title": "איך זה שכוכב",
                 "artist": "מתי כספי",
-                "local_file": "songs/eyal-liron.mp3",
-                "album_art": "songs/eyal-liron.png"
+                "local_file": "songs/eyal-liron.m4a",
+                "album_art": "songs/eyal-liron.webp"
             }
         },
         {
             "id": 11,
             "name": "הילה",
-            "photo": "assets/images/hila.jpeg",
+            "photo": "assets/images/hila.webp",
             "voice_message": "assets/recordings/hila.opus",
             "song": {
                 "title": "Don't Stop Me Now",
                 "artist": "Queen",
-                "local_file": "songs/hila.mp3",
-                "album_art": "songs/hila.png"
+                "local_file": "songs/hila.m4a",
+                "album_art": "songs/hila.webp"
             }
         },
         {
             "id": 12,
             "name": "גיל וטל",
-            "photo": "assets/images/gil-tal.jpeg",
+            "photo": "assets/images/gil-tal.webp",
             "video_message": "assets/videos/gil-tal.mp4",
             "song": {
                 "title": "אדון שוקו",
                 "artist": "אריק איינשטיין",
-                "local_file": "songs/gil-tal.mp3",
-                "album_art": "songs/gil-tal.png"
+                "local_file": "songs/gil-tal.m4a",
+                "album_art": "songs/gil-tal.webp"
             }
         },
         {
             "id": 13,
             "name": "אסתי וחיים",
-            "photo": "assets/images/esti-haim.jpeg",
+            "photo": "assets/images/esti-haim.webp",
             "video_message": "assets/videos/esti-haim.mp4",
             "song": {
                 "title": "ילדותי השניה",
                 "artist": "מתי כספי",
-                "local_file": "songs/esti-haim.mp3",
-                "album_art": "songs/esti-haim.png"
+                "local_file": "songs/esti-haim.m4a",
+                "album_art": "songs/esti-haim.webp"
             }
         },
         {
             "id": 14,
             "name": "יובל",
-            "photo": "assets/images/yuval.png",
+            "photo": "assets/images/yuval.webp",
             "voice_message": "assets/recordings/yuval.opus",
             "song": {
                 "title": "וידוי",
                 "artist": "יהודית רביץ",
-                "local_file": "songs/yuval.mp3",
-                "album_art": "songs/yuval.png"
+                "local_file": "songs/yuval.m4a",
+                "album_art": "songs/yuval.webp"
             }
         },
         {
             "id": 15,
             "name": "לירון ולירון",
-            "photo": "assets/images/liron-liron.jpeg",
+            "photo": "assets/images/liron-liron.webp",
             "voice_message": "assets/recordings/liron-liron.opus",
             "song": {
                 "title": "משהו חדש מתחיל",
                 "artist": "דני רובס",
-                "local_file": "songs/liron-liron.mp3",
-                "album_art": "songs/liron-liron.png"
+                "local_file": "songs/liron-liron.m4a",
+                "album_art": "songs/liron-liron.webp"
             }
         }
     ]

@@ -6,7 +6,8 @@ import {
     VinylRecord,
     TimelineSlider,
     PrimaryActionButton,
-    DedicationAvatar
+    DedicationAvatar,
+    MediaLoadingSpinner
 } from './PlayerComponents';
 import { useAudioPlayer } from '../../context/AudioContext';
 
@@ -40,12 +41,17 @@ const VideoPhaseView = ({
     onEnded
 }) => {
     const [isPortrait, setIsPortrait] = useState(false);
+    const [isVideoLoading, setIsVideoLoading] = useState(true);
 
     const handleLoadedMetadata = () => {
         if (videoRef.current) {
             const { videoWidth, videoHeight } = videoRef.current;
             setIsPortrait(videoHeight > videoWidth);
         }
+    };
+
+    const handleCanPlay = () => {
+        setIsVideoLoading(false);
     };
 
     return (
@@ -80,15 +86,23 @@ const VideoPhaseView = ({
                         : 'w-[90%] max-w-sm aspect-video'
                         }`}
                 >
+                    {/* Video loading overlay */}
+                    {isVideoLoading && (
+                        <div className="absolute inset-0 bg-celebration-charcoal flex items-center justify-center z-10">
+                            <MediaLoadingSpinner size="lg" />
+                        </div>
+                    )}
                     <video
                         ref={videoRef}
                         src={dedication.video_message}
                         className={`w-full h-full object-cover transition-all duration-500 ${!isPlaying ? 'blur-sm' : ''}`}
                         playsInline
                         muted={false}
+                        preload="metadata"
                         onEnded={onEnded}
                         onClick={onTogglePlay}
                         onLoadedMetadata={handleLoadedMetadata}
+                        onCanPlay={handleCanPlay}
                     />
                 </motion.div>
             </div>
