@@ -249,8 +249,8 @@ const DedicationsScreen = ({ dedications, onBack }) => {
 
         // Update previous state
         previousShowPlayer.current = showPlayer;
-    // Only depend on showPlayer to avoid running on every currentTime update
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // Only depend on showPlayer to avoid running on every currentTime update
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [showPlayer, hasVideoGreeting, currentDedicationIndex]);
 
     // Map global state to props expected by screens
@@ -290,7 +290,7 @@ const DedicationsScreen = ({ dedications, onBack }) => {
     return (
         <>
             {/* Hidden video element for inline video audio playback */}
-            <video ref={inlineVideoRef} className="hidden" playsInline />
+            <video ref={inlineVideoRef} className="hidden" playsInline preload="metadata" />
 
             {isMobile ? (
                 <MobileDedicationsScreen {...screenProps} />

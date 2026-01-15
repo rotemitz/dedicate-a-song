@@ -98,6 +98,7 @@ const GreetingCard = ({
                         src={dedication.video_message}
                         className="w-full h-full object-cover"
                         playsInline
+                        preload="metadata"
                         onEnded={onEnded}
                         onClick={onTogglePlay}
                     />

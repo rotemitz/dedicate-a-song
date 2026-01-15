@@ -328,7 +328,7 @@ export const AudioProvider = ({ children }) => {
     return (
         <AudioContext.Provider value={value}>
             {/* Global audio element - hidden, persistent */}
-            <audio ref={audioRef} preload="auto" />
+            <audio ref={audioRef} preload="metadata" />
             {children}
         </AudioContext.Provider>
     );
