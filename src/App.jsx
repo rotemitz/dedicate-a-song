@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import WelcomeScreen from './components/WelcomeScreen';
 import DedicationsScreen from './components/DedicationsScreen';
 import { AudioProvider } from './context/AudioContext';
+import { transformAllDedications } from './lib/supabase';
 
 function App() {
   const [showDedications, setShowDedications] = useState(false);
@@ -26,7 +27,9 @@ function App() {
       .then(data => {
         // Sort by ID as requested
         const sorted = data.dedications.sort((a, b) => a.id - b.id);
-        setDedications(sorted);
+        // Transform local paths to Supabase Storage URLs
+        const withSupabaseUrls = transformAllDedications(sorted);
+        setDedications(withSupabaseUrls);
         setLoading(false);
       })
       .catch(err => {

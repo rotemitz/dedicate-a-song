@@ -4,8 +4,8 @@
         {
             "id": 4,
             "name": "ויקי מיירס",
-            "photo": "assets/images/vicky.webp",
-            "voice_message": "assets/recordings/vicky.opus",
+            "photo": "images/vicky.webp",
+            "voice_message": "recordings/vicky.opus",
             "song": {
                 "title": "Cigarettes & Alcohol",
                 "artist": "Oasis",
@@ -16,8 +16,8 @@
         {
             "id": 3,
             "name": "ליעד עלווה והילדים",
-            "photo": "assets/images/liad-alva.webp",
-            "video_message": "assets/videos/liad-alva.mp4",
+            "photo": "images/liad-alva.webp",
+            "video_message": "videos/liad-alva.mp4",
             "song": {
                 "title": "טל",
                 "artist": "יהורם גאון",
@@ -28,8 +28,8 @@
         {
             "id": 1,
             "name": "עליזה רום-פוזניאק",
-            "photo": "assets/images/aliza.webp",
-            "voice_message": "assets/recordings/aliza.opus",
+            "photo": "images/aliza.webp",
+            "voice_message": "recordings/aliza.opus",
             "song": {
                 "title": "באת לי פתאום",
                 "artist": "קרן פלס ורוני אלטר",
@@ -40,8 +40,8 @@
         {
             "id": 2,
             "name": "אייל פוזניאק",
-            "photo": "assets/images/eyal-pozniak.webp",
-            "voice_message": "assets/recordings/eyal-pozniak.opus",
+            "photo": "images/eyal-pozniak.webp",
+            "voice_message": "recordings/eyal-pozniak.opus",
             "song": {
                 "title": "מנוף",
                 "artist": "בן ורד ויעל ארנון ורד",
@@ -52,8 +52,8 @@
         {
             "id": 5,
             "name": "קרן שלב",
-            "photo": "assets/images/keren.webp",
-            "video_message": "assets/videos/keren.mp4",
+            "photo": "images/keren.webp",
+            "video_message": "videos/keren.mp4",
             "song": {
                 "title": "Hakuna Matata",
                 "artist": "The Lion King",
@@ -64,8 +64,8 @@
         {
             "id": 6,
             "name": "רותם שובל",
-            "photo": "assets/images/rotem-shoval.webp",
-            "video_message": "assets/videos/rotem-shoval.mp4",
+            "photo": "images/rotem-shoval.webp",
+            "video_message": "videos/rotem-shoval.mp4",
             "song": {
                 "title": "מה שאת אוהבת",
                 "artist": "גלי עטרי",
@@ -76,8 +76,8 @@
         {
             "id": 7,
             "name": "חן ונימי",
-            "photo": "assets/images/chen-nimi.webp",
-            "video_message": "assets/videos/chen-nimi.mp4",
+            "photo": "images/chen-nimi.webp",
+            "video_message": "videos/chen-nimi.mp4",
             "song": {
                 "title": "I'll be there for you",
                 "artist": "The rembrandts",
@@ -88,8 +88,8 @@
         {
             "id": 8,
             "name": "גילי",
-            "photo": "assets/images/gili.webp",
-            "video_message": "assets/videos/gili.mp4",
+            "photo": "images/gili.webp",
+            "video_message": "videos/gili.mp4",
             "song": {
                 "title": "לחיות נכון",
                 "artist": "רונה קינן",
@@ -100,8 +100,8 @@
         {
             "id": 9,
             "name": "אמא ואבא",
-            "photo": "assets/images/ima-aba.webp",
-            "video_message": "assets/videos/ima-aba.mp4",
+            "photo": "images/ima-aba.webp",
+            "video_message": "videos/ima-aba.mp4",
             "song": {
                 "title": "מה שאת אוהבת",
                 "artist": "גלי עטרי",
@@ -112,8 +112,8 @@
         {
             "id": 10,
             "name": "אייל לירון והילדים",
-            "photo": "assets/images/eyal-liron.webp",
-            "voice_message": "assets/recordings/eyal-liron.m4a",
+            "photo": "images/eyal-liron.webp",
+            "voice_message": "recordings/eyal-liron.m4a",
             "song": {
                 "title": "איך זה שכוכב",
                 "artist": "מתי כספי",
@@ -124,8 +124,8 @@
         {
             "id": 11,
             "name": "הילה",
-            "photo": "assets/images/hila.webp",
-            "voice_message": "assets/recordings/hila.opus",
+            "photo": "images/hila.webp",
+            "voice_message": "recordings/hila.opus",
             "song": {
                 "title": "Don't Stop Me Now",
                 "artist": "Queen",
@@ -136,8 +136,8 @@
         {
             "id": 12,
             "name": "גיל וטל",
-            "photo": "assets/images/gil-tal.webp",
-            "video_message": "assets/videos/gil-tal.mp4",
+            "photo": "images/gil-tal.webp",
+            "video_message": "videos/gil-tal.mp4",
             "song": {
                 "title": "אדון שוקו",
                 "artist": "אריק איינשטיין",
@@ -148,8 +148,8 @@
         {
             "id": 13,
             "name": "אסתי וחיים",
-            "photo": "assets/images/esti-haim.webp",
-            "video_message": "assets/videos/esti-haim.mp4",
+            "photo": "images/esti-haim.webp",
+            "video_message": "videos/esti-haim.mp4",
             "song": {
                 "title": "ילדותי השניה",
                 "artist": "מתי כספי",
@@ -160,8 +160,8 @@
         {
             "id": 14,
             "name": "יובל",
-            "photo": "assets/images/yuval.webp",
-            "voice_message": "assets/recordings/yuval.opus",
+            "photo": "images/yuval.webp",
+            "voice_message": "recordings/yuval.opus",
             "song": {
                 "title": "וידוי",
                 "artist": "יהודית רביץ",
@@ -172,8 +172,8 @@
         {
             "id": 15,
             "name": "לירון ולירון",
-            "photo": "assets/images/liron-liron.webp",
-            "voice_message": "assets/recordings/liron-liron.opus",
+            "photo": "images/liron-liron.webp",
+            "voice_message": "recordings/liron-liron.opus",
             "song": {
                 "title": "משהו חדש מתחיל",
                 "artist": "דני רובס",
