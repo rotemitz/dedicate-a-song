@@ -75,7 +75,8 @@ const GreetingCard = ({
     isPlaying,
     isGreeting,
     onEnded,
-    onTogglePlay
+    onTogglePlay,
+    onVideoCanPlay
 }) => (
     <motion.div
         initial={{ y: 50, opacity: 0 }}
@@ -101,6 +102,7 @@ const GreetingCard = ({
                         preload="metadata"
                         onEnded={onEnded}
                         onClick={onTogglePlay}
+                        onCanPlay={onVideoCanPlay}
                     />
                     {/* Play Overlay */}
                     <AnimatePresence>
@@ -295,21 +297,62 @@ const DesktopImmersivePlayer = ({
         return () => { document.body.style.overflow = ''; };
     }, []);
 
-    // Handle video playback sync with global state
+    // Dedicated effect to handle video loading when dedication changes
+    // This runs when we navigate to a new video dedication
     useEffect(() => {
         if (!videoRef.current || !hasVideoGreeting || !isGreeting) return;
 
-        // Sync video time with global currentTime
-        if (Math.abs(videoRef.current.currentTime - currentTime) > 0.5) {
-            videoRef.current.currentTime = currentTime;
+        const video = videoRef.current;
+        console.log('[DesktopPlayer] Video dedication effect - loading video for:', dedication?.name);
+
+        // Force load the video (in case src was just updated in JSX)
+        video.load();
+
+        // Only attempt to play if we should be playing
+        if (isPlaying) {
+            const attemptPlay = () => {
+                console.log('[DesktopPlayer] Attempting to play video, readyState:', video.readyState);
+                video.play().catch(e => console.error("Video play error:", e));
+            };
+
+            // Check if video is ready to play
+            if (video.readyState >= 3) { // HAVE_FUTURE_DATA or higher
+                attemptPlay();
+            } else {
+                // Wait for video to be ready
+                const handleCanPlayThrough = () => {
+                    console.log('[DesktopPlayer] Video canplaythrough fired');
+                    attemptPlay();
+                    video.removeEventListener('canplaythrough', handleCanPlayThrough);
+                };
+                video.addEventListener('canplaythrough', handleCanPlayThrough);
+                return () => video.removeEventListener('canplaythrough', handleCanPlayThrough);
+            }
+        }
+    }, [dedication?.video_message, hasVideoGreeting, isGreeting, isPlaying]); // Trigger on video source change
+
+    // Handle play/pause sync with global state (separate from loading)
+    useEffect(() => {
+        if (!videoRef.current || !hasVideoGreeting || !isGreeting) return;
+
+        const video = videoRef.current;
+
+        // Sync video time with global currentTime (only if significantly different)
+        if (Math.abs(video.currentTime - currentTime) > 0.5) {
+            video.currentTime = currentTime;
         }
 
         if (isPlaying) {
-            videoRef.current.play().catch(e => console.error("Video play error:", e));
+            // Only play if video is ready
+            if (video.readyState >= 3 && video.paused) {
+                video.play().catch(e => console.error("Video play sync error:", e));
+            }
         } else {
-            videoRef.current.pause();
+            if (!video.paused) {
+                video.pause();
+            }
         }
-    }, [isPlaying, hasVideoGreeting, isGreeting, currentTime]);
+    }, [isPlaying, currentTime, hasVideoGreeting, isGreeting]);
 
     // Video progress tracking
     useEffect(() => {
@@ -343,6 +386,15 @@ const DesktopImmersivePlayer = ({
         skipToSong();
     };
 
+    const handleVideoCanPlay = () => {
+        // Auto-play when video is ready and we're supposed to be playing
+        // This handles the case when navigating via "Next" button where
+        // the effect runs before the video element is ready
+        if (isPlaying && videoRef.current?.paused) {
+            videoRef.current.play().catch(e => console.error("Video auto-play error:", e));
+        }
+    };
+
     const handleTogglePlay = () => {
         togglePlay();
     };
@@ -374,6 +426,7 @@ const DesktopImmersivePlayer = ({
                         isGreeting={isGreeting}
                         onEnded={handleVideoEnded}
                         onTogglePlay={handleTogglePlay}
+                        onVideoCanPlay={handleVideoCanPlay}
                     />
                     <VinylCard
                         dedication={dedication}
