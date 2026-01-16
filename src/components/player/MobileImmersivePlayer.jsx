@@ -1,11 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useMotionValue, useTransform, animate } from 'framer-motion';
 import {
     SegmentProgressBar,
     WaveformVisualizer,
     VinylRecord,
     TimelineSlider,
-    PrimaryActionButton,
     DedicationAvatar,
     MediaLoadingSpinner
 } from './PlayerComponents';
@@ -21,10 +20,130 @@ const pageTransition = {
 };
 
 const contentTransition = {
-    initial: { opacity: 0, y: 20, scale: 0.95 },
-    animate: { opacity: 1, y: 0, scale: 1 },
-    exit: { opacity: 0, y: -20, scale: 0.95 }
+    initial: { opacity: 0 },
+    animate: { opacity: 1 },
+    exit: { opacity: 0 }
 };
+
+// ============================================
+// UP NEXT PREVIEW COMPONENT
+// ============================================
+const UpNextPreview = ({ dedication, onClick }) => {
+    if (!dedication?.song?.local_file) return null;
+
+    return (
+        <motion.button
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            onClick={onClick}
+            className="flex items-center gap-3 px-4 py-3 rounded-2xl bg-white/70 backdrop-blur-xl border border-white/40 shadow-lg hover:bg-white/80 active:scale-95 transition-all"
+            style={{ boxShadow: '0 8px 32px rgba(212, 144, 123, 0.2)' }}
+        >
+            {/* Album art thumbnail */}
+            <div className="relative w-12 h-12 rounded-xl overflow-hidden shadow-md flex-shrink-0">
+                <img
+                    src={dedication.song?.album_art || dedication.photo}
+                    alt="Up next"
+                    className="w-full h-full object-cover"
+                />
+                {/* Pulsing overlay */}
+                <motion.div
+                    className="absolute inset-0 bg-rose-gold-500/20"
+                    animate={{ opacity: [0.2, 0.4, 0.2] }}
+                    transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                />
+            </div>
+
+            {/* Song info */}
+            <div className="text-left min-w-0">
+                <p className="text-[10px] uppercase tracking-wider text-rose-gold-500 font-semibold">
+                    Up Next
+                </p>
+                <p className="text-sm font-medium text-celebration-charcoal truncate">
+                    {dedication.song?.title}
+                </p>
+                <p className="text-xs text-rose-gold-400 truncate">
+                    {dedication.song?.artist}
+                </p>
+            </div>
+
+            {/* Play icon */}
+            <div className="w-8 h-8 rounded-full bg-rose-gold-500 flex items-center justify-center flex-shrink-0 ml-auto">
+                <span className="material-symbols-outlined text-white !text-lg" style={{ fontVariationSettings: "'FILL' 1" }}>
+                    play_arrow
+                </span>
+            </div>
+        </motion.button>
+    );
+};
+
+// ============================================
+// GLASSMORPHIC FLOATING CONTROLS
+// ============================================
+const GlassmorphicControls = ({
+    isPlaying,
+    onTogglePlay,
+    onClose,
+    showSwipeHint = true
+}) => (
+    <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2, type: "spring", stiffness: 300, damping: 25 }}
+        className="flex items-center gap-4"
+    >
+        {/* Swipe hint - left */}
+        {showSwipeHint && (
+            <motion.div
+                className="text-rose-gold-300"
+                animate={{ x: [-3, 0, -3] }}
+                transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+            >
+                <span className="material-symbols-outlined !text-xl">chevron_left</span>
+            </motion.div>
+        )}
+
+        {/* Main control pill */}
+        <div
+            className="flex items-center gap-2 px-2 py-2 rounded-full bg-white/70 backdrop-blur-xl border border-white/40 shadow-xl"
+            style={{ boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)' }}
+        >
+            {/* Close button */}
+            <button
+                onClick={onClose}
+                className="w-11 h-11 rounded-full bg-white/80 hover:bg-white flex items-center justify-center transition-colors"
+                aria-label="Close player"
+            >
+                <span className="material-symbols-outlined text-celebration-charcoal/70 !text-xl">close</span>
+            </button>
+
+            {/* Play/Pause button */}
+            <button
+                onClick={onTogglePlay}
+                className="w-14 h-14 rounded-full bg-gradient-to-br from-rose-gold-400 to-rose-gold-600 text-white flex items-center justify-center shadow-lg hover:scale-105 active:scale-95 transition-transform"
+                style={{ boxShadow: '0 4px 20px rgba(212, 144, 123, 0.4)' }}
+                aria-label={isPlaying ? "Pause" : "Play"}
+            >
+                <span className="material-symbols-outlined !text-3xl" style={{ fontVariationSettings: "'FILL' 1" }}>
+                    {isPlaying ? 'pause' : 'play_arrow'}
+                </span>
+            </button>
+        </div>
+
+        {/* Swipe hint - right */}
+        {showSwipeHint && (
+            <motion.div
+                className="text-rose-gold-300"
+                animate={{ x: [3, 0, 3] }}
+                transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+            >
+                <span className="material-symbols-outlined !text-xl">chevron_right</span>
+            </motion.div>
+        )}
+    </motion.div>
+);
 
 // ============================================
 // VIDEO PHASE VIEW (for video greetings - themed card layout)
@@ -36,28 +155,22 @@ const VideoPhaseView = ({
     progress,
     duration,
     onTogglePlay,
-    onSkipToSong,
     onSeek,
     onEnded,
     onTimeUpdate,
     onDurationChange
 }) => {
-    const [isPortrait, setIsPortrait] = useState(null); // null = unknown, true = portrait, false = landscape
+    const [isPortrait, setIsPortrait] = useState(null);
     const [isVideoLoading, setIsVideoLoading] = useState(true);
 
-    // Ensure video loads when component mounts or source changes
-    // This handles the AnimatePresence timing issue where the parent's effect
-    // runs before this component mounts
     useEffect(() => {
         if (videoRef.current && dedication.video_message) {
             setIsVideoLoading(true);
-            setIsPortrait(null); // Reset orientation when video changes
+            setIsPortrait(null);
             videoRef.current.load();
         }
     }, [dedication.video_message, videoRef]);
 
-    // Video progress tracking - must be in this component to ensure
-    // listeners are attached after the video element exists
     useEffect(() => {
         const video = videoRef.current;
         if (!video) return;
@@ -69,7 +182,6 @@ const VideoPhaseView = ({
         video.addEventListener('loadedmetadata', handleDurationChange);
         video.addEventListener('durationchange', handleDurationChange);
 
-        // Get initial duration if already loaded
         if (video.duration && !isNaN(video.duration)) {
             onDurationChange(video.duration);
         }
@@ -84,7 +196,6 @@ const VideoPhaseView = ({
     const detectOrientation = () => {
         if (videoRef.current) {
             const { videoWidth, videoHeight } = videoRef.current;
-            // Only update if we have valid dimensions
             if (videoWidth > 0 && videoHeight > 0) {
                 setIsPortrait(videoHeight > videoWidth);
                 return true;
@@ -99,14 +210,9 @@ const VideoPhaseView = ({
 
     const handleCanPlay = () => {
         setIsVideoLoading(false);
-        // Try to detect orientation again in case it wasn't available at loadedmetadata
-        // This is a fallback for iOS Safari where dimensions may load later
         if (isPortrait === null) {
             detectOrientation();
         }
-        // Auto-play when video is ready and we're supposed to be playing
-        // This handles the case when navigating via "Next" button where
-        // the effect runs before the video element mounts
         if (isPlaying && videoRef.current?.paused) {
             videoRef.current.play().catch(e => console.error("Video auto-play error:", e));
         }
@@ -121,33 +227,29 @@ const VideoPhaseView = ({
             exit="exit"
             transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
             style={{ willChange: 'transform, opacity' }}
-            className="flex-1 flex flex-col items-center justify-center px-6 gap-4"
+            className="flex-1 flex flex-col items-center justify-center px-6 gap-4 w-full"
         >
             {/* Header */}
             <div className="text-center">
                 <p className="text-sm uppercase tracking-widest text-rose-gold-500 font-medium mb-2">
-                    Video Dedication
+                    Video Message
                 </p>
                 <h1 className="text-2xl font-serif text-celebration-charcoal">
-                    A message from <span className="italic">{dedication.name}</span>
+                    From <span className="italic">{dedication.name}</span>
                 </h1>
             </div>
 
-            {/* Video Card - adapts to portrait or landscape */}
-            <div className="my-6 w-full flex justify-center">
-                <motion.div
-                    initial={{ scale: 0.9, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    transition={{ duration: 0.5 }}
+            {/* Video Card */}
+            <div className="my-4 w-full flex justify-center">
+                <div
                     className={`relative rounded-2xl overflow-hidden shadow-floating bg-celebration-charcoal ${
                         isPortrait === true
                             ? 'w-[55%] max-w-[240px] aspect-[9/16]'
                             : isPortrait === false
                                 ? 'w-[90%] max-w-sm aspect-video'
-                                : 'w-[70%] max-w-[280px] aspect-square' // Unknown - use square as fallback
+                                : 'w-[70%] max-w-[280px] aspect-square'
                         }`}
                 >
-                    {/* Video loading overlay */}
                     {isVideoLoading && (
                         <div className="absolute inset-0 bg-celebration-charcoal flex items-center justify-center z-10">
                             <MediaLoadingSpinner size="lg" />
@@ -165,36 +267,12 @@ const VideoPhaseView = ({
                         onLoadedMetadata={handleLoadedMetadata}
                         onCanPlay={handleCanPlay}
                     />
-                </motion.div>
+                </div>
             </div>
 
-            {/* Controls */}
-            <div className="flex flex-col items-center gap-6">
-                {/* Play/Pause Button */}
-                <PrimaryActionButton onClick={onTogglePlay}>
-                    <span className="material-symbols-outlined !text-4xl" style={{ fontVariationSettings: "'FILL' 1" }}>
-                        {isPlaying ? 'pause' : 'play_arrow'}
-                    </span>
-                </PrimaryActionButton>
-
-                {/* Skip to Song Button */}
-                {dedication.song?.local_file && (
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ delay: 0.5 }}
-                    >
-                        <PrimaryActionButton variant="skip" onClick={onSkipToSong}>
-                            <span className="material-symbols-outlined !text-xl">skip_next</span>
-                            Skip to Song
-                        </PrimaryActionButton>
-                    </motion.div>
-                )}
-
-                {/* Timeline */}
-                <div className="w-full mt-4">
-                    <TimelineSlider progress={progress} duration={duration} onSeek={onSeek} />
-                </div>
+            {/* Timeline */}
+            <div className="w-full max-w-sm">
+                <TimelineSlider progress={progress} duration={duration} onSeek={onSeek} />
             </div>
         </motion.div>
     );
@@ -208,8 +286,6 @@ const VoicePhaseView = ({
     isPlaying,
     progress,
     duration,
-    onTogglePlay,
-    onSkipToSong,
     onSeek
 }) => (
     <motion.div
@@ -220,69 +296,37 @@ const VoicePhaseView = ({
         exit="exit"
         transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
         style={{ willChange: 'transform, opacity' }}
-        className="flex-1 flex flex-col items-center justify-center px-6 gap-4"
+        className="flex-1 flex flex-col items-center justify-center px-6 gap-4 w-full"
     >
         {/* Header */}
         <div className="text-center">
             <p className="text-sm uppercase tracking-widest text-rose-gold-500 font-medium mb-2">
-                Voice Dedication
+                Voice Message
             </p>
             <h1 className="text-2xl font-serif text-celebration-charcoal">
-                A message from <span className="italic">{dedication.name}</span>
+                From <span className="italic">{dedication.name}</span>
             </h1>
         </div>
 
         {/* Hero Profile */}
-        <div className="my-8 flex flex-col items-center gap-4">
-            <motion.div
-                initial={{ scale: 0.9, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ duration: 0.5 }}
-            >
-                <DedicationAvatar
-                    src={dedication.photo}
-                    alt={dedication.name}
-                    isPlaying={isPlaying}
-                    size="large"
-                />
-            </motion.div>
+        <div className="my-6 flex flex-col items-center gap-4">
+            <DedicationAvatar
+                src={dedication.photo}
+                alt={dedication.name}
+                isPlaying={isPlaying}
+                size="large"
+            />
 
             {/* Waveform */}
-            <div className="mt-6">
+            <div className="mt-4">
                 <WaveformVisualizer isPlaying={isPlaying} barCount={16} />
             </div>
         </div>
 
-        {/* Controls */}
-        <div className="flex flex-col items-center gap-6">
-            {/* Play/Pause Button */}
-            <PrimaryActionButton onClick={onTogglePlay}>
-                <span className="material-symbols-outlined !text-4xl" style={{ fontVariationSettings: "'FILL' 1" }}>
-                    {isPlaying ? 'pause' : 'play_arrow'}
-                </span>
-            </PrimaryActionButton>
-
-            {/* Skip to Song Button */}
-            {dedication.song?.local_file && (
-                <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.5 }}
-                >
-                    <PrimaryActionButton variant="skip" onClick={onSkipToSong}>
-                        <span className="material-symbols-outlined !text-xl">skip_next</span>
-                        Skip to Song
-                    </PrimaryActionButton>
-                </motion.div>
-            )}
-
-            {/* Timeline */}
-            <div className="w-full mt-8">
-                <TimelineSlider progress={progress} duration={duration} onSeek={onSeek} />
-            </div>
+        {/* Timeline */}
+        <div className="w-full max-w-sm">
+            <TimelineSlider progress={progress} duration={duration} onSeek={onSeek} />
         </div>
-
-
     </motion.div>
 );
 
@@ -305,12 +349,12 @@ const SongPhaseView = ({
         exit="exit"
         transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
         style={{ willChange: 'transform, opacity' }}
-        className="flex-1 flex flex-col items-center justify-center px-6 gap-4"
+        className="flex-1 flex flex-col items-center justify-center px-6 gap-4 w-full"
     >
         {/* Header */}
         <div className="text-center">
             <p className="text-sm uppercase tracking-widest text-rose-gold-500 font-medium mb-2">
-                40th Birthday
+                Dedicated Song
             </p>
             <h1 className="text-2xl font-serif text-celebration-charcoal">
                 Now Playing
@@ -318,72 +362,56 @@ const SongPhaseView = ({
         </div>
 
         {/* Hero Vinyl */}
-        <div className="my-8 flex flex-col items-center">
+        <div className="my-6 flex flex-col items-center">
             <VinylRecord
                 albumArt={dedication.song?.album_art || dedication.photo}
                 songTitle={dedication.song?.title}
                 isPlaying={isPlaying}
-                size="w-56 h-56"
+                size="w-52 h-52"
                 onClick={onTogglePlay}
             />
         </div>
 
         {/* Song Info */}
-        <div className="text-center mb-6">
-            <h2 className="text-3xl font-serif text-celebration-charcoal mb-2">
+        <div className="text-center">
+            <h2 className="text-2xl font-serif text-celebration-charcoal mb-1">
                 {dedication.song?.title}
             </h2>
-            <p className="text-lg text-rose-gold-600 font-sans">
+            <p className="text-base text-rose-gold-600 font-sans">
                 {dedication.song?.artist}
             </p>
         </div>
 
-        {/* Controls */}
-        <div className="flex flex-col items-center gap-6">
-            {/* Play/Pause Button */}
-            <PrimaryActionButton onClick={onTogglePlay}>
-                <span className="material-symbols-outlined !text-4xl" style={{ fontVariationSettings: "'FILL' 1" }}>
-                    {isPlaying ? 'pause' : 'play_arrow'}
-                </span>
-            </PrimaryActionButton>
-        </div>
-
         {/* Timeline */}
-        <div className="w-full mt-8">
+        <div className="w-full max-w-sm mt-4">
             <TimelineSlider progress={progress} duration={duration} onSeek={onSeek} />
         </div>
     </motion.div>
 );
 
 // ============================================
-// FOOTER NAVIGATION
+// SWIPE HINT OVERLAY
 // ============================================
-const FooterNavigation = ({ onPrevious, onNext, onClose, isGreeting }) => (
-    <div
-        className="w-full px-8 pt-6 flex items-center justify-between"
-        style={{ paddingBottom: 'max(24px, calc(16px + env(safe-area-inset-bottom)))' }}
+const SwipeHintOverlay = ({ direction }) => (
+    <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className={`absolute top-1/2 -translate-y-1/2 ${direction === 'left' ? 'left-2' : 'right-2'} z-10`}
     >
-        <button onClick={onPrevious} className="text-left flex-1">
-            <p className="text-[10px] uppercase tracking-tighter text-rose-gold-400">Previous</p>
-            <p className="text-sm font-medium text-celebration-charcoal mt-1">Dedication</p>
-        </button>
-
-        {/* Close button - centered */}
-        <button
-            onClick={onClose}
-            className="w-12 h-12 rounded-full bg-white/80 hover:bg-white transition-colors shadow-md mx-4 flex items-center justify-center"
-            aria-label="Close player"
+        <motion.div
+            className="w-10 h-10 rounded-full bg-white/60 backdrop-blur-sm flex items-center justify-center shadow-lg"
+            animate={{
+                x: direction === 'left' ? [-5, 0, -5] : [5, 0, 5],
+                scale: [1, 1.1, 1]
+            }}
+            transition={{ duration: 0.8, repeat: Infinity }}
         >
-            <span className="material-symbols-outlined text-celebration-charcoal leading-none">close</span>
-        </button>
-
-        <button onClick={onNext} className="text-right flex-1">
-            <p className="text-[10px] uppercase tracking-tighter text-rose-gold-400">Next</p>
-            <p className="text-sm font-medium text-celebration-charcoal mt-1">
-                {isGreeting ? 'Song' : 'Dedication'}
-            </p>
-        </button>
-    </div>
+            <span className="material-symbols-outlined text-rose-gold-500 !text-xl">
+                {direction === 'left' ? 'chevron_left' : 'chevron_right'}
+            </span>
+        </motion.div>
+    </motion.div>
 );
 
 // ============================================
@@ -397,7 +425,6 @@ const MobileImmersivePlayer = ({
     onNext,
     onPrevious,
 }) => {
-    // Use global audio context
     const {
         isPlaying,
         currentTime,
@@ -410,10 +437,17 @@ const MobileImmersivePlayer = ({
         setDuration,
     } = useAudioPlayer();
 
-    // Video ref for video greetings (kept local for display)
     const videoRef = useRef(null);
+    const containerRef = useRef(null);
 
-    // Determine if we're in greeting phase
+    // Swipe gesture state
+    const x = useMotionValue(0);
+    const [isDragging, setIsDragging] = useState(false);
+    const [swipeDirection, setSwipeDirection] = useState(null);
+
+    // Subtle visual feedback during drag (less dramatic)
+    const dragOpacity = useTransform(x, [-100, 0, 100], [0.85, 1, 0.85]);
+
     const isGreeting = phase === 'greeting';
     const hasVideoGreeting = dedication.video_message != null;
 
@@ -423,31 +457,22 @@ const MobileImmersivePlayer = ({
         return () => { document.body.style.overflow = ''; };
     }, []);
 
-    // Dedicated effect to handle video loading when dedication changes
-    // This runs when we navigate to a new video dedication
+    // Video loading effect
     useEffect(() => {
         if (!videoRef.current || !hasVideoGreeting || !isGreeting) return;
 
         const video = videoRef.current;
-        console.log('[MobilePlayer] Video dedication effect - loading video for:', dedication?.name);
-
-        // Force load the video (in case src was just updated in JSX)
         video.load();
 
-        // Only attempt to play if we should be playing
         if (isPlaying) {
             const attemptPlay = () => {
-                console.log('[MobilePlayer] Attempting to play video, readyState:', video.readyState);
                 video.play().catch(e => console.error("Video play error:", e));
             };
 
-            // Check if video is ready to play
-            if (video.readyState >= 3) { // HAVE_FUTURE_DATA or higher
+            if (video.readyState >= 3) {
                 attemptPlay();
             } else {
-                // Wait for video to be ready - use canplay for faster start on slow connections
                 const handleCanPlay = () => {
-                    console.log('[MobilePlayer] Video canplay fired');
                     attemptPlay();
                     video.removeEventListener('canplay', handleCanPlay);
                 };
@@ -455,21 +480,19 @@ const MobileImmersivePlayer = ({
                 return () => video.removeEventListener('canplay', handleCanPlay);
             }
         }
-    }, [dedication?.video_message, hasVideoGreeting, isGreeting, isPlaying]); // Trigger on video source change
+    }, [dedication?.video_message, hasVideoGreeting, isGreeting, isPlaying]);
 
-    // Handle play/pause sync with global state (separate from loading)
+    // Video play/pause sync
     useEffect(() => {
         if (!videoRef.current || !hasVideoGreeting || !isGreeting) return;
 
         const video = videoRef.current;
 
-        // Sync video time with global currentTime (only if significantly different)
         if (Math.abs(video.currentTime - currentTime) > 0.5) {
             video.currentTime = currentTime;
         }
 
         if (isPlaying) {
-            // Only play if video is ready
             if (video.readyState >= 3 && video.paused) {
                 video.play().catch(e => console.error("Video play sync error:", e));
             }
@@ -480,16 +503,12 @@ const MobileImmersivePlayer = ({
         }
     }, [isPlaying, currentTime, hasVideoGreeting, isGreeting]);
 
-    // Note: Video progress tracking is handled inside VideoPhaseView
-    // to avoid AnimatePresence timing issues with videoRef
-
     const handleVideoEnded = () => {
         skipToSong();
     };
 
     const handleSeek = (time) => {
         seek(time);
-        // Also seek video if in video greeting mode
         if (videoRef.current && hasVideoGreeting && isGreeting) {
             videoRef.current.currentTime = time;
         }
@@ -503,6 +522,47 @@ const MobileImmersivePlayer = ({
         skipToSong();
     };
 
+    // Swipe handlers
+    const handleDragStart = () => {
+        setIsDragging(true);
+    };
+
+    const handleDrag = (_, info) => {
+        if (info.offset.x > 30) {
+            setSwipeDirection('right');
+        } else if (info.offset.x < -30) {
+            setSwipeDirection('left');
+        } else {
+            setSwipeDirection(null);
+        }
+    };
+
+    const handleDragEnd = (_, info) => {
+        setIsDragging(false);
+        setSwipeDirection(null);
+
+        const threshold = 80;
+        const velocity = info.velocity.x;
+        const offset = info.offset.x;
+
+        if (offset > threshold || velocity > 500) {
+            // Swipe right - go to previous
+            x.set(0);
+            onPrevious();
+        } else if (offset < -threshold || velocity < -500) {
+            // Swipe left - go to next (song if greeting, next dedication if song)
+            x.set(0);
+            if (isGreeting) {
+                handleSkipToSong();
+            } else {
+                onNext();
+            }
+        } else {
+            // Snap back with spring animation
+            animate(x, 0, { type: "spring", stiffness: 500, damping: 30 });
+        }
+    };
+
     return (
         <motion.div
             variants={pageTransition}
@@ -512,7 +572,6 @@ const MobileImmersivePlayer = ({
             className="fixed inset-0 z-[2000] h-[100dvh] w-full flex flex-col items-center bg-celebration-cream overflow-hidden"
             style={{
                 paddingTop: 'max(16px, env(safe-area-inset-top))',
-                paddingBottom: 'env(safe-area-inset-bottom)'
             }}
         >
             {/* Segment Progress Bar */}
@@ -523,57 +582,90 @@ const MobileImmersivePlayer = ({
                 duration={duration}
             />
 
-            {/* Phase Content */}
-            <AnimatePresence mode="wait">
-                {isGreeting && hasVideoGreeting ? (
-                    <VideoPhaseView
-                        key="video"
-                        videoRef={videoRef}
-                        dedication={dedication}
-                        isPlaying={isPlaying}
-                        progress={currentTime}
-                        duration={duration}
-                        onTogglePlay={handleTogglePlay}
-                        onSkipToSong={handleSkipToSong}
-                        onSeek={handleSeek}
-                        onEnded={handleVideoEnded}
-                        onTimeUpdate={setCurrentTime}
-                        onDurationChange={setDuration}
-                    />
-                ) : isGreeting ? (
-                    <VoicePhaseView
-                        key="voice"
-                        dedication={dedication}
-                        isPlaying={isPlaying}
-                        progress={currentTime}
-                        duration={duration}
-                        onTogglePlay={handleTogglePlay}
-                        onSkipToSong={handleSkipToSong}
-                        onSeek={handleSeek}
-                    />
-                ) : (
-                    <SongPhaseView
-                        key="song"
-                        dedication={dedication}
-                        isPlaying={isPlaying}
-                        progress={currentTime}
-                        duration={duration}
-                        onTogglePlay={handleTogglePlay}
-                        onSeek={handleSeek}
-                    />
-                )}
-            </AnimatePresence>
+            {/* Swipeable Content Container */}
+            <motion.div
+                ref={containerRef}
+                className="flex-1 w-full flex flex-col items-center justify-center relative touch-pan-y"
+                style={{ x, opacity: dragOpacity }}
+                drag="x"
+                dragConstraints={{ left: 0, right: 0 }}
+                dragElastic={0.15}
+                onDragStart={handleDragStart}
+                onDrag={handleDrag}
+                onDragEnd={handleDragEnd}
+            >
+                {/* Swipe direction indicators */}
+                <AnimatePresence>
+                    {isDragging && swipeDirection === 'left' && (
+                        <SwipeHintOverlay direction="right" />
+                    )}
+                    {isDragging && swipeDirection === 'right' && (
+                        <SwipeHintOverlay direction="left" />
+                    )}
+                </AnimatePresence>
 
-            {/* Footer Navigation */}
-            <FooterNavigation
-                onPrevious={onPrevious}
-                onNext={() => {
-                    if (isGreeting) handleSkipToSong();
-                    else onNext();
-                }}
-                onClose={onClose}
-                isGreeting={isGreeting}
-            />
+                {/* Phase Content */}
+                <AnimatePresence mode="wait">
+                    {isGreeting && hasVideoGreeting ? (
+                        <VideoPhaseView
+                            key="video"
+                            videoRef={videoRef}
+                            dedication={dedication}
+                            isPlaying={isPlaying}
+                            progress={currentTime}
+                            duration={duration}
+                            onTogglePlay={handleTogglePlay}
+                            onSeek={handleSeek}
+                            onEnded={handleVideoEnded}
+                            onTimeUpdate={setCurrentTime}
+                            onDurationChange={setDuration}
+                        />
+                    ) : isGreeting ? (
+                        <VoicePhaseView
+                            key="voice"
+                            dedication={dedication}
+                            isPlaying={isPlaying}
+                            progress={currentTime}
+                            duration={duration}
+                            onSeek={handleSeek}
+                        />
+                    ) : (
+                        <SongPhaseView
+                            key="song"
+                            dedication={dedication}
+                            isPlaying={isPlaying}
+                            progress={currentTime}
+                            duration={duration}
+                            onTogglePlay={handleTogglePlay}
+                            onSeek={handleSeek}
+                        />
+                    )}
+                </AnimatePresence>
+            </motion.div>
+
+            {/* Bottom Controls Area */}
+            <div
+                className="w-full flex flex-col items-center gap-4 px-6 pb-2"
+                style={{ paddingBottom: 'max(16px, calc(8px + env(safe-area-inset-bottom)))' }}
+            >
+                {/* Up Next Preview - only show during greeting phase */}
+                <AnimatePresence>
+                    {isGreeting && dedication?.song?.local_file && (
+                        <UpNextPreview
+                            dedication={dedication}
+                            onClick={handleSkipToSong}
+                        />
+                    )}
+                </AnimatePresence>
+
+                {/* Glassmorphic Controls */}
+                <GlassmorphicControls
+                    isPlaying={isPlaying}
+                    onTogglePlay={handleTogglePlay}
+                    onClose={onClose}
+                    showSwipeHint={!isDragging}
+                />
+            </div>
         </motion.div>
     );
 };

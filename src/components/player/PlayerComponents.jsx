@@ -224,7 +224,6 @@ export const VinylRecord = ({ albumArt, isPlaying, songTitle, size = 'w-72 h-72'
 
                 {/* The Tonearm with Spring Physics */}
                 <motion.div
-                    initial={{ rotate: -35 }}
                     animate={{ rotate: isPlaying ? 15 : -35 }}
                     transition={{ type: "spring", stiffness: 50, damping: 15 }}
                     className="absolute -top-2 -right-2 w-1/2 h-full pointer-events-none z-20 origin-top-right"
