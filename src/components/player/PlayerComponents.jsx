@@ -409,8 +409,15 @@ export const TimelineSlider = ({ progress, duration, onSeek }) => {
         return `${min}:${sec < 10 ? '0' + sec : sec}`;
     };
 
+    // Stop propagation to prevent parent drag handlers (e.g., swipe navigation) from triggering
+    const stopDragPropagation = (e) => e.stopPropagation();
+
     return (
-        <div className="w-full px-6">
+        <div
+            className="w-full px-6"
+            onPointerDownCapture={stopDragPropagation}
+            onTouchStartCapture={stopDragPropagation}
+        >
             <InteractiveProgressBar
                 progress={progress}
                 duration={duration}

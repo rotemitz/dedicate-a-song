@@ -179,10 +179,12 @@ export const AudioProvider = ({ children }) => {
 
         setPhase('song');
         setCurrentTime(0);
+        setDuration(0);
 
         if (audioRef.current) {
             audioRef.current.src = currentDedication.song.local_file;
             audioRef.current.load();
+            audioRef.current.currentTime = 0;
 
             if (isPlaying) {
                 // Wait for audio to be ready before playing (streaming optimized)

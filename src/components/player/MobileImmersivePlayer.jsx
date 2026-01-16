@@ -507,6 +507,20 @@ const MobileImmersivePlayer = ({
         skipToSong();
     };
 
+    // Guard video time updates - only update if still in greeting phase
+    // This prevents late timeupdate events during exit animation from overwriting song time
+    const handleVideoTimeUpdate = (time) => {
+        if (phase === 'greeting') {
+            setCurrentTime(time);
+        }
+    };
+
+    const handleVideoDurationChange = (dur) => {
+        if (phase === 'greeting') {
+            setDuration(dur);
+        }
+    };
+
     const handleSeek = (time) => {
         seek(time);
         if (videoRef.current && hasVideoGreeting && isGreeting) {
@@ -617,8 +631,8 @@ const MobileImmersivePlayer = ({
                             onTogglePlay={handleTogglePlay}
                             onSeek={handleSeek}
                             onEnded={handleVideoEnded}
-                            onTimeUpdate={setCurrentTime}
-                            onDurationChange={setDuration}
+                            onTimeUpdate={handleVideoTimeUpdate}
+                            onDurationChange={handleVideoDurationChange}
                         />
                     ) : isGreeting ? (
                         <VoicePhaseView

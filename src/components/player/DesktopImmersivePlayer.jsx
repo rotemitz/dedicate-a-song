@@ -382,12 +382,18 @@ const DesktopImmersivePlayer = ({
         }
     };
 
+    // Guard video time updates - only update if still in greeting phase
+    // This prevents late events during phase transition from overwriting song time
     const handleVideoTimeUpdate = (e) => {
-        setCurrentTime(e.target.currentTime);
+        if (isGreeting) {
+            setCurrentTime(e.target.currentTime);
+        }
     };
 
     const handleVideoLoadedMetadata = (e) => {
-        setDuration(e.target.duration);
+        if (isGreeting) {
+            setDuration(e.target.duration);
+        }
     };
 
     const handleTogglePlay = () => {
