@@ -324,18 +324,30 @@ export const InteractiveProgressBar = ({
         setIsDragging(false);
     };
 
-    // Global mouse up listener when dragging
+    // Global mouse/touch listeners when dragging
     React.useEffect(() => {
         if (isDragging) {
             const handleGlobalMouseMove = (e) => handleSeek(e.clientX);
             const handleGlobalMouseUp = () => setIsDragging(false);
+            const handleGlobalTouchMove = (e) => {
+                if (e.touches[0]) {
+                    handleSeek(e.touches[0].clientX);
+                }
+            };
+            const handleGlobalTouchEnd = () => setIsDragging(false);
 
             window.addEventListener('mousemove', handleGlobalMouseMove);
             window.addEventListener('mouseup', handleGlobalMouseUp);
+            window.addEventListener('touchmove', handleGlobalTouchMove, { passive: true });
+            window.addEventListener('touchend', handleGlobalTouchEnd);
+            window.addEventListener('touchcancel', handleGlobalTouchEnd);
 
             return () => {
                 window.removeEventListener('mousemove', handleGlobalMouseMove);
                 window.removeEventListener('mouseup', handleGlobalMouseUp);
+                window.removeEventListener('touchmove', handleGlobalTouchMove);
+                window.removeEventListener('touchend', handleGlobalTouchEnd);
+                window.removeEventListener('touchcancel', handleGlobalTouchEnd);
             };
         }
     }, [isDragging, duration]);
