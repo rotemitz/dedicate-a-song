@@ -90,17 +90,29 @@ export const AudioProvider = ({ children }) => {
         if (audioRef.current && source) {
             audioRef.current.src = source;
             audioRef.current.load();
-            console.log('[loadDedication] Audio src set, calling play...');
-            // Use setTimeout to ensure state updates have propagated
-            setTimeout(() => {
-                if (audioRef.current && audioRef.current.src) {
-                    console.log('[loadDedication] Playing audio, readyState:', audioRef.current.readyState);
-                    audioRef.current.play().catch(e => {
-                        console.error("[loadDedication] Audio play error:", e);
-                        setIsPlaying(false);
-                    });
-                }
-            }, 50);
+            console.log('[loadDedication] Audio src set, waiting for audio to be ready...');
+
+            // Use canplay event for streaming optimization - starts playing as soon as
+            // enough data is buffered, without waiting for the entire file
+            const handleCanPlay = () => {
+                console.log('[loadDedication] Audio ready, playing...');
+                audioRef.current?.play().catch(e => {
+                    console.error("[loadDedication] Audio play error:", e);
+                    setIsPlaying(false);
+                });
+                audioRef.current?.removeEventListener('canplay', handleCanPlay);
+            };
+
+            // Check if already ready (HAVE_FUTURE_DATA or higher - enough to start playing)
+            if (audioRef.current.readyState >= 3) {
+                console.log('[loadDedication] Audio already ready, playing immediately');
+                audioRef.current.play().catch(e => {
+                    console.error("[loadDedication] Audio play error:", e);
+                    setIsPlaying(false);
+                });
+            } else {
+                audioRef.current.addEventListener('canplay', handleCanPlay);
+            }
         } else {
             console.log('[loadDedication] No source available');
         }
@@ -171,8 +183,19 @@ export const AudioProvider = ({ children }) => {
         if (audioRef.current) {
             audioRef.current.src = currentDedication.song.local_file;
             audioRef.current.load();
+
             if (isPlaying) {
-                audioRef.current.play().catch(e => console.error("Skip to song play error:", e));
+                // Wait for audio to be ready before playing (streaming optimized)
+                const handleCanPlay = () => {
+                    audioRef.current?.play().catch(e => console.error("Skip to song play error:", e));
+                    audioRef.current?.removeEventListener('canplay', handleCanPlay);
+                };
+
+                if (audioRef.current.readyState >= 3) {
+                    audioRef.current.play().catch(e => console.error("Skip to song play error:", e));
+                } else {
+                    audioRef.current.addEventListener('canplay', handleCanPlay);
+                }
             }
         }
 
