@@ -319,14 +319,14 @@ const DesktopImmersivePlayer = ({
             if (video.readyState >= 3) { // HAVE_FUTURE_DATA or higher
                 attemptPlay();
             } else {
-                // Wait for video to be ready
-                const handleCanPlayThrough = () => {
-                    console.log('[DesktopPlayer] Video canplaythrough fired');
+                // Wait for video to be ready - use canplay for faster start on slow connections
+                const handleCanPlay = () => {
+                    console.log('[DesktopPlayer] Video canplay fired');
                     attemptPlay();
-                    video.removeEventListener('canplaythrough', handleCanPlayThrough);
+                    video.removeEventListener('canplay', handleCanPlay);
                 };
-                video.addEventListener('canplaythrough', handleCanPlayThrough);
-                return () => video.removeEventListener('canplaythrough', handleCanPlayThrough);
+                video.addEventListener('canplay', handleCanPlay);
+                return () => video.removeEventListener('canplay', handleCanPlay);
             }
         }
     }, [dedication?.video_message, hasVideoGreeting, isGreeting, isPlaying]); // Trigger on video source change

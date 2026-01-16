@@ -43,6 +43,16 @@ const VideoPhaseView = ({
     const [isPortrait, setIsPortrait] = useState(false);
     const [isVideoLoading, setIsVideoLoading] = useState(true);
 
+    // Ensure video loads when component mounts or source changes
+    // This handles the AnimatePresence timing issue where the parent's effect
+    // runs before this component mounts
+    useEffect(() => {
+        if (videoRef.current && dedication.video_message) {
+            setIsVideoLoading(true);
+            videoRef.current.load();
+        }
+    }, [dedication.video_message, videoRef]);
+
     const handleLoadedMetadata = () => {
         if (videoRef.current) {
             const { videoWidth, videoHeight } = videoRef.current;
@@ -390,14 +400,14 @@ const MobileImmersivePlayer = ({
             if (video.readyState >= 3) { // HAVE_FUTURE_DATA or higher
                 attemptPlay();
             } else {
-                // Wait for video to be ready
-                const handleCanPlayThrough = () => {
-                    console.log('[MobilePlayer] Video canplaythrough fired');
+                // Wait for video to be ready - use canplay for faster start on slow connections
+                const handleCanPlay = () => {
+                    console.log('[MobilePlayer] Video canplay fired');
                     attemptPlay();
-                    video.removeEventListener('canplaythrough', handleCanPlayThrough);
+                    video.removeEventListener('canplay', handleCanPlay);
                 };
-                video.addEventListener('canplaythrough', handleCanPlayThrough);
-                return () => video.removeEventListener('canplaythrough', handleCanPlayThrough);
+                video.addEventListener('canplay', handleCanPlay);
+                return () => video.removeEventListener('canplay', handleCanPlay);
             }
         }
     }, [dedication?.video_message, hasVideoGreeting, isGreeting, isPlaying]); // Trigger on video source change
