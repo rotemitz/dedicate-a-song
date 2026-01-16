@@ -163,13 +163,38 @@ const VideoPhaseView = ({
     const [isPortrait, setIsPortrait] = useState(null);
     const [isVideoLoading, setIsVideoLoading] = useState(true);
 
+    // Load video and trigger autoplay when VideoPhaseView mounts
+    // This is critical for the case when transitioning from song phase to video greeting,
+    // because AnimatePresence mode="wait" delays mounting until exit animation completes,
+    // meaning the parent's video loading effect runs before videoRef.current is set
     useEffect(() => {
-        if (videoRef.current && dedication.video_message) {
-            setIsVideoLoading(true);
-            setIsPortrait(null);
-            videoRef.current.load();
+        if (!videoRef.current || !dedication.video_message) return;
+
+        const video = videoRef.current;
+        setIsVideoLoading(true);
+        setIsPortrait(null);
+        video.load();
+
+        // Attempt to autoplay if isPlaying is true
+        if (isPlaying) {
+            const attemptPlay = () => {
+                if (video.paused) {
+                    video.play().catch(e => console.error("VideoPhaseView auto-play error:", e));
+                }
+            };
+
+            if (video.readyState >= 3) {
+                attemptPlay();
+            } else {
+                const handleCanPlayOnce = () => {
+                    attemptPlay();
+                    video.removeEventListener('canplay', handleCanPlayOnce);
+                };
+                video.addEventListener('canplay', handleCanPlayOnce);
+                return () => video.removeEventListener('canplay', handleCanPlayOnce);
+            }
         }
-    }, [dedication.video_message, videoRef]);
+    }, [dedication.video_message, videoRef, isPlaying]);
 
     useEffect(() => {
         const video = videoRef.current;
@@ -258,7 +283,7 @@ const VideoPhaseView = ({
                     <video
                         ref={videoRef}
                         src={dedication.video_message}
-                        className={`w-full h-full object-contain transition-all duration-500 ${!isPlaying ? 'blur-sm' : ''}`}
+                        className={`w-full h-full object-cover transition-all duration-500 ${!isPlaying ? 'blur-sm' : ''}`}
                         playsInline
                         muted={false}
                         preload="metadata"
