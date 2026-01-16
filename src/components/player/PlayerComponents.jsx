@@ -134,17 +134,21 @@ export const DedicationAvatar = ({
         >
             {/* Loading skeleton */}
             {isLoading && (
-                <div className="absolute inset-0 bg-rose-gold-100 animate-pulse flex items-center justify-center">
+                <div className="absolute inset-0 bg-rose-gold-100 animate-pulse flex items-center justify-center rounded-full">
                     <MediaLoadingSpinner size={size === 'large' ? 'lg' : 'sm'} />
                 </div>
             )}
-            <img
-                src={src || 'assets/placeholder.png'}
-                alt={alt}
-                className={`w-full h-full object-cover transition-all duration-500 ${!isPlaying ? 'blur-sm' : ''} ${isLoading ? 'opacity-0' : 'opacity-100'}`}
-                onLoad={() => setIsLoading(false)}
-                onError={() => setIsLoading(false)}
-            />
+            {/* Wrapper to fix iOS Safari blur breaking out of overflow:hidden */}
+            <div className="w-full h-full rounded-full overflow-hidden">
+                <img
+                    src={src || 'assets/placeholder.png'}
+                    alt={alt}
+                    className={`w-full h-full object-cover transition-all duration-500 rounded-full ${!isPlaying ? 'blur-sm scale-105' : ''} ${isLoading ? 'opacity-0' : 'opacity-100'}`}
+                    style={{ transform: 'translateZ(0)' }}
+                    onLoad={() => setIsLoading(false)}
+                    onError={() => setIsLoading(false)}
+                />
+            </div>
         </div>
     );
 };
