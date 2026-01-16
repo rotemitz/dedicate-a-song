@@ -42,7 +42,7 @@ const VideoPhaseView = ({
     onTimeUpdate,
     onDurationChange
 }) => {
-    const [isPortrait, setIsPortrait] = useState(false);
+    const [isPortrait, setIsPortrait] = useState(null); // null = unknown, true = portrait, false = landscape
     const [isVideoLoading, setIsVideoLoading] = useState(true);
 
     // Ensure video loads when component mounts or source changes
@@ -51,6 +51,7 @@ const VideoPhaseView = ({
     useEffect(() => {
         if (videoRef.current && dedication.video_message) {
             setIsVideoLoading(true);
+            setIsPortrait(null); // Reset orientation when video changes
             videoRef.current.load();
         }
     }, [dedication.video_message, videoRef]);
@@ -80,15 +81,29 @@ const VideoPhaseView = ({
         };
     }, [videoRef, onTimeUpdate, onDurationChange]);
 
-    const handleLoadedMetadata = () => {
+    const detectOrientation = () => {
         if (videoRef.current) {
             const { videoWidth, videoHeight } = videoRef.current;
-            setIsPortrait(videoHeight > videoWidth);
+            // Only update if we have valid dimensions
+            if (videoWidth > 0 && videoHeight > 0) {
+                setIsPortrait(videoHeight > videoWidth);
+                return true;
+            }
         }
+        return false;
+    };
+
+    const handleLoadedMetadata = () => {
+        detectOrientation();
     };
 
     const handleCanPlay = () => {
         setIsVideoLoading(false);
+        // Try to detect orientation again in case it wasn't available at loadedmetadata
+        // This is a fallback for iOS Safari where dimensions may load later
+        if (isPortrait === null) {
+            detectOrientation();
+        }
         // Auto-play when video is ready and we're supposed to be playing
         // This handles the case when navigating via "Next" button where
         // the effect runs before the video element mounts
@@ -124,9 +139,12 @@ const VideoPhaseView = ({
                     initial={{ scale: 0.9, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     transition={{ duration: 0.5 }}
-                    className={`relative rounded-2xl overflow-hidden shadow-floating bg-celebration-charcoal ${isPortrait
-                        ? 'w-[55%] max-w-[240px] aspect-[9/16]'
-                        : 'w-[90%] max-w-sm aspect-video'
+                    className={`relative rounded-2xl overflow-hidden shadow-floating bg-celebration-charcoal ${
+                        isPortrait === true
+                            ? 'w-[55%] max-w-[240px] aspect-[9/16]'
+                            : isPortrait === false
+                                ? 'w-[90%] max-w-sm aspect-video'
+                                : 'w-[70%] max-w-[280px] aspect-square' // Unknown - use square as fallback
                         }`}
                 >
                     {/* Video loading overlay */}
@@ -138,7 +156,7 @@ const VideoPhaseView = ({
                     <video
                         ref={videoRef}
                         src={dedication.video_message}
-                        className={`w-full h-full object-cover transition-all duration-500 ${!isPlaying ? 'blur-sm' : ''}`}
+                        className={`w-full h-full object-contain transition-all duration-500 ${!isPlaying ? 'blur-sm' : ''}`}
                         playsInline
                         muted={false}
                         preload="metadata"
