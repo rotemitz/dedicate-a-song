@@ -129,26 +129,25 @@ export const DedicationAvatar = ({
 
     return (
         <div
-            className={`${sizeClasses[size]} rounded-full overflow-hidden border-white/20 shadow-2xl isolate relative`}
-            style={{ WebkitMaskImage: '-webkit-radial-gradient(white, black)' }}
+            className={`${sizeClasses[size]} rounded-full overflow-hidden border-white/20 shadow-2xl relative`}
+            style={{
+                clipPath: 'circle(50%)',
+                WebkitClipPath: 'circle(50%)'
+            }}
         >
             {/* Loading skeleton */}
             {isLoading && (
-                <div className="absolute inset-0 bg-rose-gold-100 animate-pulse flex items-center justify-center rounded-full">
+                <div className="absolute inset-0 bg-rose-gold-100 animate-pulse flex items-center justify-center">
                     <MediaLoadingSpinner size={size === 'large' ? 'lg' : 'sm'} />
                 </div>
             )}
-            {/* Wrapper to fix iOS Safari blur breaking out of overflow:hidden */}
-            <div className="w-full h-full rounded-full overflow-hidden">
-                <img
-                    src={src || 'assets/placeholder.png'}
-                    alt={alt}
-                    className={`w-full h-full object-cover transition-all duration-500 rounded-full ${!isPlaying ? 'blur-sm scale-105' : ''} ${isLoading ? 'opacity-0' : 'opacity-100'}`}
-                    style={{ transform: 'translateZ(0)' }}
-                    onLoad={() => setIsLoading(false)}
-                    onError={() => setIsLoading(false)}
-                />
-            </div>
+            <img
+                src={src || 'assets/placeholder.png'}
+                alt={alt}
+                className={`w-full h-full object-cover transition-all duration-500 ${!isPlaying ? 'blur-sm scale-110' : ''} ${isLoading ? 'opacity-0' : 'opacity-100'}`}
+                onLoad={() => setIsLoading(false)}
+                onError={() => setIsLoading(false)}
+            />
         </div>
     );
 };
