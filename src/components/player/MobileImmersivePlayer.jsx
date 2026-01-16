@@ -38,7 +38,9 @@ const VideoPhaseView = ({
     onTogglePlay,
     onSkipToSong,
     onSeek,
-    onEnded
+    onEnded,
+    onTimeUpdate,
+    onDurationChange
 }) => {
     const [isPortrait, setIsPortrait] = useState(false);
     const [isVideoLoading, setIsVideoLoading] = useState(true);
@@ -52,6 +54,31 @@ const VideoPhaseView = ({
             videoRef.current.load();
         }
     }, [dedication.video_message, videoRef]);
+
+    // Video progress tracking - must be in this component to ensure
+    // listeners are attached after the video element exists
+    useEffect(() => {
+        const video = videoRef.current;
+        if (!video) return;
+
+        const handleTimeUpdate = () => onTimeUpdate(video.currentTime);
+        const handleDurationChange = () => onDurationChange(video.duration);
+
+        video.addEventListener('timeupdate', handleTimeUpdate);
+        video.addEventListener('loadedmetadata', handleDurationChange);
+        video.addEventListener('durationchange', handleDurationChange);
+
+        // Get initial duration if already loaded
+        if (video.duration && !isNaN(video.duration)) {
+            onDurationChange(video.duration);
+        }
+
+        return () => {
+            video.removeEventListener('timeupdate', handleTimeUpdate);
+            video.removeEventListener('loadedmetadata', handleDurationChange);
+            video.removeEventListener('durationchange', handleDurationChange);
+        };
+    }, [videoRef, onTimeUpdate, onDurationChange]);
 
     const handleLoadedMetadata = () => {
         if (videoRef.current) {
@@ -435,26 +462,8 @@ const MobileImmersivePlayer = ({
         }
     }, [isPlaying, currentTime, hasVideoGreeting, isGreeting]);
 
-    // Video progress tracking
-    useEffect(() => {
-        if (!videoRef.current || !hasVideoGreeting || !isGreeting) return;
-
-        const video = videoRef.current;
-        const handleTimeUpdate = () => {
-            setCurrentTime(video.currentTime);
-        };
-        const handleLoadedMetadata = () => {
-            setDuration(video.duration);
-        };
-
-        video.addEventListener('timeupdate', handleTimeUpdate);
-        video.addEventListener('loadedmetadata', handleLoadedMetadata);
-
-        return () => {
-            video.removeEventListener('timeupdate', handleTimeUpdate);
-            video.removeEventListener('loadedmetadata', handleLoadedMetadata);
-        };
-    }, [hasVideoGreeting, isGreeting, setCurrentTime, setDuration]);
+    // Note: Video progress tracking is handled inside VideoPhaseView
+    // to avoid AnimatePresence timing issues with videoRef
 
     const handleVideoEnded = () => {
         skipToSong();
@@ -510,6 +519,8 @@ const MobileImmersivePlayer = ({
                         onSkipToSong={handleSkipToSong}
                         onSeek={handleSeek}
                         onEnded={handleVideoEnded}
+                        onTimeUpdate={setCurrentTime}
+                        onDurationChange={setDuration}
                     />
                 ) : isGreeting ? (
                     <VoicePhaseView

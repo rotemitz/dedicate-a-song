@@ -76,7 +76,9 @@ const GreetingCard = ({
     isGreeting,
     onEnded,
     onTogglePlay,
-    onVideoCanPlay
+    onVideoCanPlay,
+    onTimeUpdate,
+    onLoadedMetadata
 }) => (
     <motion.div
         initial={{ y: 50, opacity: 0 }}
@@ -103,6 +105,9 @@ const GreetingCard = ({
                         onEnded={onEnded}
                         onClick={onTogglePlay}
                         onCanPlay={onVideoCanPlay}
+                        onTimeUpdate={onTimeUpdate}
+                        onLoadedMetadata={onLoadedMetadata}
+                        onDurationChange={onLoadedMetadata}
                     />
                     {/* Play Overlay */}
                     <AnimatePresence>
@@ -354,26 +359,8 @@ const DesktopImmersivePlayer = ({
         }
     }, [isPlaying, currentTime, hasVideoGreeting, isGreeting]);
 
-    // Video progress tracking
-    useEffect(() => {
-        if (!videoRef.current || !hasVideoGreeting || !isGreeting) return;
-
-        const video = videoRef.current;
-        const handleTimeUpdate = () => {
-            setCurrentTime(video.currentTime);
-        };
-        const handleLoadedMetadata = () => {
-            setDuration(video.duration);
-        };
-
-        video.addEventListener('timeupdate', handleTimeUpdate);
-        video.addEventListener('loadedmetadata', handleLoadedMetadata);
-
-        return () => {
-            video.removeEventListener('timeupdate', handleTimeUpdate);
-            video.removeEventListener('loadedmetadata', handleLoadedMetadata);
-        };
-    }, [hasVideoGreeting, isGreeting, setCurrentTime, setDuration]);
+    // Note: Video progress tracking is handled via onTimeUpdate/onLoadedMetadata
+    // props passed to GreetingCard to avoid timing issues
 
     // Sync volume to video
     useEffect(() => {
@@ -393,6 +380,14 @@ const DesktopImmersivePlayer = ({
         if (isPlaying && videoRef.current?.paused) {
             videoRef.current.play().catch(e => console.error("Video auto-play error:", e));
         }
+    };
+
+    const handleVideoTimeUpdate = (e) => {
+        setCurrentTime(e.target.currentTime);
+    };
+
+    const handleVideoLoadedMetadata = (e) => {
+        setDuration(e.target.duration);
     };
 
     const handleTogglePlay = () => {
@@ -427,6 +422,8 @@ const DesktopImmersivePlayer = ({
                         onEnded={handleVideoEnded}
                         onTogglePlay={handleTogglePlay}
                         onVideoCanPlay={handleVideoCanPlay}
+                        onTimeUpdate={handleVideoTimeUpdate}
+                        onLoadedMetadata={handleVideoLoadedMetadata}
                     />
                     <VinylCard
                         dedication={dedication}
