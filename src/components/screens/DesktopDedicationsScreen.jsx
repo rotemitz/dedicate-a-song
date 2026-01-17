@@ -1,6 +1,7 @@
 import DedicationCard from '../DedicationCard';
 import ImmersivePlayer from '../ImmersivePlayer';
 import Banner from '../Banner';
+import FinaleCard from '../cards/FinaleCard';
 import { FooterQuote } from './SharedComponents';
 
 const DesktopDedicationsScreen = ({
@@ -23,7 +24,10 @@ const DesktopDedicationsScreen = ({
     onInlinePause,
     onInlineSeek,
     onInlineSkip,
-    onOpenFullView
+    onOpenFullView,
+    // Finale props
+    finaleData,
+    onFinaleClick
 }) => {
     return (
         <section id="dedications-screen" className="min-h-screen w-full bg-celebration-cream">
@@ -57,6 +61,13 @@ const DesktopDedicationsScreen = ({
                             />
                         </div>
                     ))}
+
+                    {/* Finale Card at the end */}
+                    {finaleData && (
+                        <div className="min-w-0">
+                            <FinaleCard finaleData={finaleData} onClick={onFinaleClick} />
+                        </div>
+                    )}
                 </div>
 
                 {/* Desktop Footer Quote */}

@@ -2,6 +2,7 @@ import { AnimatePresence } from 'framer-motion';
 import DedicationCard from '../DedicationCard';
 import ImmersivePlayer from '../ImmersivePlayer';
 import Banner from '../Banner';
+import FinaleCard from '../cards/FinaleCard';
 import { NowPlayingBar, MobileFooter } from './SharedComponents';
 
 const MobileDedicationsScreen = ({
@@ -25,7 +26,10 @@ const MobileDedicationsScreen = ({
     onInlinePause,
     onInlineSeek,
     onInlineSkip,
-    onOpenFullView
+    onOpenFullView,
+    // Finale props
+    finaleData,
+    onFinaleClick
 }) => {
     return (
         <section id="dedications-screen" className="min-h-screen min-h-dvh bg-celebration-cream">
@@ -66,6 +70,11 @@ const MobileDedicationsScreen = ({
                             />
                         </div>
                     ))}
+
+                    {/* Finale Card at the end */}
+                    {finaleData && (
+                        <FinaleCard finaleData={finaleData} onClick={onFinaleClick} />
+                    )}
                 </div>
 
                 {/* Mobile Footer */}

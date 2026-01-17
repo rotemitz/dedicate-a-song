@@ -1,5 +1,10 @@
 {
     "birthday_person": "Tal",
+    "finale": {
+        "video": "videos/finale.mp4",
+        "title": "יום הולדת שמח!",
+        "subtitle": "באהבה מכולם"
+    },
     "dedications": [
         {
             "id": 4,

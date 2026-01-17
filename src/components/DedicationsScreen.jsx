@@ -1,14 +1,16 @@
 import { useState, useEffect, useRef } from 'react';
 import { MobileDedicationsScreen, DesktopDedicationsScreen } from './screens';
 import { useAudioPlayer } from '../context/AudioContext';
+import CelebrationFinale from './CelebrationFinale';
 
 // Feature flag: Set to false to skip inline player and go directly to immersive player
 // Set to true to re-enable inline playback
 const ENABLE_INLINE_PLAYER = false;
 
-const DedicationsScreen = ({ dedications, onBack }) => {
+const DedicationsScreen = ({ dedications, finaleData, onBack }) => {
     const [isMobile, setIsMobile] = useState(false);
     const [showPlayer, setShowPlayer] = useState(false);
+    const [showFinale, setShowFinale] = useState(false);
 
     // Inline video ref for playing video audio in inline mode
     const inlineVideoRef = useRef(null);
@@ -52,13 +54,16 @@ const DedicationsScreen = ({ dedications, onBack }) => {
                 // Load next dedication
                 loadDedication(dedications[currentDedicationIndex + 1], currentDedicationIndex + 1);
             } else {
-                // End of list
+                // End of list - show finale if available, otherwise close player
                 if (showPlayer) {
                     setShowPlayer(false);
                 }
+                if (finaleData) {
+                    setShowFinale(true);
+                }
             }
         });
-    }, [currentDedicationIndex, dedications, showPlayer, loadDedication, setOnDedicationEnd]);
+    }, [currentDedicationIndex, dedications, showPlayer, finaleData, loadDedication, setOnDedicationEnd]);
 
     // Sync scroll when returning from player
     useEffect(() => {
@@ -164,6 +169,18 @@ const DedicationsScreen = ({ dedications, onBack }) => {
         if (!ENABLE_INLINE_PLAYER) {
             stop();
         }
+    };
+
+    const handleCloseFinale = () => {
+        setShowFinale(false);
+    };
+
+    const handleReplayFinale = () => {
+        // Replay is handled internally by CelebrationFinale
+    };
+
+    const handleFinaleClick = () => {
+        setShowFinale(true);
     };
 
     // Inline video management for video greetings
@@ -284,8 +301,22 @@ const DedicationsScreen = ({ dedications, onBack }) => {
         onInlinePause: handleInlinePause,
         onInlineSeek: handleInlineSeek,
         onInlineSkip: handleInlineSkip,
-        onOpenFullView: handleOpenFullView
+        onOpenFullView: handleOpenFullView,
+        // Finale props
+        finaleData,
+        onFinaleClick: handleFinaleClick
     };
+
+    // Show finale page if active
+    if (showFinale && finaleData) {
+        return (
+            <CelebrationFinale
+                finaleData={finaleData}
+                onClose={handleCloseFinale}
+                onReplay={handleReplayFinale}
+            />
+        );
+    }
 
     return (
         <>

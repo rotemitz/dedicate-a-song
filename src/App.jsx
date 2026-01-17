@@ -2,11 +2,12 @@ import React, { useState, useEffect } from 'react';
 import WelcomeScreen from './components/WelcomeScreen';
 import DedicationsScreen from './components/DedicationsScreen';
 import { AudioProvider } from './context/AudioContext';
-import { transformAllDedications } from './lib/supabase';
+import { transformAllDedications, getMediaUrl } from './lib/supabase';
 
 function App() {
   const [showDedications, setShowDedications] = useState(false);
   const [dedications, setDedications] = useState([]);
+  const [finaleData, setFinaleData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -30,6 +31,15 @@ function App() {
         // Transform local paths to Supabase Storage URLs
         const withSupabaseUrls = transformAllDedications(sorted);
         setDedications(withSupabaseUrls);
+
+        // Extract and transform finale data if present
+        if (data.finale) {
+          setFinaleData({
+            ...data.finale,
+            video: getMediaUrl(data.finale.video)
+          });
+        }
+
         setLoading(false);
       })
       .catch(err => {
@@ -117,7 +127,7 @@ function App() {
   return (
     <AudioProvider>
       {showDedications ? (
-        <DedicationsScreen dedications={dedications} onBack={handleBackToWelcome} />
+        <DedicationsScreen dedications={dedications} finaleData={finaleData} onBack={handleBackToWelcome} />
       ) : (
         <WelcomeScreen onStart={handleStart} />
       )}
