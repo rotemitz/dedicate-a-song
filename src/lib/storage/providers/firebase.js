@@ -83,8 +83,10 @@ export function getMediaUrl(path) {
   // For Firebase public buckets, we can construct the URL directly
   // Format: https://firebasestorage.googleapis.com/v0/b/{bucket}/o/{encodedPath}?alt=media
   if (firebaseConfig.storageBucket) {
+    // Strip gs:// prefix if present
+    const bucket = firebaseConfig.storageBucket.replace(/^gs:\/\//, '');
     const encodedPath = encodeURIComponent(path);
-    return `https://firebasestorage.googleapis.com/v0/b/${firebaseConfig.storageBucket}/o/${encodedPath}?alt=media`;
+    return `https://firebasestorage.googleapis.com/v0/b/${bucket}/o/${encodedPath}?alt=media`;
   }
 
   // Fallback: trigger async resolution and return path for now
