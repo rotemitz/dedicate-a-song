@@ -221,6 +221,18 @@
                 "local_file": "songs/doron.m4a",
                 "album_art": "songs/doron.webp"
             }
+        },
+        {
+            "id": 1,
+            "name": "דני",
+            "photo": "images/dani.webp",
+            "video_message": "videos/dani.mp4",
+            "song": {
+                "title": "הילדה הכי יפה בגן",
+                "artist": "הכבש השישה עשר",
+                "local_file": "songs/dani.m4a",
+                "album_art": "songs/dani.webp"
+            }
         }
     ]
 }
