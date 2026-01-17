@@ -649,11 +649,13 @@ input[type="range"]::-moz-range-thumb {
   background: linear-gradient(180deg, #FDF8F2 0%, #F4E4E0 100%);
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
-  padding: var(--spacing-lg);
+  padding: var(--spacing-md);
+  padding-top: max(var(--spacing-lg), env(safe-area-inset-top));
+  padding-bottom: calc(60px + env(safe-area-inset-bottom));
   position: relative;
-  overflow: hidden;
+  overflow-y: auto;
   min-height: 100vh;
   min-height: 100dvh;
 }
@@ -679,7 +681,6 @@ input[type="range"]::-moz-range-thumb {
   max-width: 500px;
   width: 100%;
   padding: 0 var(--spacing-sm);
-  padding-bottom: 80px; /* Space for the fixed footer */
 }
 
 .order-selection-header {
@@ -706,15 +707,15 @@ input[type="range"]::-moz-range-thumb {
 .order-options-container {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-md);
+  gap: var(--spacing-sm);
 }
 
 .order-option-card {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.5rem;
-  padding: 1.5rem 2rem;
+  gap: 0.25rem;
+  padding: 1rem 1.5rem;
   background: rgba(255, 255, 255, 0.85);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
@@ -739,30 +740,27 @@ input[type="range"]::-moz-range-thumb {
 }
 
 .option-icon {
-  font-size: 2rem;
-  margin-bottom: 0.25rem;
+  font-size: 1.75rem;
 }
 
 .option-title {
   font-family: var(--font-display);
-  font-size: 1.4rem;
+  font-size: 1.25rem;
   font-weight: 600;
   color: #2D2D2D;
 }
 
 .option-description {
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   color: #955444;
 }
 
 .order-selection-footer {
-  position: fixed;
-  bottom: max(var(--spacing-lg), calc(var(--spacing-lg) + env(safe-area-inset-bottom)));
-  left: 50%;
-  transform: translateX(-50%);
+  margin-top: auto;
+  padding-top: var(--spacing-md);
   font-size: 0.875rem;
   color: #B8725E;
-  z-index: 10;
+  z-index: 1;
 }
 
 /* Desktop: Show cards in a row */

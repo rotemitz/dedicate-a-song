@@ -1,17 +1,6 @@
-import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
 
 const OrderSelectionScreen = ({ onSelect }) => {
-    // Lock scroll on this screen
-    useEffect(() => {
-        document.body.style.overflow = 'hidden';
-        document.documentElement.style.overflow = 'hidden';
-        return () => {
-            document.body.style.overflow = '';
-            document.documentElement.style.overflow = '';
-        };
-    }, []);
-
     const options = [
         {
             id: 'emotional',
