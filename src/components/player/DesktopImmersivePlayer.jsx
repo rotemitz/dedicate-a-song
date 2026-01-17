@@ -227,9 +227,6 @@ const VinylCard = ({
 
         {/* Now Playing Info - Bottom Center */}
         <div className="absolute bottom-8 left-0 right-0 text-center px-8">
-            <p className="text-xs font-bold tracking-[0.2em] uppercase text-rose-gold-500 font-sans mb-2">
-                {isGreeting ? 'Click to Skip to Song' : 'Now Playing'}
-            </p>
             <h2 className="text-2xl font-semibold font-display text-celebration-charcoal mb-1">{dedication.song?.title}</h2>
             <p className="text-rose-gold-500/80 italic font-sans">{dedication.song?.artist}</p>
         </div>
