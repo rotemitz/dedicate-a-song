@@ -3,7 +3,7 @@ import WelcomeScreen from './components/WelcomeScreen';
 import OrderSelectionScreen from './components/OrderSelectionScreen';
 import DedicationsScreen from './components/DedicationsScreen';
 import { AudioProvider } from './context/AudioContext';
-import { transformAllDedications, getMediaUrl } from './lib/supabase';
+import { transformAllDedications, getMediaUrl } from './lib/storage';
 
 // Sorting functions for dedications
 const sortDedications = (dedications, orderType) => {
@@ -60,9 +60,9 @@ function App() {
         return res.json();
       })
       .then(data => {
-        // Transform local paths to Supabase Storage URLs (don't sort yet)
-        const withSupabaseUrls = transformAllDedications(data.dedications);
-        setDedications(withSupabaseUrls);
+        // Transform local paths to storage URLs (don't sort yet)
+        const withStorageUrls = transformAllDedications(data.dedications);
+        setDedications(withStorageUrls);
 
         // Extract and transform finale data if present
         if (data.finale) {
