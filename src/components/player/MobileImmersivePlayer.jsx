@@ -257,22 +257,21 @@ const VideoPhaseView = ({
             {/* Header */}
             <div className="text-center">
                 <p className="text-sm uppercase tracking-widest text-rose-gold-500 font-medium mb-2">
-                    Video Message
+                    ברכה
                 </p>
                 <h1 className="text-2xl font-serif text-celebration-charcoal">
-                    From <span className="italic">{dedication.name}</span>
+                    <span className="italic">מ{dedication.name}</span>
                 </h1>
             </div>
 
             {/* Video Card */}
             <div className="my-4 w-full flex justify-center">
                 <div
-                    className={`relative rounded-2xl overflow-hidden shadow-floating bg-celebration-charcoal ${
-                        isPortrait === true
-                            ? 'w-[55%] max-w-[240px] aspect-[9/16]'
-                            : isPortrait === false
-                                ? 'w-[90%] max-w-sm aspect-video'
-                                : 'w-[70%] max-w-[280px] aspect-square'
+                    className={`relative rounded-2xl overflow-hidden shadow-floating bg-celebration-charcoal ${isPortrait === true
+                        ? 'w-[55%] max-w-[240px] aspect-[9/16]'
+                        : isPortrait === false
+                            ? 'w-[90%] max-w-sm aspect-video'
+                            : 'w-[70%] max-w-[280px] aspect-square'
                         }`}
                 >
                     {isVideoLoading && (
@@ -326,10 +325,10 @@ const VoicePhaseView = ({
         {/* Header */}
         <div className="text-center">
             <p className="text-sm uppercase tracking-widest text-rose-gold-500 font-medium mb-2">
-                Voice Message
+                ברכה
             </p>
             <h1 className="text-2xl font-serif text-celebration-charcoal">
-                From <span className="italic">{dedication.name}</span>
+                <span className="italic">מ{dedication.name}</span>
             </h1>
         </div>
 
