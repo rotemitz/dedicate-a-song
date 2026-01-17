@@ -7,7 +7,7 @@
     },
     "dedications": [
         {
-            "id": 4,
+            "id": 1,
             "name": "ויקי מיירס",
             "photo": "images/vicky.webp",
             "voice_message": "recordings/vicky.opus",
@@ -24,7 +24,7 @@
             }
         },
         {
-            "id": 9,
+            "id": 2,
             "name": "ליעד עלווה והילדים",
             "relationship": "Brother in law and his family",
             "photo": "images/liad-alva.webp",
@@ -41,7 +41,7 @@
             }
         },
         {
-            "id": 2,
+            "id": 3,
             "name": "עליזה רום-פוזניאק",
             "photo": "images/aliza.webp",
             "relationship": "Best friend",
@@ -58,7 +58,7 @@
             }
         },
         {
-            "id": 2,
+            "id": 4,
             "name": "אייל פוזניאק",
             "photo": "images/eyal-pozniak.webp",
             "relationship": "A close friend and also marries to her best friend Aliza",
@@ -109,7 +109,7 @@
             }
         },
         {
-            "id": 6,
+            "id": 7,
             "name": "חן ונימי",
             "relationship": "Sister and her husband",
             "photo": "images/chen-nimi.webp",
@@ -143,7 +143,7 @@
             }
         },
         {
-            "id": 5,
+            "id": 9,
             "name": "אמא ואבא",
             "relationship": "Parents",
             "photo": "images/ima-aba.webp",
@@ -160,7 +160,7 @@
             }
         },
         {
-            "id": 7,
+            "id": 10,
             "name": "אייל לירון והילדים",
             "relationship": "Brother and his family",
             "photo": "images/eyal-liron.webp",
@@ -211,7 +211,7 @@
             }
         },
         {
-            "id": 8,
+            "id": 13,
             "name": "אסתי וחיים",
             "relationship": "Parents in law",
             "photo": "images/esti-haim.webp",
@@ -245,7 +245,7 @@
             }
         },
         {
-            "id": 7,
+            "id": 15,
             "name": "לירון ולירון",
             "relationship": "Friends",
             "photo": "images/liron-liron.webp",
@@ -262,7 +262,7 @@
             }
         },
         {
-            "id": 1,
+            "id": 16,
             "name": "אהובך",
             "relationship": "Husband",
             "photo": "images/rotem.webp",
@@ -279,7 +279,7 @@
             }
         },
         {
-            "id": 2,
+            "id": 17,
             "name": "אור",
             "relationship": "Son",
             "photo": "images/or.webp",
@@ -296,7 +296,7 @@
             }
         },
         {
-            "id": 3,
+            "id": 18,
             "name": "דורון",
             "relationship": "Daughter",
             "photo": "images/doron.webp",
@@ -313,7 +313,7 @@
             }
         },
         {
-            "id": 4,
+            "id": 19,
             "name": "דני",
             "relationship": "Daughter",
             "photo": "images/dani.webp",
