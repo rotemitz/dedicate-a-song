@@ -209,6 +209,18 @@
                 "local_file": "songs/or.m4a",
                 "album_art": "songs/or.webp"
             }
+        },
+        {
+            "id": 1,
+            "name": "דורון",
+            "photo": "images/doron.webp",
+            "video_message": "videos/doron.mp4",
+            "song": {
+                "title": "אמא יקרה לי",
+                "artist": "רוחמה רז",
+                "local_file": "songs/doron.m4a",
+                "album_art": "songs/doron.webp"
+            }
         }
     ]
 }
