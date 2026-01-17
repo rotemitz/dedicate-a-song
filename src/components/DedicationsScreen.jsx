@@ -7,10 +7,11 @@ import CelebrationFinale from './CelebrationFinale';
 // Set to true to re-enable inline playback
 const ENABLE_INLINE_PLAYER = false;
 
-const DedicationsScreen = ({ dedications, finaleData, onBack }) => {
+const DedicationsScreen = ({ dedications, finaleData, onBack, autoStartPlayer, onAutoStartHandled }) => {
     const [isMobile, setIsMobile] = useState(false);
     const [showPlayer, setShowPlayer] = useState(false);
     const [showFinale, setShowFinale] = useState(false);
+    const autoStartHandled = useRef(false);
 
     // Inline video ref for playing video audio in inline mode
     const inlineVideoRef = useRef(null);
@@ -45,6 +46,20 @@ const DedicationsScreen = ({ dedications, finaleData, onBack }) => {
         window.addEventListener('resize', checkMobile);
         return () => window.removeEventListener('resize', checkMobile);
     }, []);
+
+    // Auto-start player when autoStartPlayer prop is true
+    useEffect(() => {
+        if (autoStartPlayer && !autoStartHandled.current && dedications.length > 0) {
+            autoStartHandled.current = true;
+            // Load first dedication and open player
+            loadDedication(dedications[0], 0);
+            setShowPlayer(true);
+            // Notify parent that auto-start has been handled
+            if (onAutoStartHandled) {
+                onAutoStartHandled();
+            }
+        }
+    }, [autoStartPlayer, dedications, loadDedication, onAutoStartHandled]);
 
     // Register dedication end handler
     useEffect(() => {

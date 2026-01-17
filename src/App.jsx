@@ -1,21 +1,55 @@
 import React, { useState, useEffect } from 'react';
 import WelcomeScreen from './components/WelcomeScreen';
+import OrderSelectionScreen from './components/OrderSelectionScreen';
 import DedicationsScreen from './components/DedicationsScreen';
 import { AudioProvider } from './context/AudioContext';
 import { transformAllDedications, getMediaUrl } from './lib/supabase';
 
+// Sorting functions for dedications
+const sortDedications = (dedications, orderType) => {
+  const sorted = [...dedications];
+
+  switch (orderType) {
+    case 'emotional':
+      // Sort by emotional_journey priority (ascending)
+      return sorted.sort((a, b) =>
+        (a.sort_priority?.emotional_journey || 999) - (b.sort_priority?.emotional_journey || 999)
+      );
+
+    case 'close_first':
+      // Sort by close_first priority (ascending)
+      return sorted.sort((a, b) =>
+        (a.sort_priority?.close_first || 999) - (b.sort_priority?.close_first || 999)
+      );
+
+    case 'random':
+      // Fisher-Yates shuffle
+      for (let i = sorted.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [sorted[i], sorted[j]] = [sorted[j], sorted[i]];
+      }
+      return sorted;
+
+    default:
+      return sorted;
+  }
+};
+
 function App() {
-  const [showDedications, setShowDedications] = useState(false);
+  // Screen state: 'welcome' | 'order_select' | 'dedications'
+  const [currentScreen, setCurrentScreen] = useState('welcome');
   const [dedications, setDedications] = useState([]);
+  const [sortedDedications, setSortedDedications] = useState([]);
+  const [autoStartPlayer, setAutoStartPlayer] = useState(false);
   const [finaleData, setFinaleData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Check return visitor
-    if (localStorage.getItem('birthday_app_visited')) {
-      setShowDedications(true);
-    }
+    // Return visitors skip to order selection (they've already seen welcome)
+    // Comment out for testing: if (localStorage.getItem('birthday_app_visited')) {
+    //   setCurrentScreen('order_select');
+    // }
 
     // Load Data
     fetch('data/dedications.json')
@@ -26,10 +60,8 @@ function App() {
         return res.json();
       })
       .then(data => {
-        // Sort by ID as requested
-        const sorted = data.dedications.sort((a, b) => a.id - b.id);
-        // Transform local paths to Supabase Storage URLs
-        const withSupabaseUrls = transformAllDedications(sorted);
+        // Transform local paths to Supabase Storage URLs (don't sort yet)
+        const withSupabaseUrls = transformAllDedications(data.dedications);
         setDedications(withSupabaseUrls);
 
         // Extract and transform finale data if present
@@ -53,14 +85,28 @@ function App() {
     // Mark visited
     localStorage.setItem('birthday_app_visited', 'true');
 
-    // Delay for confetti
+    // Delay for confetti, then show order selection
     setTimeout(() => {
-      setShowDedications(true);
+      setCurrentScreen('order_select');
     }, 1500);
   };
 
+  const handleOrderSelect = (orderType) => {
+    // Sort dedications based on selected order
+    const sorted = sortDedications(dedications, orderType);
+    setSortedDedications(sorted);
+    setAutoStartPlayer(true);
+    setCurrentScreen('dedications');
+  };
+
   const handleBackToWelcome = () => {
-    setShowDedications(false);
+    setCurrentScreen('welcome');
+    setAutoStartPlayer(false);
+  };
+
+  const handleBackToOrderSelect = () => {
+    setCurrentScreen('order_select');
+    setAutoStartPlayer(false);
   };
 
   if (loading) {
@@ -126,10 +172,20 @@ function App() {
 
   return (
     <AudioProvider>
-      {showDedications ? (
-        <DedicationsScreen dedications={dedications} finaleData={finaleData} onBack={handleBackToWelcome} />
-      ) : (
+      {currentScreen === 'welcome' && (
         <WelcomeScreen onStart={handleStart} />
+      )}
+      {currentScreen === 'order_select' && (
+        <OrderSelectionScreen onSelect={handleOrderSelect} />
+      )}
+      {currentScreen === 'dedications' && (
+        <DedicationsScreen
+          dedications={sortedDedications}
+          finaleData={finaleData}
+          onBack={handleBackToOrderSelect}
+          autoStartPlayer={autoStartPlayer}
+          onAutoStartHandled={() => setAutoStartPlayer(false)}
+        />
       )}
     </AudioProvider>
   );

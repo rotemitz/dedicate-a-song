@@ -11,6 +11,11 @@
             "name": "ויקי מיירס",
             "photo": "images/vicky.webp",
             "voice_message": "recordings/vicky.opus",
+            "relationship": "Friend from Phd, in touch once in a while",
+            "sort_priority": {
+                "emotional_journey": 1,
+                "close_first": 19
+            },
             "song": {
                 "title": "Cigarettes & Alcohol",
                 "artist": "Oasis",
@@ -19,10 +24,15 @@
             }
         },
         {
-            "id": 3,
+            "id": 9,
             "name": "ליעד עלווה והילדים",
+            "relationship": "Brother in law and his family",
             "photo": "images/liad-alva.webp",
             "video_message": "videos/liad-alva.mp4",
+            "sort_priority": {
+                "emotional_journey": 11,
+                "close_first": 10
+            },
             "song": {
                 "title": "טל",
                 "artist": "יהורם גאון",
@@ -34,6 +44,11 @@
             "id": 2,
             "name": "עליזה רום-פוזניאק",
             "photo": "images/aliza.webp",
+            "relationship": "Best friend",
+            "sort_priority": {
+                "emotional_journey": 6,
+                "close_first": 13
+            },
             "voice_message": "recordings/aliza.opus",
             "song": {
                 "title": "באת לי פתאום",
@@ -46,6 +61,11 @@
             "id": 2,
             "name": "אייל פוזניאק",
             "photo": "images/eyal-pozniak.webp",
+            "relationship": "A close friend and also marries to her best friend Aliza",
+            "sort_priority": {
+                "emotional_journey": 7,
+                "close_first": 14
+            },
             "voice_message": "recordings/eyal-pozniak.opus",
             "song": {
                 "title": "מנוף",
@@ -58,6 +78,11 @@
             "id": 5,
             "name": "קרן שלב",
             "photo": "images/keren.webp",
+            "relationship": "Friend from the army, not so close anymore",
+            "sort_priority": {
+                "emotional_journey": 2,
+                "close_first": 18
+            },
             "video_message": "videos/keren.mp4",
             "song": {
                 "title": "Hakuna Matata",
@@ -69,7 +94,12 @@
         {
             "id": 6,
             "name": "רותם שובל",
+            "relationship": "Best friend no. 2 and oldest friend",
             "photo": "images/rotem-shoval.webp",
+            "sort_priority": {
+                "emotional_journey": 8,
+                "close_first": 12
+            },
             "video_message": "videos/rotem-shoval.mp4",
             "song": {
                 "title": "מה שאת אוהבת",
@@ -79,9 +109,14 @@
             }
         },
         {
-            "id": 7,
+            "id": 6,
             "name": "חן ונימי",
+            "relationship": "Sister and her husband",
             "photo": "images/chen-nimi.webp",
+            "sort_priority": {
+                "emotional_journey": 14,
+                "close_first": 6
+            },
             "video_message": "videos/chen-nimi.mp4",
             "song": {
                 "title": "I'll be there for you",
@@ -93,7 +128,12 @@
         {
             "id": 8,
             "name": "גילי",
+            "relationship": "Sister in law",
             "photo": "images/gili.webp",
+            "sort_priority": {
+                "emotional_journey": 9,
+                "close_first": 9
+            },
             "video_message": "videos/gili.mp4",
             "song": {
                 "title": "לחיות נכון",
@@ -103,9 +143,14 @@
             }
         },
         {
-            "id": 9,
+            "id": 5,
             "name": "אמא ואבא",
+            "relationship": "Parents",
             "photo": "images/ima-aba.webp",
+            "sort_priority": {
+                "emotional_journey": 15,
+                "close_first": 5
+            },
             "video_message": "videos/ima-aba.mp4",
             "song": {
                 "title": "מה שאת אוהבת",
@@ -115,9 +160,14 @@
             }
         },
         {
-            "id": 10,
+            "id": 7,
             "name": "אייל לירון והילדים",
+            "relationship": "Brother and his family",
             "photo": "images/eyal-liron.webp",
+            "sort_priority": {
+                "emotional_journey": 13,
+                "close_first": 7
+            },
             "voice_message": "recordings/eyal-liron.mp3",
             "song": {
                 "title": "איך זה שכוכב",
@@ -129,7 +179,12 @@
         {
             "id": 11,
             "name": "הילה",
+            "relationship": "A Friend",
             "photo": "images/hila.webp",
+            "sort_priority": {
+                "emotional_journey": 3,
+                "close_first": 17
+            },
             "voice_message": "recordings/hila.opus",
             "song": {
                 "title": "Don't Stop Me Now",
@@ -141,7 +196,12 @@
         {
             "id": 12,
             "name": "גיל וטל",
+            "relationship": "A Friend",
             "photo": "images/gil-tal.webp",
+            "sort_priority": {
+                "emotional_journey": 4,
+                "close_first": 16
+            },
             "video_message": "videos/gil-tal.mp4",
             "song": {
                 "title": "אדון שוקו",
@@ -151,9 +211,14 @@
             }
         },
         {
-            "id": 13,
+            "id": 8,
             "name": "אסתי וחיים",
+            "relationship": "Parents in law",
             "photo": "images/esti-haim.webp",
+            "sort_priority": {
+                "emotional_journey": 12,
+                "close_first": 8
+            },
             "video_message": "videos/esti-haim.mp4",
             "song": {
                 "title": "ילדותי השניה",
@@ -165,7 +230,12 @@
         {
             "id": 14,
             "name": "יובל",
+            "relationship": "Brother in law",
             "photo": "images/yuval.webp",
+            "sort_priority": {
+                "emotional_journey": 10,
+                "close_first": 11
+            },
             "voice_message": "recordings/yuval.opus",
             "song": {
                 "title": "וידוי",
@@ -175,9 +245,14 @@
             }
         },
         {
-            "id": 15,
+            "id": 7,
             "name": "לירון ולירון",
+            "relationship": "Friends",
             "photo": "images/liron-liron.webp",
+            "sort_priority": {
+                "emotional_journey": 5,
+                "close_first": 15
+            },
             "voice_message": "recordings/liron-liron.opus",
             "song": {
                 "title": "משהו חדש מתחיל",
@@ -189,7 +264,12 @@
         {
             "id": 1,
             "name": "אהובך",
-            "photo": "",
+            "relationship": "Husband",
+            "photo": "images/rotem.webp",
+            "sort_priority": {
+                "emotional_journey": 19,
+                "close_first": 1
+            },
             "video_message": "",
             "song": {
                 "title": "לא יפריד דבר",
@@ -199,9 +279,14 @@
             }
         },
         {
-            "id": 1,
+            "id": 2,
             "name": "אור",
+            "relationship": "Son",
             "photo": "images/or.webp",
+            "sort_priority": {
+                "emotional_journey": 18,
+                "close_first": 2
+            },
             "video_message": "videos/or.mp4",
             "song": {
                 "title": "Dance Monkey",
@@ -211,9 +296,14 @@
             }
         },
         {
-            "id": 1,
+            "id": 3,
             "name": "דורון",
+            "relationship": "Daughter",
             "photo": "images/doron.webp",
+            "sort_priority": {
+                "emotional_journey": 17,
+                "close_first": 3
+            },
             "video_message": "videos/doron.mp4",
             "song": {
                 "title": "אמא יקרה לי",
@@ -223,9 +313,14 @@
             }
         },
         {
-            "id": 1,
+            "id": 4,
             "name": "דני",
+            "relationship": "Daughter",
             "photo": "images/dani.webp",
+            "sort_priority": {
+                "emotional_journey": 16,
+                "close_first": 4
+            },
             "video_message": "videos/dani.mp4",
             "song": {
                 "title": "הילדה הכי יפה בגן",
