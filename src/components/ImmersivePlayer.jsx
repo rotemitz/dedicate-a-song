@@ -12,7 +12,7 @@ import { useAudioPlayer } from '../context/AudioContext';
 const ImmersivePlayer = ({
     currentIndex = 0,
     totalCount = 1,
-    eventTitle = "Birthday Dedications",
+    eventTitle = "Birthday Wishes",
     onClose,
     onNext,
     onPrevious,

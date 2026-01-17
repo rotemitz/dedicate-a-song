@@ -307,7 +307,7 @@ const DesktopImmersivePlayer = ({
     dedication,
     currentIndex = 0,
     totalCount = 1,
-    eventTitle = "Birthday Dedications",
+    eventTitle = "Birthday Wishes",
     onClose,
     onNext,
     onPrevious,

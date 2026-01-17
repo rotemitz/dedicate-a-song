@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-const Header = ({ autoplayEnabled, setAutoplayEnabled, title = "Birthday Dedications" }) => {
+const Header = ({ autoplayEnabled, setAutoplayEnabled, title = "Birthday Wishes" }) => {
     const [scrolled, setScrolled] = useState(false);
 
     useEffect(() => {
