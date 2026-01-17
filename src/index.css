@@ -646,7 +646,9 @@ input[type="range"]::-moz-range-thumb {
    ORDER SELECTION SCREEN
    ============================================ */
 .order-selection-screen {
+  background: #F4E4E0;
   background: linear-gradient(180deg, #FDF8F2 0%, #F4E4E0 100%);
+  background-attachment: fixed;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
