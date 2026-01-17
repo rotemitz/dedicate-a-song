@@ -63,22 +63,23 @@ const WelcomeScreen = ({ onStart }) => {
 
     return (
         <section id="welcome-screen" className="screen active">
-            <div className="welcome-content">
+            <div className="welcome-content ">
                 <div className="sparkle-container">
                     <span className="sparkle">✨</span>
                     <span className="sparkle">✨</span>
                     <span className="sparkle">✨</span>
                 </div>
-                <h1 className="welcome-title">Happy 40th Birthday</h1>
-                <h2 className="welcome-name">Tal</h2>
-                <p className="welcome-subtitle">A collection of love, wishes & music<br />from those who cherish you most</p>
+                <h1 className="welcome-title">יומולדת 40 שמח</h1>
+                <h2 className="welcome-name">טל</h2>
+                <p className="welcome-subtitle">אוסף של אהבה, ברכות ומוזיקה<br />מכל האנשים שאת הכי אוהבת</p>
                 <button
                     id="start-button"
                     className="start-button"
                     onClick={handleStart}
+                    dir="rtl"
                 >
-                    <span className="button-text">Start Here</span>
                     <span className="button-icon">→</span>
+                    <span className="button-text">הנה מתחילים</span>
                 </button>
             </div>
             <div className="welcome-footer">
