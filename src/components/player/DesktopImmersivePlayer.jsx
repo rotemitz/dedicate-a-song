@@ -67,18 +67,86 @@ const DesktopHeader = ({ eventTitle, current, total, progress, duration, onClose
 );
 
 // ============================================
-// GREETING CARD (Left - Dark)
+// VIDEO PLAYER (Clean video with no card wrapper)
 // ============================================
-const GreetingCard = ({
+const VideoPlayer = ({
     dedication,
     videoRef,
     isPlaying,
-    isGreeting,
+    isPortraitVideo,
     onEnded,
     onTogglePlay,
     onVideoCanPlay,
     onTimeUpdate,
     onLoadedMetadata
+}) => (
+    <motion.div
+        initial={{ y: 50, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
+        className="relative h-full flex items-center justify-end"
+        style={{ willChange: 'transform, opacity' }}
+    >
+        {/* Video with rounded corners - height matches container, width by aspect ratio */}
+        <div
+            className="relative h-full overflow-hidden"
+            style={{
+                borderRadius: '48px',
+                boxShadow: '0 20px 50px rgba(0,0,0,0.15)'
+            }}
+        >
+            <video
+                ref={videoRef}
+                src={dedication.video_message}
+                className="h-full w-auto object-contain"
+                playsInline
+                preload="metadata"
+                onEnded={onEnded}
+                onClick={onTogglePlay}
+                onCanPlay={onVideoCanPlay}
+                onTimeUpdate={onTimeUpdate}
+                onLoadedMetadata={onLoadedMetadata}
+                onDurationChange={onLoadedMetadata}
+                style={{ borderRadius: '48px' }}
+            />
+            {/* Play Overlay */}
+            <AnimatePresence>
+                {!isPlaying && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="absolute inset-0 flex items-center justify-center bg-black/40 cursor-pointer"
+                        style={{ borderRadius: '48px' }}
+                        onClick={onTogglePlay}
+                    >
+                        <span className="material-symbols-outlined text-white !text-8xl" style={{ fontVariationSettings: "'FILL' 1" }}>
+                            play_circle
+                        </span>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            {/* Sender Name Badge with gradient */}
+            <div
+                className={`absolute bottom-6 z-10 ${isPortraitVideo ? 'left-1/2 -translate-x-1/2' : 'right-6'} backdrop-blur-sm rounded-2xl px-6 py-3 shadow-lg`}
+                style={{
+                    background: 'linear-gradient(135deg, rgba(212, 144, 123, 0.95) 0%, rgba(180, 100, 80, 0.95) 100%)'
+                }}
+            >
+                <h2 className="text-xl font-bold text-white font-display">{dedication.name}</h2>
+            </div>
+        </div>
+    </motion.div>
+);
+
+// ============================================
+// GREETING CARD (For voice messages only - Dark)
+// ============================================
+const VoiceGreetingCard = ({
+    dedication,
+    isPlaying,
+    isGreeting
 }) => (
     <motion.div
         initial={{ y: 50, opacity: 0 }}
@@ -90,43 +158,11 @@ const GreetingCard = ({
             minHeight: '400px',
             willChange: 'transform, opacity'
         }}
-        className="relative flex-1 bg-celebration-charcoal overflow-hidden flex flex-col"
+        className="relative w-full h-full bg-celebration-charcoal overflow-hidden flex flex-col"
     >
         {/* Content Area */}
         <div className="flex-1 relative flex items-center justify-center p-10">
-            {dedication.video_message ? (
-                <div className="relative w-full h-full rounded-3xl overflow-hidden">
-                    <video
-                        ref={videoRef}
-                        src={dedication.video_message}
-                        className="w-full h-full object-cover"
-                        playsInline
-                        preload="metadata"
-                        onEnded={onEnded}
-                        onClick={onTogglePlay}
-                        onCanPlay={onVideoCanPlay}
-                        onTimeUpdate={onTimeUpdate}
-                        onLoadedMetadata={onLoadedMetadata}
-                        onDurationChange={onLoadedMetadata}
-                    />
-                    {/* Play Overlay */}
-                    <AnimatePresence>
-                        {!isPlaying && (
-                            <motion.div
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                exit={{ opacity: 0 }}
-                                className="absolute inset-0 flex items-center justify-center bg-black/40 cursor-pointer"
-                                onClick={onTogglePlay}
-                            >
-                                <span className="material-symbols-outlined text-white !text-8xl" style={{ fontVariationSettings: "'FILL' 1" }}>
-                                    play_circle
-                                </span>
-                            </motion.div>
-                        )}
-                    </AnimatePresence>
-                </div>
-            ) : dedication.voice_message ? (
+            {dedication.voice_message ? (
                 <div className="flex flex-col items-center justify-center gap-6">
                     {/* Avatar */}
                     <DedicationAvatar
@@ -146,10 +182,14 @@ const GreetingCard = ({
             )}
         </div>
 
-        {/* From Label - Bottom Left */}
-        <div className="absolute bottom-8 left-10 text-white z-10">
-            <p className="text-xs font-semibold tracking-[0.2em] uppercase opacity-60 font-sans mb-1">From</p>
-            <h2 className="text-3xl font-bold font-display">{dedication.name}</h2>
+        {/* Sender Name Badge with gradient */}
+        <div
+            className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 backdrop-blur-sm rounded-2xl px-6 py-3 shadow-lg"
+            style={{
+                background: 'linear-gradient(135deg, rgba(212, 144, 123, 0.95) 0%, rgba(180, 100, 80, 0.95) 100%)'
+            }}
+        >
+            <h2 className="text-xl font-bold text-white font-display">{dedication.name}</h2>
         </div>
     </motion.div>
 );
@@ -174,7 +214,7 @@ const VinylCard = ({
             minHeight: '400px',
             willChange: 'transform, opacity'
         }}
-        className="relative flex-1 bg-celebration-cream-light overflow-hidden flex flex-col items-center justify-center"
+        className="relative w-full h-full bg-celebration-cream-light overflow-hidden flex flex-col items-center justify-center"
     >
         {/* Vinyl Record - Clickable for skip/play-pause */}
         <VinylRecord
@@ -293,14 +333,23 @@ const DesktopImmersivePlayer = ({
     // Video ref for video greetings (kept local for display)
     const videoRef = useRef(null);
 
+    // Track video aspect ratio for layout
+    const [videoAspectRatio, setVideoAspectRatio] = useState(null);
+
     const isGreeting = phase === 'greeting';
     const hasVideoGreeting = dedication.video_message != null;
+    const isPortraitVideo = videoAspectRatio !== null && videoAspectRatio < 1;
 
     // Lock body scroll
     useEffect(() => {
         document.body.style.overflow = 'hidden';
         return () => { document.body.style.overflow = ''; };
     }, []);
+
+    // Reset video aspect ratio when dedication changes
+    useEffect(() => {
+        setVideoAspectRatio(null);
+    }, [dedication]);
 
     // Dedicated effect to handle video loading when dedication changes
     // This runs when we navigate to a new video dedication
@@ -394,6 +443,11 @@ const DesktopImmersivePlayer = ({
         if (isGreeting) {
             setDuration(e.target.duration);
         }
+        // Capture video aspect ratio for layout
+        const video = e.target;
+        if (video.videoWidth && video.videoHeight) {
+            setVideoAspectRatio(video.videoWidth / video.videoHeight);
+        }
     };
 
     const handleTogglePlay = () => {
@@ -419,26 +473,51 @@ const DesktopImmersivePlayer = ({
 
             {/* Hero Section - Split Cards */}
             <div className="flex-1 flex items-center justify-center px-8 py-4">
-                <div className="w-full max-w-6xl flex gap-10 h-full max-h-[600px]">
-                    <GreetingCard
-                        dedication={dedication}
-                        videoRef={videoRef}
-                        isPlaying={isPlaying}
-                        isGreeting={isGreeting}
-                        onEnded={handleVideoEnded}
-                        onTogglePlay={handleTogglePlay}
-                        onVideoCanPlay={handleVideoCanPlay}
-                        onTimeUpdate={handleVideoTimeUpdate}
-                        onLoadedMetadata={handleVideoLoadedMetadata}
-                    />
-                    <VinylCard
-                        dedication={dedication}
-                        isPlaying={isPlaying}
-                        isGreeting={isGreeting}
-                        onSkipToSong={skipToSong}
-                        onTogglePlay={handleTogglePlay}
-                    />
-                </div>
+                {hasVideoGreeting ? (
+                    /* Video layout: video sizes by aspect ratio, both centered */
+                    <div className="flex items-center justify-center gap-10 h-full max-h-[600px]">
+                        <VideoPlayer
+                            dedication={dedication}
+                            videoRef={videoRef}
+                            isPlaying={isPlaying}
+                            isPortraitVideo={isPortraitVideo}
+                            onEnded={handleVideoEnded}
+                            onTogglePlay={handleTogglePlay}
+                            onVideoCanPlay={handleVideoCanPlay}
+                            onTimeUpdate={handleVideoTimeUpdate}
+                            onLoadedMetadata={handleVideoLoadedMetadata}
+                        />
+                        <div className="h-full aspect-square">
+                            <VinylCard
+                                dedication={dedication}
+                                isPlaying={isPlaying}
+                                isGreeting={isGreeting}
+                                onSkipToSong={skipToSong}
+                                onTogglePlay={handleTogglePlay}
+                            />
+                        </div>
+                    </div>
+                ) : (
+                    /* Voice/no greeting layout: equal width cards */
+                    <div className="w-full max-w-5xl flex gap-10 h-full max-h-[600px]">
+                        <div className="flex-1">
+                            <VoiceGreetingCard
+                                dedication={dedication}
+                                isPlaying={isPlaying}
+                                isGreeting={isGreeting}
+                            />
+                        </div>
+                        <div className="flex-1">
+                            <VinylCard
+                                dedication={dedication}
+                                isPlaying={isPlaying}
+                                isGreeting={isGreeting}
+                                onSkipToSong={skipToSong}
+                                onTogglePlay={handleTogglePlay}
+                            />
+                        </div>
+                    </div>
+                )}
             </div>
 
             {/* Footer Controls */}
