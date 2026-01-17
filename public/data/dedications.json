@@ -192,6 +192,18 @@
                 "local_file": "songs/rotem.m4a",
                 "album_art": "songs/rotem.webp"
             }
+        },
+        {
+            "id": 1,
+            "name": "אור",
+            "photo": "images/or.webp",
+            "video_message": "videos/or.mp4",
+            "song": {
+                "title": "Dance Monkey",
+                "artist": "Tones and I",
+                "local_file": "songs/or.m4a",
+                "album_art": "songs/or.webp"
+            }
         }
     ]
 }
