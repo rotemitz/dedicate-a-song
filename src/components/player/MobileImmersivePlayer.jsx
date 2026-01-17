@@ -163,38 +163,13 @@ const VideoPhaseView = ({
     const [isPortrait, setIsPortrait] = useState(null);
     const [isVideoLoading, setIsVideoLoading] = useState(true);
 
-    // Load video and trigger autoplay when VideoPhaseView mounts
-    // This is critical for the case when transitioning from song phase to video greeting,
-    // because AnimatePresence mode="wait" delays mounting until exit animation completes,
-    // meaning the parent's video loading effect runs before videoRef.current is set
+    // Reset loading state when video source changes
+    // Note: Parent handles video.load() to avoid duplicate calls
     useEffect(() => {
         if (!videoRef.current || !dedication.video_message) return;
-
-        const video = videoRef.current;
         setIsVideoLoading(true);
         setIsPortrait(null);
-        video.load();
-
-        // Attempt to autoplay if isPlaying is true
-        if (isPlaying) {
-            const attemptPlay = () => {
-                if (video.paused) {
-                    video.play().catch(e => console.error("VideoPhaseView auto-play error:", e));
-                }
-            };
-
-            if (video.readyState >= 3) {
-                attemptPlay();
-            } else {
-                const handleCanPlayOnce = () => {
-                    attemptPlay();
-                    video.removeEventListener('canplay', handleCanPlayOnce);
-                };
-                video.addEventListener('canplay', handleCanPlayOnce);
-                return () => video.removeEventListener('canplay', handleCanPlayOnce);
-            }
-        }
-    }, [dedication.video_message, videoRef, isPlaying]);
+    }, [dedication.video_message, videoRef]);
 
     useEffect(() => {
         const video = videoRef.current;
@@ -463,6 +438,8 @@ const MobileImmersivePlayer = ({
 
     const videoRef = useRef(null);
     const containerRef = useRef(null);
+    const lastVideoSrcRef = useRef(null);
+    const pendingPlayRef = useRef(false);
 
     // Swipe gesture state
     const x = useMotionValue(0);
@@ -481,28 +458,25 @@ const MobileImmersivePlayer = ({
         return () => { document.body.style.overflow = ''; };
     }, []);
 
-    // Video loading effect
+    // Video loading effect - only load when source actually changes
     useEffect(() => {
         if (!videoRef.current || !hasVideoGreeting || !isGreeting) return;
 
         const video = videoRef.current;
-        video.load();
+        const currentSrc = dedication?.video_message;
 
-        if (isPlaying) {
-            const attemptPlay = () => {
-                video.play().catch(e => console.error("Video play error:", e));
-            };
+        // Only call load() if the source actually changed
+        if (lastVideoSrcRef.current !== currentSrc) {
+            lastVideoSrcRef.current = currentSrc;
+            video.load();
+        }
 
-            if (video.readyState >= 3) {
-                attemptPlay();
-            } else {
-                const handleCanPlay = () => {
-                    attemptPlay();
-                    video.removeEventListener('canplay', handleCanPlay);
-                };
-                video.addEventListener('canplay', handleCanPlay);
-                return () => video.removeEventListener('canplay', handleCanPlay);
-            }
+        // Track if we should autoplay when video is ready
+        pendingPlayRef.current = isPlaying;
+
+        // If already ready and should play, play now
+        if (isPlaying && video.readyState >= 3 && video.paused) {
+            video.play().catch(e => console.error("Video play error:", e));
         }
     }, [dedication?.video_message, hasVideoGreeting, isGreeting, isPlaying]);
 

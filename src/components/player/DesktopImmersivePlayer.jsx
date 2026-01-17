@@ -329,6 +329,7 @@ const DesktopImmersivePlayer = ({
 
     // Video ref for video greetings (kept local for display)
     const videoRef = useRef(null);
+    const lastVideoSrcRef = useRef(null);
 
     // Track video aspect ratio for layout
     const [videoAspectRatio, setVideoAspectRatio] = useState(null);
@@ -349,38 +350,27 @@ const DesktopImmersivePlayer = ({
     }, [dedication]);
 
     // Dedicated effect to handle video loading when dedication changes
-    // This runs when we navigate to a new video dedication
+    // Only loads when the video source actually changes to avoid race conditions
     useEffect(() => {
         if (!videoRef.current || !hasVideoGreeting || !isGreeting) return;
 
         const video = videoRef.current;
-        console.log('[DesktopPlayer] Video dedication effect - loading video for:', dedication?.name);
+        const currentSrc = dedication?.video_message;
 
-        // Force load the video (in case src was just updated in JSX)
-        video.load();
-
-        // Only attempt to play if we should be playing
-        if (isPlaying) {
-            const attemptPlay = () => {
-                console.log('[DesktopPlayer] Attempting to play video, readyState:', video.readyState);
-                video.play().catch(e => console.error("Video play error:", e));
-            };
-
-            // Check if video is ready to play
-            if (video.readyState >= 3) { // HAVE_FUTURE_DATA or higher
-                attemptPlay();
-            } else {
-                // Wait for video to be ready - use canplay for faster start on slow connections
-                const handleCanPlay = () => {
-                    console.log('[DesktopPlayer] Video canplay fired');
-                    attemptPlay();
-                    video.removeEventListener('canplay', handleCanPlay);
-                };
-                video.addEventListener('canplay', handleCanPlay);
-                return () => video.removeEventListener('canplay', handleCanPlay);
-            }
+        // Only call load() if the source actually changed
+        if (lastVideoSrcRef.current !== currentSrc) {
+            lastVideoSrcRef.current = currentSrc;
+            console.log('[DesktopPlayer] Video source changed, loading:', dedication?.name);
+            video.load();
         }
-    }, [dedication?.video_message, hasVideoGreeting, isGreeting, isPlaying]); // Trigger on video source change
+
+        // If already ready and should play, play now
+        // Otherwise, handleVideoCanPlay callback will handle it when video is ready
+        if (isPlaying && video.readyState >= 3 && video.paused) {
+            console.log('[DesktopPlayer] Video ready, playing immediately');
+            video.play().catch(e => console.error("Video play error:", e));
+        }
+    }, [dedication?.video_message, hasVideoGreeting, isGreeting, isPlaying]);
 
     // Handle play/pause sync with global state (separate from loading)
     useEffect(() => {
