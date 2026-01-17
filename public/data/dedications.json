@@ -26,7 +26,7 @@
             }
         },
         {
-            "id": 1,
+            "id": 2,
             "name": "עליזה רום-פוזניאק",
             "photo": "images/aliza.webp",
             "voice_message": "recordings/aliza.opus",
@@ -179,6 +179,18 @@
                 "artist": "דני רובס",
                 "local_file": "songs/liron-liron.m4a",
                 "album_art": "songs/liron-liron.webp"
+            }
+        },
+        {
+            "id": 1,
+            "name": "אהובך",
+            "photo": "",
+            "video_message": "",
+            "song": {
+                "title": "לא יפריד דבר",
+                "artist": "רותם יצחק",
+                "local_file": "songs/rotem.m4a",
+                "album_art": "songs/rotem.webp"
             }
         }
     ]
