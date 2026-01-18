@@ -213,7 +213,11 @@ const VideoPhaseView = ({
         if (isPortrait === null) {
             detectOrientation();
         }
+        // Always try to play when video becomes ready and we're in playing state
+        // This handles navigation between dedications where isPlaying is already true
+        console.log('[MobilePlayer] handleCanPlay - isPlaying:', isPlaying, 'paused:', videoRef.current?.paused);
         if (isPlaying && videoRef.current?.paused) {
+            console.log('[MobilePlayer] Triggering autoplay from handleCanPlay');
             videoRef.current.play().catch(e => console.error("Video auto-play error:", e));
         }
     };
@@ -439,7 +443,7 @@ const MobileImmersivePlayer = ({
     const videoRef = useRef(null);
     const containerRef = useRef(null);
     const lastVideoSrcRef = useRef(null);
-    const pendingPlayRef = useRef(false);
+    const pendingAutoplayRef = useRef(false);
 
     // Swipe gesture state
     const x = useMotionValue(0);
@@ -468,14 +472,15 @@ const MobileImmersivePlayer = ({
         // Only call load() if the source actually changed
         if (lastVideoSrcRef.current !== currentSrc) {
             lastVideoSrcRef.current = currentSrc;
+            console.log('[MobilePlayer] Video source changed, loading:', dedication?.name);
+            // Mark that we want to autoplay when video is ready
+            pendingAutoplayRef.current = isPlaying;
             video.load();
         }
 
-        // Track if we should autoplay when video is ready
-        pendingPlayRef.current = isPlaying;
-
         // If already ready and should play, play now
         if (isPlaying && video.readyState >= 3 && video.paused) {
+            console.log('[MobilePlayer] Video already ready, playing immediately');
             video.play().catch(e => console.error("Video play error:", e));
         }
     }, [dedication?.video_message, hasVideoGreeting, isGreeting, isPlaying]);

@@ -330,6 +330,7 @@ const DesktopImmersivePlayer = ({
     // Video ref for video greetings (kept local for display)
     const videoRef = useRef(null);
     const lastVideoSrcRef = useRef(null);
+    const pendingAutoplayRef = useRef(false);
 
     // Track video aspect ratio for layout
     const [videoAspectRatio, setVideoAspectRatio] = useState(null);
@@ -361,6 +362,8 @@ const DesktopImmersivePlayer = ({
         if (lastVideoSrcRef.current !== currentSrc) {
             lastVideoSrcRef.current = currentSrc;
             console.log('[DesktopPlayer] Video source changed, loading:', dedication?.name);
+            // Mark that we want to autoplay when video is ready
+            pendingAutoplayRef.current = isPlaying;
             video.load();
         }
 
@@ -413,7 +416,10 @@ const DesktopImmersivePlayer = ({
         // Auto-play when video is ready and we're supposed to be playing
         // This handles the case when navigating via "Next" button where
         // the effect runs before the video element is ready
-        if (isPlaying && videoRef.current?.paused) {
+        console.log('[DesktopPlayer] handleVideoCanPlay - isPlaying:', isPlaying, 'paused:', videoRef.current?.paused, 'pendingAutoplay:', pendingAutoplayRef.current);
+        if ((isPlaying || pendingAutoplayRef.current) && videoRef.current?.paused) {
+            console.log('[DesktopPlayer] Triggering autoplay from handleVideoCanPlay');
+            pendingAutoplayRef.current = false;
             videoRef.current.play().catch(e => console.error("Video auto-play error:", e));
         }
     };
