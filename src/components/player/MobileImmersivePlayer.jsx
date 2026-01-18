@@ -152,6 +152,7 @@ const VideoPhaseView = ({
     videoRef,
     dedication,
     isPlaying,
+    isPlayingRef,
     progress,
     duration,
     onTogglePlay,
@@ -213,10 +214,10 @@ const VideoPhaseView = ({
         if (isPortrait === null) {
             detectOrientation();
         }
-        // Always try to play when video becomes ready and we're in playing state
-        // This handles navigation between dedications where isPlaying is already true
-        console.log('[MobilePlayer] handleCanPlay - isPlaying:', isPlaying, 'paused:', videoRef.current?.paused);
-        if (isPlaying && videoRef.current?.paused) {
+        // Use ref to get latest isPlaying value, avoiding stale closure issues
+        // This handles navigation between dedications where isPlaying may change after render
+        console.log('[MobilePlayer] handleCanPlay - isPlayingRef:', isPlayingRef.current, 'paused:', videoRef.current?.paused);
+        if (isPlayingRef.current && videoRef.current?.paused) {
             console.log('[MobilePlayer] Triggering autoplay from handleCanPlay');
             videoRef.current.play().catch(e => console.error("Video auto-play error:", e));
         }
@@ -443,7 +444,12 @@ const MobileImmersivePlayer = ({
     const videoRef = useRef(null);
     const containerRef = useRef(null);
     const lastVideoSrcRef = useRef(null);
-    const pendingAutoplayRef = useRef(false);
+
+    // Track latest isPlaying value in a ref to avoid stale closures in callbacks
+    const isPlayingRef = useRef(isPlaying);
+    useEffect(() => {
+        isPlayingRef.current = isPlaying;
+    }, [isPlaying]);
 
     // Swipe gesture state
     const x = useMotionValue(0);
@@ -473,8 +479,6 @@ const MobileImmersivePlayer = ({
         if (lastVideoSrcRef.current !== currentSrc) {
             lastVideoSrcRef.current = currentSrc;
             console.log('[MobilePlayer] Video source changed, loading:', dedication?.name);
-            // Mark that we want to autoplay when video is ready
-            pendingAutoplayRef.current = isPlaying;
             video.load();
         }
 
@@ -629,6 +633,7 @@ const MobileImmersivePlayer = ({
                             videoRef={videoRef}
                             dedication={dedication}
                             isPlaying={isPlaying}
+                            isPlayingRef={isPlayingRef}
                             progress={currentTime}
                             duration={duration}
                             onTogglePlay={handleTogglePlay}
