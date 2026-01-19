@@ -156,6 +156,7 @@ body {
    WELCOME SCREEN
    ============================================ */
 #welcome-screen {
+  background-color: #F4E4E0;
   background: linear-gradient(180deg, #FDF8F2 0%, #F4E4E0 100%);
   display: flex;
   /* Always flex since we render conditionally */
@@ -165,8 +166,8 @@ body {
   padding: var(--spacing-lg);
   position: relative;
   overflow: hidden;
-  height: 100vh;
-  height: 100dvh;
+  min-height: 100vh;
+  min-height: 100dvh;
 }
 
 /* Animated background particles */
@@ -646,7 +647,7 @@ input[type="range"]::-moz-range-thumb {
    ORDER SELECTION SCREEN
    ============================================ */
 .order-selection-screen {
-  background: #F4E4E0;
+  background-color: #F4E4E0;
   background: linear-gradient(180deg, #FDF8F2 0%, #F4E4E0 100%);
   background-attachment: fixed;
   display: flex;
@@ -656,8 +657,8 @@ input[type="range"]::-moz-range-thumb {
   padding: var(--spacing-md);
   position: relative;
   overflow: hidden;
-  height: 100vh;
-  height: 100dvh;
+  min-height: 100vh;
+  min-height: 100dvh;
 }
 
 .order-selection-screen::before {
