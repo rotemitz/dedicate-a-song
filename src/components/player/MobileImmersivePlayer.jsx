@@ -162,11 +162,13 @@ const VideoPhaseView = ({
 }) => {
     const [isPortrait, setIsPortrait] = useState(null);
     const [isVideoLoading, setIsVideoLoading] = useState(true);
+    const [isVideoReady, setIsVideoReady] = useState(false);
 
     // Reset loading state when video source changes
     useEffect(() => {
         if (!dedication.video_message) return;
         setIsVideoLoading(true);
+        setIsVideoReady(false);
         setIsPortrait(null);
     }, [dedication.video_message]);
 
@@ -174,6 +176,7 @@ const VideoPhaseView = ({
     const handleVideoError = (e) => {
         console.error('[MobilePlayer] Video load error:', e.target.error);
         console.error('[MobilePlayer] Video URL was:', dedication.video_message);
+        setIsVideoLoading(false);
     };
 
     useEffect(() => {
@@ -209,18 +212,28 @@ const VideoPhaseView = ({
         return false;
     };
 
+    // When metadata loads, we can detect orientation
     const handleLoadedMetadata = () => {
         detectOrientation();
     };
 
-    const handleCanPlay = () => {
+    // When first frame is available (loadeddata), stop spinner and show first frame
+    const handleLoadedData = () => {
         setIsVideoLoading(false);
+        setIsVideoReady(true);
         if (isPortrait === null) {
             detectOrientation();
         }
-        // Notify parent that video is ready
+    };
+
+    // When video can play through, notify parent to attempt autoplay
+    const handleCanPlay = () => {
+        // Notify parent that video is ready for playback attempt
         onCanPlay();
     };
+
+    // Show play button when video is ready but not playing
+    const showPlayButton = isVideoReady && !isPlaying;
 
     return (
         <motion.div
@@ -253,21 +266,51 @@ const VideoPhaseView = ({
                             : 'w-[70%] max-w-[280px] aspect-square'
                         }`}
                 >
+                    {/* Loading spinner - shown until first frame is available */}
                     {isVideoLoading && (
                         <div className="absolute inset-0 bg-celebration-charcoal flex items-center justify-center z-10">
                             <MediaLoadingSpinner size="lg" />
                         </div>
                     )}
+
+                    {/* Play button overlay - shown when video is ready but not playing */}
+                    {showPlayButton && (
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            className="absolute inset-0 flex items-center justify-center z-10 cursor-pointer"
+                            onClick={onTogglePlay}
+                        >
+                            {/* Semi-transparent overlay */}
+                            <div className="absolute inset-0 bg-black/30" />
+                            {/* Play button */}
+                            <motion.div
+                                initial={{ scale: 0.8 }}
+                                animate={{ scale: 1 }}
+                                whileTap={{ scale: 0.95 }}
+                                className="relative w-20 h-20 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center shadow-xl"
+                            >
+                                <span
+                                    className="material-symbols-outlined text-rose-gold-500 !text-5xl ml-1"
+                                    style={{ fontVariationSettings: "'FILL' 1" }}
+                                >
+                                    play_arrow
+                                </span>
+                            </motion.div>
+                        </motion.div>
+                    )}
+
                     <video
                         ref={videoRef}
                         src={dedication.video_message}
-                        className={`w-full h-full object-cover transition-all duration-500 ${!isPlaying ? 'blur-sm' : ''}`}
+                        className="w-full h-full object-cover"
                         playsInline
                         muted={false}
                         preload="metadata"
                         onEnded={onEnded}
                         onClick={onTogglePlay}
                         onLoadedMetadata={handleLoadedMetadata}
+                        onLoadedData={handleLoadedData}
                         onCanPlay={handleCanPlay}
                         onError={handleVideoError}
                     />
@@ -678,18 +721,21 @@ const MobileImmersivePlayer = ({
         }
     }, [phase]);
 
-    // Handle video can play - autoplay with iOS muted workaround
+    // Handle video can play - attempt autoplay with iOS muted workaround
     const handleVideoCanPlay = useCallback(() => {
         if (videoRef.current && videoRef.current.paused) {
             // Start muted for iOS autoplay compatibility
             videoRef.current.muted = true;
             videoRef.current.play()
                 .then(() => {
+                    // Autoplay succeeded, unmute
                     videoRef.current.muted = false;
                     setIsPlaying(true);
                 })
-                .catch(e => {
-                    console.error("Video autoplay error:", e);
+                .catch(() => {
+                    // Autoplay failed (mobile) - restore unmuted state
+                    // User will see play button and can tap to play
+                    videoRef.current.muted = false;
                 });
         }
     }, []);
