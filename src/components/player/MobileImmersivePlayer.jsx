@@ -170,9 +170,16 @@ const VideoPhaseView = ({
     // Note: Parent handles video.load() to avoid duplicate calls
     useEffect(() => {
         if (!videoRef.current || !dedication.video_message) return;
+        console.log('[MobilePlayer] VideoPhaseView - video URL:', dedication.video_message);
         setIsVideoLoading(true);
         setIsPortrait(null);
     }, [dedication.video_message, videoRef]);
+
+    // Handle video loading errors
+    const handleVideoError = (e) => {
+        console.error('[MobilePlayer] Video load error:', e.target.error);
+        console.error('[MobilePlayer] Video URL was:', dedication.video_message);
+    };
 
     useEffect(() => {
         const video = videoRef.current;
@@ -286,6 +293,7 @@ const VideoPhaseView = ({
                         onClick={onTogglePlay}
                         onLoadedMetadata={handleLoadedMetadata}
                         onCanPlay={handleCanPlay}
+                        onError={handleVideoError}
                     />
                 </div>
             </div>
