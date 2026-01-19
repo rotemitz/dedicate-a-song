@@ -159,15 +159,16 @@ body {
   background-color: #F4E4E0;
   background: linear-gradient(180deg, #FDF8F2 0%, #F4E4E0 100%);
   display: flex;
-  /* Always flex since we render conditionally */
   flex-direction: column;
   justify-content: center;
   align-items: center;
   padding: var(--spacing-lg);
-  position: relative;
+  position: fixed;
+  inset: 0;
   overflow: hidden;
-  min-height: 100vh;
-  min-height: 100dvh;
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: auto;
+  touch-action: none;
 }
 
 /* Animated background particles */
