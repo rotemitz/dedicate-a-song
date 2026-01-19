@@ -10,9 +10,9 @@ export const isDev =
       window.location.hostname === '127.0.0.1'));
 
 // Get storage provider from environment variable
-// Defaults to 'local' in dev mode, 'supabase' in production
+// Defaults to 'local' in dev mode, 'firebase' in production
 const envProvider = import.meta.env.VITE_STORAGE_PROVIDER;
-export const storageProvider = envProvider || (isDev ? 'local' : 'supabase');
+export const storageProvider = envProvider || (isDev ? 'local' : 'firebase');
 
 // Supabase configuration
 export const supabaseConfig = {

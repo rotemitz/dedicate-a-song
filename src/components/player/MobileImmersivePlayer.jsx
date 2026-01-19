@@ -153,6 +153,7 @@ const VideoPhaseView = ({
     dedication,
     isPlaying,
     isPlayingRef,
+    shouldAutoPlayOnMountRef,
     progress,
     duration,
     onTogglePlay,
@@ -214,10 +215,17 @@ const VideoPhaseView = ({
         if (isPortrait === null) {
             detectOrientation();
         }
-        // Use ref to get latest isPlaying value, avoiding stale closure issues
-        // This handles navigation between dedications where isPlaying may change after render
-        console.log('[MobilePlayer] handleCanPlay - isPlayingRef:', isPlayingRef.current, 'paused:', videoRef.current?.paused);
-        if (isPlayingRef.current && videoRef.current?.paused) {
+        // Check both isPlayingRef AND shouldAutoPlayOnMountRef
+        // shouldAutoPlayOnMountRef handles the case where user pauses before video loads
+        const shouldPlay = isPlayingRef.current || shouldAutoPlayOnMountRef.current;
+        console.log('[MobilePlayer] handleCanPlay - isPlayingRef:', isPlayingRef.current, 'shouldAutoPlayOnMount:', shouldAutoPlayOnMountRef.current, 'paused:', videoRef.current?.paused);
+
+        // Clear the auto-play flag after checking
+        if (shouldAutoPlayOnMountRef.current) {
+            shouldAutoPlayOnMountRef.current = false;
+        }
+
+        if (shouldPlay && videoRef.current?.paused) {
             console.log('[MobilePlayer] Triggering autoplay from handleCanPlay');
             videoRef.current.play().catch(e => console.error("Video auto-play error:", e));
         }
@@ -451,6 +459,9 @@ const MobileImmersivePlayer = ({
         isPlayingRef.current = isPlaying;
     }, [isPlaying]);
 
+    // Track if video should auto-play when ready (set on dedication change, cleared after play attempt)
+    const shouldAutoPlayOnMountRef = useRef(false);
+
     // Swipe gesture state
     const x = useMotionValue(0);
     const [isDragging, setIsDragging] = useState(false);
@@ -467,6 +478,14 @@ const MobileImmersivePlayer = ({
         document.body.style.overflow = 'hidden';
         return () => { document.body.style.overflow = ''; };
     }, []);
+
+    // Set auto-play flag when dedication changes and has video greeting
+    useEffect(() => {
+        if (hasVideoGreeting && isGreeting && isPlaying) {
+            console.log('[MobilePlayer] Setting shouldAutoPlayOnMount for video greeting');
+            shouldAutoPlayOnMountRef.current = true;
+        }
+    }, [dedication?.id]); // Only trigger on dedication change
 
     // Video loading effect - only load when source actually changes
     useEffect(() => {
@@ -656,6 +675,7 @@ const MobileImmersivePlayer = ({
                             dedication={dedication}
                             isPlaying={isPlaying}
                             isPlayingRef={isPlayingRef}
+                            shouldAutoPlayOnMountRef={shouldAutoPlayOnMountRef}
                             progress={currentTime}
                             duration={duration}
                             onTogglePlay={handleTogglePlay}
