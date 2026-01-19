@@ -4,6 +4,11 @@ import Banner from '../Banner';
 import FinaleCard from '../cards/FinaleCard';
 import { FooterQuote } from './SharedComponents';
 
+/**
+ * DesktopDedicationsScreen - Desktop layout for dedications grid.
+ * All playback is now handled in the ImmersivePlayer.
+ * Cards are clickable to open the immersive player.
+ */
 const DesktopDedicationsScreen = ({
     dedications,
     currentCardIndex,
@@ -14,17 +19,6 @@ const DesktopDedicationsScreen = ({
     onClosePlayer,
     onNext,
     onPrevious,
-    // Inline play props
-    inlinePlayingIndex,
-    inlineProgress,
-    inlineDuration,
-    inlineIsPlaying,
-    inlinePhase,
-    onInlinePlay,
-    onInlinePause,
-    onInlineSeek,
-    onInlineSkip,
-    onOpenFullView,
     // Finale props
     finaleData,
     onFinaleClick
@@ -49,15 +43,6 @@ const DesktopDedicationsScreen = ({
                                 activeMediaType={null}
                                 onPlay={() => onCardClick(index)}
                                 onMediaEnded={() => { }}
-                                // Inline play props
-                                isInlinePlaying={inlinePlayingIndex === index && inlineIsPlaying}
-                                inlineProgress={inlineProgress}
-                                inlineDuration={inlineDuration}
-                                inlinePhase={inlinePhase}
-                                onInlinePlay={() => onInlinePlay(index)}
-                                onInlinePause={onInlinePause}
-                                onInlineSeek={onInlineSeek}
-                                onOpenFullView={() => onOpenFullView(index)}
                             />
                         </div>
                     ))}

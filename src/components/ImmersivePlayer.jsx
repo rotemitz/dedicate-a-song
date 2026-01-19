@@ -1,23 +1,22 @@
 import React, { useEffect, useState } from 'react';
 import { DesktopImmersivePlayer, MobileImmersivePlayer } from './player';
-import { useAudioPlayer } from '../context/AudioContext';
 
 /**
  * ImmersivePlayer - Adaptive player that renders Desktop or Mobile version
  * based on viewport width. Uses the new "antigravity" design system with
  * rose gold and cream theme.
- * 
- * Uses global AudioContext for dedication data and playback state.
+ *
+ * All playback state is now local to each player component.
+ * This component just handles responsive switching.
  */
 const ImmersivePlayer = ({
+    dedication,
     currentIndex = 0,
     totalCount = 1,
     eventTitle = "Birthday Wishes",
     onClose,
     onNext,
     onPrevious,
-    // Fallback dedication prop (used if context is not set)
-    dedication: dedicationProp,
 }) => {
     // Initialize with correct value to avoid rendering wrong player first
     const [isMobile, setIsMobile] = useState(() => {
@@ -26,13 +25,6 @@ const ImmersivePlayer = ({
         }
         return false; // SSR fallback
     });
-
-    // Use dedication from context as primary source
-    const { currentDedication, currentDedicationIndex } = useAudioPlayer();
-
-    // Use context dedication if available, otherwise fallback to prop
-    const dedication = currentDedication || dedicationProp;
-    const index = currentDedicationIndex >= 0 ? currentDedicationIndex : currentIndex;
 
     // Detect viewport size on mount and resize
     useEffect(() => {
@@ -53,7 +45,7 @@ const ImmersivePlayer = ({
     // Common props for both players
     const playerProps = {
         dedication,
-        currentIndex: index,
+        currentIndex,
         totalCount,
         eventTitle,
         onClose,

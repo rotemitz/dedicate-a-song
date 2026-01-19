@@ -1,15 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { WaveformVisualizer, DedicationAvatar, VinylRecord } from './PlayerComponents';
-import { useAudioPlayer } from '../../context/AudioContext';
-
-// Helper function
-const formatTime = (time) => {
-    if (!time || isNaN(time)) return "0:00";
-    const min = Math.floor(time / 60);
-    const sec = Math.floor(time % 60);
-    return `${min}:${sec < 10 ? '0' + sec : sec}`;
-};
 
 // ============================================
 // DESKTOP SEGMENT PROGRESS BAR
@@ -312,37 +303,118 @@ const DesktopImmersivePlayer = ({
     onNext,
     onPrevious,
 }) => {
-    // Use global audio context
-    const {
-        isPlaying,
-        currentTime,
-        duration,
-        phase,
-        volume,
-        togglePlay,
-        seek,
-        skipToSong,
-        changeVolume,
-        setCurrentTime,
-        setDuration,
-    } = useAudioPlayer();
-
-    // Video ref for video greetings (kept local for display)
+    // Local media refs
     const videoRef = useRef(null);
-    const lastVideoSrcRef = useRef(null);
+    const audioRef = useRef(null);
 
-    // Track latest isPlaying value in a ref to avoid stale closures in callbacks
-    const isPlayingRef = useRef(isPlaying);
-    useEffect(() => {
-        isPlayingRef.current = isPlaying;
-    }, [isPlaying]);
+    // Local playback state (no context!)
+    const [isPlaying, setIsPlaying] = useState(false);
+    const [currentTime, setCurrentTime] = useState(0);
+    const [duration, setDuration] = useState(0);
+    const [phase, setPhase] = useState('greeting'); // 'greeting' or 'song'
+    const [volume, setVolume] = useState(1);
 
     // Track video aspect ratio for layout
     const [videoAspectRatio, setVideoAspectRatio] = useState(null);
 
+    // Computed values
+    const hasVideoGreeting = dedication?.video_message != null;
     const isGreeting = phase === 'greeting';
-    const hasVideoGreeting = dedication.video_message != null;
     const isPortraitVideo = videoAspectRatio !== null && videoAspectRatio < 1;
+
+    // Get current active media element
+    const getActiveMedia = useCallback(() => {
+        if (phase === 'greeting') {
+            return hasVideoGreeting ? videoRef.current : audioRef.current;
+        }
+        return audioRef.current;
+    }, [phase, hasVideoGreeting]);
+
+    // Play
+    const play = useCallback(() => {
+        const media = getActiveMedia();
+        if (media) {
+            media.play().catch(e => console.error("Play error:", e));
+        }
+        setIsPlaying(true);
+    }, [getActiveMedia]);
+
+    // Pause
+    const pause = useCallback(() => {
+        const media = getActiveMedia();
+        if (media) {
+            media.pause();
+        }
+        setIsPlaying(false);
+    }, [getActiveMedia]);
+
+    // Toggle
+    const togglePlay = useCallback(() => {
+        if (isPlaying) {
+            pause();
+        } else {
+            play();
+        }
+    }, [isPlaying, play, pause]);
+
+    // Skip to song phase
+    const skipToSong = useCallback(() => {
+        console.log('[DesktopPlayer] skipToSong called');
+
+        // Stop video if playing
+        if (videoRef.current) {
+            videoRef.current.pause();
+        }
+        // Stop voice message if playing
+        if (audioRef.current) {
+            audioRef.current.pause();
+        }
+
+        setPhase('song');
+        setCurrentTime(0);
+        setDuration(0);
+
+        // Load and play song
+        if (audioRef.current && dedication?.song?.local_file) {
+            audioRef.current.src = dedication.song.local_file;
+            audioRef.current.load();
+            audioRef.current.play()
+                .then(() => setIsPlaying(true))
+                .catch(e => console.error("Song play error:", e));
+        } else {
+            // No song, go to next dedication
+            console.log('[DesktopPlayer] No song available, calling onNext');
+            onNext();
+        }
+    }, [dedication, onNext]);
+
+    // Handle greeting ended (voice or video)
+    const handleGreetingEnded = useCallback(() => {
+        console.log('[DesktopPlayer] Greeting ended');
+        if (dedication?.song?.local_file) {
+            skipToSong();
+        } else {
+            // No song, go to next dedication
+            onNext();
+        }
+    }, [dedication, skipToSong, onNext]);
+
+    // Handle song ended
+    const handleSongEnded = useCallback(() => {
+        console.log('[DesktopPlayer] Song ended, calling onNext');
+        onNext();
+    }, [onNext]);
+
+    // Volume change
+    const changeVolume = useCallback((newVolume) => {
+        setVolume(newVolume);
+        if (audioRef.current) {
+            audioRef.current.volume = newVolume;
+        }
+        if (videoRef.current) {
+            videoRef.current.volume = newVolume;
+        }
+    }, []);
 
     // Lock body scroll
     useEffect(() => {
@@ -350,90 +422,137 @@ const DesktopImmersivePlayer = ({
         return () => { document.body.style.overflow = ''; };
     }, []);
 
+    // Cleanup on unmount
+    useEffect(() => {
+        return () => {
+            // Stop all media on unmount
+            if (videoRef.current) {
+                videoRef.current.pause();
+                videoRef.current.src = '';
+            }
+            if (audioRef.current) {
+                audioRef.current.pause();
+                audioRef.current.src = '';
+            }
+        };
+    }, []);
+
     // Reset video aspect ratio when dedication changes
     useEffect(() => {
         setVideoAspectRatio(null);
     }, [dedication]);
 
-    // Dedicated effect to handle video loading when dedication changes
-    // Only loads when the video source actually changes to avoid race conditions
+    // Autoplay when dedication changes
     useEffect(() => {
-        if (!videoRef.current || !hasVideoGreeting || !isGreeting) return;
+        if (!dedication) return;
 
-        const video = videoRef.current;
-        const currentSrc = dedication?.video_message;
+        console.log('[DesktopPlayer] Dedication changed to:', dedication.name);
+        const dedicationHasGreeting = dedication.video_message || dedication.voice_message;
+        const newPhase = dedicationHasGreeting ? 'greeting' : 'song';
 
-        // Only call load() if the source actually changed
-        if (lastVideoSrcRef.current !== currentSrc) {
-            lastVideoSrcRef.current = currentSrc;
-            console.log('[DesktopPlayer] Video source changed, loading:', dedication?.name);
-            video.load();
+        setPhase(newPhase);
+        setCurrentTime(0);
+        setDuration(0);
+
+        // Autoplay video greeting
+        if (dedication.video_message && videoRef.current) {
+            console.log('[DesktopPlayer] Has video greeting, will autoplay when ready');
+            // Video autoplay is handled by handleVideoCanPlay callback
+            videoRef.current.load();
         }
-
-        // If already ready and should play, play now
-        // Otherwise, handleVideoCanPlay callback will handle it when video is ready
-        if (isPlaying && video.readyState >= 3 && video.paused) {
-            console.log('[DesktopPlayer] Video ready, playing immediately');
-            video.play().catch(e => console.error("Video play error:", e));
+        // Autoplay voice greeting
+        else if (dedication.voice_message && audioRef.current) {
+            console.log('[DesktopPlayer] Has voice greeting, loading and playing');
+            audioRef.current.src = dedication.voice_message;
+            audioRef.current.load();
+            audioRef.current.play()
+                .then(() => setIsPlaying(true))
+                .catch(e => console.error("Voice autoplay error:", e));
         }
-    }, [dedication?.video_message, hasVideoGreeting, isGreeting, isPlaying]);
+        // Autoplay song (no greeting)
+        else if (dedication.song?.local_file && audioRef.current) {
+            console.log('[DesktopPlayer] No greeting, loading and playing song');
+            audioRef.current.src = dedication.song.local_file;
+            audioRef.current.load();
+            audioRef.current.play()
+                .then(() => setIsPlaying(true))
+                .catch(e => console.error("Song autoplay error:", e));
+        }
+    }, [dedication?.id]);
 
-    // Handle play/pause sync with global state (separate from loading)
+    // Audio element event listeners
     useEffect(() => {
-        if (!videoRef.current || !hasVideoGreeting || !isGreeting) return;
+        const audio = audioRef.current;
+        if (!audio) return;
 
-        const video = videoRef.current;
-
-        // Sync video time with global currentTime (only if significantly different)
-        if (Math.abs(video.currentTime - currentTime) > 0.5) {
-            video.currentTime = currentTime;
-        }
-
-        if (isPlaying) {
-            // Only play if video is ready
-            if (video.readyState >= 3 && video.paused) {
-                video.play().catch(e => console.error("Video play sync error:", e));
+        const onEnded = () => {
+            console.log('[DesktopPlayer] Audio ended, phase:', phase);
+            if (phase === 'greeting') {
+                handleGreetingEnded();
+            } else {
+                handleSongEnded();
             }
-        } else {
-            if (!video.paused) {
-                video.pause();
-            }
-        }
-    }, [isPlaying, currentTime, hasVideoGreeting, isGreeting]);
+        };
 
-    // Note: Video progress tracking is handled via onTimeUpdate/onLoadedMetadata
-    // props passed to GreetingCard to avoid timing issues
+        const onTimeUpdate = () => setCurrentTime(audio.currentTime);
+        const onLoadedMetadata = () => setDuration(audio.duration);
+        const onPlay = () => setIsPlaying(true);
+        const onPause = () => setIsPlaying(false);
 
-    // Sync volume to video
+        audio.addEventListener('ended', onEnded);
+        audio.addEventListener('timeupdate', onTimeUpdate);
+        audio.addEventListener('loadedmetadata', onLoadedMetadata);
+        audio.addEventListener('play', onPlay);
+        audio.addEventListener('pause', onPause);
+
+        return () => {
+            audio.removeEventListener('ended', onEnded);
+            audio.removeEventListener('timeupdate', onTimeUpdate);
+            audio.removeEventListener('loadedmetadata', onLoadedMetadata);
+            audio.removeEventListener('play', onPlay);
+            audio.removeEventListener('pause', onPause);
+        };
+    }, [phase, handleGreetingEnded, handleSongEnded]);
+
+    // Sync volume to audio/video
     useEffect(() => {
+        if (audioRef.current) {
+            audioRef.current.volume = volume;
+        }
         if (videoRef.current) {
             videoRef.current.volume = volume;
         }
     }, [volume]);
 
-    const handleVideoEnded = () => {
-        skipToSong();
-    };
+    // Video element handlers
+    const handleVideoEnded = useCallback(() => {
+        console.log('[DesktopPlayer] Video ended');
+        handleGreetingEnded();
+    }, [handleGreetingEnded]);
 
-    const handleVideoCanPlay = () => {
-        // Auto-play when video is ready and we're supposed to be playing
-        // Use ref to get latest isPlaying value, avoiding stale closure issues
-        console.log('[DesktopPlayer] handleVideoCanPlay - isPlayingRef:', isPlayingRef.current, 'paused:', videoRef.current?.paused);
-        if (isPlayingRef.current && videoRef.current?.paused) {
-            console.log('[DesktopPlayer] Triggering autoplay from handleVideoCanPlay');
-            videoRef.current.play().catch(e => console.error("Video auto-play error:", e));
+    const handleVideoCanPlay = useCallback(() => {
+        console.log('[DesktopPlayer] Video can play');
+        if (videoRef.current && videoRef.current.paused) {
+            videoRef.current.play()
+                .then(() => {
+                    console.log('[DesktopPlayer] Video autoplay succeeded');
+                    setIsPlaying(true);
+                })
+                .catch(e => {
+                    console.error("Video autoplay error:", e);
+                });
         }
-    };
+    }, []);
 
-    // Guard video time updates - only update if still in greeting phase
-    // This prevents late events during phase transition from overwriting song time
-    const handleVideoTimeUpdate = (e) => {
+    // Video time update (only update local state in greeting phase)
+    const handleVideoTimeUpdate = useCallback((e) => {
         if (isGreeting) {
             setCurrentTime(e.target.currentTime);
         }
-    };
+    }, [isGreeting]);
 
-    const handleVideoLoadedMetadata = (e) => {
+    // Video metadata loaded
+    const handleVideoLoadedMetadata = useCallback((e) => {
         if (isGreeting) {
             setDuration(e.target.duration);
         }
@@ -442,11 +561,16 @@ const DesktopImmersivePlayer = ({
         if (video.videoWidth && video.videoHeight) {
             setVideoAspectRatio(video.videoWidth / video.videoHeight);
         }
-    };
+    }, [isGreeting]);
 
-    const handleTogglePlay = () => {
-        togglePlay();
-    };
+    // Handle next - skip to song if greeting, otherwise go to next dedication
+    const handleNext = useCallback(() => {
+        if (isGreeting) {
+            skipToSong();
+        } else {
+            onNext();
+        }
+    }, [isGreeting, skipToSong, onNext]);
 
     return (
         <div
@@ -455,6 +579,9 @@ const DesktopImmersivePlayer = ({
                 background: 'linear-gradient(180deg, #FDF8F2 0%, #F4E4E0 100%)'
             }}
         >
+            {/* Hidden local audio element */}
+            <audio ref={audioRef} preload="metadata" />
+
             {/* Header */}
             <DesktopHeader
                 eventTitle={eventTitle}
@@ -476,7 +603,7 @@ const DesktopImmersivePlayer = ({
                             isPlaying={isPlaying}
                             isPortraitVideo={isPortraitVideo}
                             onEnded={handleVideoEnded}
-                            onTogglePlay={handleTogglePlay}
+                            onTogglePlay={togglePlay}
                             onVideoCanPlay={handleVideoCanPlay}
                             onTimeUpdate={handleVideoTimeUpdate}
                             onLoadedMetadata={handleVideoLoadedMetadata}
@@ -487,7 +614,7 @@ const DesktopImmersivePlayer = ({
                                 isPlaying={isPlaying}
                                 isGreeting={isGreeting}
                                 onSkipToSong={skipToSong}
-                                onTogglePlay={handleTogglePlay}
+                                onTogglePlay={togglePlay}
                             />
                         </div>
                     </div>
@@ -507,7 +634,7 @@ const DesktopImmersivePlayer = ({
                                 isPlaying={isPlaying}
                                 isGreeting={isGreeting}
                                 onSkipToSong={skipToSong}
-                                onTogglePlay={handleTogglePlay}
+                                onTogglePlay={togglePlay}
                             />
                         </div>
                     </div>
@@ -517,8 +644,8 @@ const DesktopImmersivePlayer = ({
             {/* Footer Controls */}
             <DesktopFooterControls
                 onPrevious={onPrevious}
-                onNext={onNext}
-                onTogglePlay={handleTogglePlay}
+                onNext={handleNext}
+                onTogglePlay={togglePlay}
                 isPlaying={isPlaying}
                 volume={volume}
                 onVolumeChange={changeVolume}
