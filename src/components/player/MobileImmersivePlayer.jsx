@@ -494,6 +494,9 @@ const MobileImmersivePlayer = ({
     // Track if video should auto-play when ready (set on dedication change, cleared after play attempt)
     const shouldAutoPlayOnMountRef = useRef(false);
 
+    // Track recent drag to prevent accidental clicks after swipe
+    const recentDragRef = useRef(false);
+
     // Swipe gesture state
     const x = useMotionValue(0);
     const [isDragging, setIsDragging] = useState(false);
@@ -608,6 +611,11 @@ const MobileImmersivePlayer = ({
     };
 
     const handleTogglePlay = () => {
+        // Ignore clicks that happen right after a swipe gesture
+        if (recentDragRef.current) {
+            console.log('[MobilePlayer] Ignoring toggle - recent drag detected');
+            return;
+        }
         togglePlay();
     };
 
@@ -618,6 +626,7 @@ const MobileImmersivePlayer = ({
     // Swipe handlers
     const handleDragStart = () => {
         setIsDragging(true);
+        recentDragRef.current = true;
     };
 
     const handleDrag = (_, info) => {
@@ -633,6 +642,11 @@ const MobileImmersivePlayer = ({
     const handleDragEnd = (_, info) => {
         setIsDragging(false);
         setSwipeDirection(null);
+
+        // Clear recent drag flag after a short delay to prevent accidental clicks
+        setTimeout(() => {
+            recentDragRef.current = false;
+        }, 300);
 
         const threshold = 80;
         const velocity = info.velocity.x;
