@@ -157,6 +157,7 @@ const VideoPhaseView = ({
     progress,
     duration,
     onTogglePlay,
+    onPlay,
     onSeek,
     onEnded,
     onTimeUpdate,
@@ -217,7 +218,8 @@ const VideoPhaseView = ({
         }
         // Check both isPlayingRef AND shouldAutoPlayOnMountRef
         // shouldAutoPlayOnMountRef handles the case where user pauses before video loads
-        const shouldPlay = isPlayingRef.current || shouldAutoPlayOnMountRef.current;
+        const shouldAutoPlay = shouldAutoPlayOnMountRef.current;
+        const shouldPlay = isPlayingRef.current || shouldAutoPlay;
         console.log('[MobilePlayer] handleCanPlay - isPlayingRef:', isPlayingRef.current, 'shouldAutoPlayOnMount:', shouldAutoPlayOnMountRef.current, 'paused:', videoRef.current?.paused);
 
         // Clear the auto-play flag after checking
@@ -228,6 +230,12 @@ const VideoPhaseView = ({
         if (shouldPlay && videoRef.current?.paused) {
             console.log('[MobilePlayer] Triggering autoplay from handleCanPlay');
             videoRef.current.play().catch(e => console.error("Video auto-play error:", e));
+            // If we're auto-playing due to shouldAutoPlayOnMount, also sync the isPlaying state
+            // This prevents the play/pause sync effect from immediately pausing the video
+            if (shouldAutoPlay && !isPlayingRef.current) {
+                console.log('[MobilePlayer] Syncing isPlaying state to true');
+                onPlay();
+            }
         }
     };
 
@@ -442,6 +450,7 @@ const MobileImmersivePlayer = ({
         currentTime,
         duration,
         phase,
+        play,
         togglePlay,
         seek,
         skipToSong,
@@ -683,6 +692,7 @@ const MobileImmersivePlayer = ({
                             progress={currentTime}
                             duration={duration}
                             onTogglePlay={handleTogglePlay}
+                            onPlay={play}
                             onSeek={handleSeek}
                             onEnded={handleVideoEnded}
                             onTimeUpdate={handleVideoTimeUpdate}
