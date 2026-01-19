@@ -1,10 +1,14 @@
-import { AnimatePresence } from 'framer-motion';
 import DedicationCard from '../DedicationCard';
 import ImmersivePlayer from '../ImmersivePlayer';
 import Banner from '../Banner';
 import FinaleCard from '../cards/FinaleCard';
-import { NowPlayingBar, MobileFooter } from './SharedComponents';
+import { MobileFooter } from './SharedComponents';
 
+/**
+ * MobileDedicationsScreen - Mobile layout for dedications list.
+ * All playback is now handled in the ImmersivePlayer.
+ * Cards are clickable to open the immersive player.
+ */
 const MobileDedicationsScreen = ({
     dedications,
     currentCardIndex,
@@ -12,21 +16,9 @@ const MobileDedicationsScreen = ({
     lastPlayedIndex,
     onBack,
     onCardClick,
-    onNowListeningClick,
     onNext,
     onPrevious,
     onClosePlayer,
-    // Inline play props
-    inlinePlayingIndex,
-    inlineProgress,
-    inlineDuration,
-    inlineIsPlaying,
-    inlinePhase,
-    onInlinePlay,
-    onInlinePause,
-    onInlineSeek,
-    onInlineSkip,
-    onOpenFullView,
     // Finale props
     finaleData,
     onFinaleClick
@@ -43,7 +35,7 @@ const MobileDedicationsScreen = ({
                     paddingLeft: '24px',
                     paddingRight: '24px',
                     paddingTop: '0px',
-                    paddingBottom: inlinePlayingIndex >= 0 ? '112px' : '24px',
+                    paddingBottom: '24px',
                     ...(showPlayer ? { display: 'none' } : {})
                 }}
             >
@@ -58,15 +50,6 @@ const MobileDedicationsScreen = ({
                                 activeMediaType={null}
                                 onPlay={() => onCardClick(index)}
                                 onMediaEnded={() => { }}
-                                // Inline play props
-                                isInlinePlaying={inlinePlayingIndex === index && inlineIsPlaying}
-                                inlineProgress={inlineProgress}
-                                inlineDuration={inlineDuration}
-                                inlinePhase={inlinePhase}
-                                onInlinePlay={() => onInlinePlay(index)}
-                                onInlinePause={onInlinePause}
-                                onInlineSeek={onInlineSeek}
-                                onOpenFullView={() => onOpenFullView(index)}
                             />
                         </div>
                     ))}
@@ -80,20 +63,6 @@ const MobileDedicationsScreen = ({
                 {/* Mobile Footer */}
                 <MobileFooter />
             </main>
-
-            {/* Floating Now Playing Bar (for inline playback) */}
-            <AnimatePresence>
-                {!showPlayer && inlinePlayingIndex >= 0 && (
-                    <NowPlayingBar
-                        key="now-playing"
-                        dedication={dedications[inlinePlayingIndex]}
-                        isPlaying={inlineIsPlaying}
-                        onPlayPause={() => inlineIsPlaying ? onInlinePause() : onInlinePlay(inlinePlayingIndex)}
-                        onSkip={onInlineSkip}
-                        onOpen={() => onOpenFullView(inlinePlayingIndex)}
-                    />
-                )}
-            </AnimatePresence>
 
             {/* Full Screen Player */}
             {showPlayer && currentCardIndex !== -1 && (

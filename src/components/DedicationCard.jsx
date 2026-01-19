@@ -4,26 +4,15 @@ import DesktopDedicationCard from './cards/DesktopDedicationCard';
 
 /**
  * DedicationCard - Main wrapper component
- * 
+ *
  * Renders mobile or desktop card based on viewport.
- * Audio playback is now managed globally via AudioContext.
+ * Clicking opens the immersive player.
  */
 const DedicationCard = ({
     dedication,
     index,
     isNowPlaying,
-    activeMediaType,
     onPlay,
-    onMediaEnded,
-    // Inline play props
-    isInlinePlaying,
-    inlineProgress,
-    inlineDuration,
-    inlinePhase,
-    onInlinePlay,
-    onInlinePause,
-    onInlineSeek,
-    onOpenFullView
 }) => {
     const handlePlay = () => {
         onPlay(index);
@@ -38,15 +27,6 @@ const DedicationCard = ({
                     isNowPlaying={isNowPlaying}
                     onPlay={handlePlay}
                     layoutId={`card-${dedication.id}`}
-                    // Inline play props
-                    isInlinePlaying={isInlinePlaying}
-                    inlineProgress={inlineProgress}
-                    inlineDuration={inlineDuration}
-                    inlinePhase={inlinePhase}
-                    onInlinePlay={onInlinePlay}
-                    onInlinePause={onInlinePause}
-                    onInlineSeek={onInlineSeek}
-                    onOpenFullView={onOpenFullView}
                 />
             </div>
 
@@ -56,19 +36,8 @@ const DedicationCard = ({
                     dedication={dedication}
                     isNowPlaying={isNowPlaying}
                     onPlay={handlePlay}
-                    // Inline play props
-                    isInlinePlaying={isInlinePlaying}
-                    inlineProgress={inlineProgress}
-                    inlineDuration={inlineDuration}
-                    inlinePhase={inlinePhase}
-                    onInlinePlay={onInlinePlay}
-                    onInlinePause={onInlinePause}
-                    onInlineSeek={onInlineSeek}
-                    onOpenFullView={onOpenFullView}
                 />
             </div>
-
-            {/* Audio elements removed - now managed globally via AudioContext */}
         </>
     );
 };

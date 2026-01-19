@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence, useMotionValue, useTransform, animate } from 'framer-motion';
 import {
     SegmentProgressBar,
@@ -8,7 +8,6 @@ import {
     DedicationAvatar,
     MediaLoadingSpinner
 } from './PlayerComponents';
-import { useAudioPlayer } from '../../context/AudioContext';
 
 // ============================================
 // PAGE TRANSITION VARIANTS
@@ -152,30 +151,25 @@ const VideoPhaseView = ({
     videoRef,
     dedication,
     isPlaying,
-    isPlayingRef,
-    shouldAutoPlayOnMountRef,
     progress,
     duration,
     onTogglePlay,
-    onPlay,
     onSeek,
     onEnded,
     onTimeUpdate,
-    onDurationChange
+    onDurationChange,
+    onCanPlay
 }) => {
     const [isPortrait, setIsPortrait] = useState(null);
     const [isVideoLoading, setIsVideoLoading] = useState(true);
-    const [isMutedForAutoplay, setIsMutedForAutoplay] = useState(true); // Start muted for iOS autoplay
 
     // Reset loading state when video source changes
-    // Note: Parent handles video.load() to avoid duplicate calls
     useEffect(() => {
-        if (!videoRef.current || !dedication.video_message) return;
+        if (!dedication.video_message) return;
         console.log('[MobilePlayer] VideoPhaseView - video URL:', dedication.video_message);
         setIsVideoLoading(true);
         setIsPortrait(null);
-        setIsMutedForAutoplay(true); // Reset muted state for new video
-    }, [dedication.video_message, videoRef]);
+    }, [dedication.video_message]);
 
     // Handle video loading errors
     const handleVideoError = (e) => {
@@ -225,40 +219,8 @@ const VideoPhaseView = ({
         if (isPortrait === null) {
             detectOrientation();
         }
-        // Check both isPlayingRef AND shouldAutoPlayOnMountRef
-        // shouldAutoPlayOnMountRef handles the case where user pauses before video loads
-        const shouldAutoPlay = shouldAutoPlayOnMountRef.current;
-        const shouldPlay = isPlayingRef.current || shouldAutoPlay;
-        console.log('[MobilePlayer] handleCanPlay - isPlayingRef:', isPlayingRef.current, 'shouldAutoPlayOnMount:', shouldAutoPlayOnMountRef.current, 'paused:', videoRef.current?.paused);
-
-        // Clear the auto-play flag after checking
-        if (shouldAutoPlayOnMountRef.current) {
-            shouldAutoPlayOnMountRef.current = false;
-        }
-
-        if (shouldPlay && videoRef.current?.paused) {
-            console.log('[MobilePlayer] Triggering autoplay from handleCanPlay (muted for iOS)');
-            // Start muted for iOS autoplay compatibility
-            videoRef.current.muted = true;
-            videoRef.current.play()
-                .then(() => {
-                    console.log('[MobilePlayer] Autoplay succeeded, unmuting');
-                    // Unmute after play starts
-                    videoRef.current.muted = false;
-                    setIsMutedForAutoplay(false);
-                })
-                .catch(e => {
-                    console.error("Video auto-play error:", e);
-                    // Keep muted state for UI feedback
-                    setIsMutedForAutoplay(true);
-                });
-            // If we're auto-playing due to shouldAutoPlayOnMount, also sync the isPlaying state
-            // This prevents the play/pause sync effect from immediately pausing the video
-            if (shouldAutoPlay && !isPlayingRef.current) {
-                console.log('[MobilePlayer] Syncing isPlaying state to true');
-                onPlay();
-            }
-        }
+        // Notify parent that video is ready
+        onCanPlay();
     };
 
     return (
@@ -468,45 +430,119 @@ const MobileImmersivePlayer = ({
     onNext,
     onPrevious,
 }) => {
-    const {
-        isPlaying,
-        currentTime,
-        duration,
-        phase,
-        play,
-        togglePlay,
-        seek,
-        skipToSong,
-        setCurrentTime,
-        setDuration,
-    } = useAudioPlayer();
-
+    // Local media refs
     const videoRef = useRef(null);
-    const containerRef = useRef(null);
-    const lastVideoSrcRef = useRef(null);
+    const audioRef = useRef(null);
 
-    // Track latest isPlaying value in a ref to avoid stale closures in callbacks
-    const isPlayingRef = useRef(isPlaying);
-    useEffect(() => {
-        isPlayingRef.current = isPlaying;
-    }, [isPlaying]);
-
-    // Track if video should auto-play when ready (set on dedication change, cleared after play attempt)
-    const shouldAutoPlayOnMountRef = useRef(false);
-
-    // Track recent drag to prevent accidental clicks after swipe
-    const recentDragRef = useRef(false);
+    // Local playback state (no context!)
+    const [isPlaying, setIsPlaying] = useState(false);
+    const [currentTime, setCurrentTime] = useState(0);
+    const [duration, setDuration] = useState(0);
+    const [phase, setPhase] = useState('greeting'); // 'greeting' or 'song'
 
     // Swipe gesture state
     const x = useMotionValue(0);
     const [isDragging, setIsDragging] = useState(false);
     const [swipeDirection, setSwipeDirection] = useState(null);
 
-    // Subtle visual feedback during drag (less dramatic)
+    // Subtle visual feedback during drag
     const dragOpacity = useTransform(x, [-100, 0, 100], [0.85, 1, 0.85]);
 
+    // Computed values
+    const hasVideoGreeting = dedication?.video_message != null;
     const isGreeting = phase === 'greeting';
-    const hasVideoGreeting = dedication.video_message != null;
+
+    // Get current active media element
+    const getActiveMedia = useCallback(() => {
+        if (phase === 'greeting') {
+            return hasVideoGreeting ? videoRef.current : audioRef.current;
+        }
+        return audioRef.current;
+    }, [phase, hasVideoGreeting]);
+
+    // Play
+    const play = useCallback(() => {
+        const media = getActiveMedia();
+        if (media) {
+            media.play().catch(e => console.error("Play error:", e));
+        }
+        setIsPlaying(true);
+    }, [getActiveMedia]);
+
+    // Pause
+    const pause = useCallback(() => {
+        const media = getActiveMedia();
+        if (media) {
+            media.pause();
+        }
+        setIsPlaying(false);
+    }, [getActiveMedia]);
+
+    // Toggle
+    const togglePlay = useCallback(() => {
+        if (isPlaying) {
+            pause();
+        } else {
+            play();
+        }
+    }, [isPlaying, play, pause]);
+
+    // Skip to song phase
+    const skipToSong = useCallback(() => {
+        console.log('[MobilePlayer] skipToSong called');
+
+        // Stop video if playing
+        if (videoRef.current) {
+            videoRef.current.pause();
+        }
+        // Stop voice message if playing
+        if (audioRef.current) {
+            audioRef.current.pause();
+        }
+
+        setPhase('song');
+        setCurrentTime(0);
+        setDuration(0);
+
+        // Load and play song
+        if (audioRef.current && dedication?.song?.local_file) {
+            audioRef.current.src = dedication.song.local_file;
+            audioRef.current.load();
+            audioRef.current.play()
+                .then(() => setIsPlaying(true))
+                .catch(e => console.error("Song play error:", e));
+        } else {
+            // No song, go to next dedication
+            console.log('[MobilePlayer] No song available, calling onNext');
+            onNext();
+        }
+    }, [dedication, onNext]);
+
+    // Handle greeting ended (voice or video)
+    const handleGreetingEnded = useCallback(() => {
+        console.log('[MobilePlayer] Greeting ended');
+        if (dedication?.song?.local_file) {
+            skipToSong();
+        } else {
+            // No song, go to next dedication
+            onNext();
+        }
+    }, [dedication, skipToSong, onNext]);
+
+    // Handle song ended
+    const handleSongEnded = useCallback(() => {
+        console.log('[MobilePlayer] Song ended, calling onNext');
+        onNext();
+    }, [onNext]);
+
+    // Seek
+    const seek = useCallback((time) => {
+        setCurrentTime(time);
+        const media = getActiveMedia();
+        if (media) {
+            media.currentTime = time;
+        }
+    }, [getActiveMedia]);
 
     // Lock body scroll
     useEffect(() => {
@@ -514,119 +550,143 @@ const MobileImmersivePlayer = ({
         return () => { document.body.style.overflow = ''; };
     }, []);
 
-    // Set auto-play flag when dedication changes and has video greeting
-    // This runs on every dedication change - we set the flag if this dedication has video
-    // The handleCanPlay will check this flag and play automatically when video is ready
+    // Cleanup on unmount
     useEffect(() => {
-        const dedicationHasVideo = dedication?.video_message != null;
-        console.log('[MobilePlayer] Dedication changed to:', dedication?.name, '| hasVideo:', dedicationHasVideo, '| isPlaying:', isPlaying);
-        if (dedicationHasVideo) {
-            console.log('[MobilePlayer] Setting shouldAutoPlayOnMount = true');
-            shouldAutoPlayOnMountRef.current = true;
-        }
-    }, [dedication?.id]); // Only trigger on dedication change
+        return () => {
+            // Stop all media on unmount
+            if (videoRef.current) {
+                videoRef.current.pause();
+                videoRef.current.src = '';
+            }
+            if (audioRef.current) {
+                audioRef.current.pause();
+                audioRef.current.src = '';
+            }
+        };
+    }, []);
 
-    // Video loading effect - only load when source actually changes
+    // Autoplay when dedication changes
     useEffect(() => {
-        console.log('[MobilePlayer] Video loading effect - hasVideoGreeting:', hasVideoGreeting, 'isGreeting:', isGreeting, 'isPlaying:', isPlaying);
-        if (!videoRef.current || !hasVideoGreeting || !isGreeting) {
-            console.log('[MobilePlayer] Video loading effect - skipping (conditions not met)');
-            return;
+        if (!dedication) return;
+
+        console.log('[MobilePlayer] Dedication changed to:', dedication.name);
+        const dedicationHasGreeting = dedication.video_message || dedication.voice_message;
+        const newPhase = dedicationHasGreeting ? 'greeting' : 'song';
+
+        setPhase(newPhase);
+        setCurrentTime(0);
+        setDuration(0);
+
+        // Autoplay video greeting
+        if (dedication.video_message && videoRef.current) {
+            console.log('[MobilePlayer] Has video greeting, will autoplay when ready');
+            // Video autoplay is handled by handleVideoCanPlay callback
+            // Just load the video
+            videoRef.current.load();
         }
-
-        const video = videoRef.current;
-        const currentSrc = dedication?.video_message;
-
-        // Only call load() if the source actually changed
-        if (lastVideoSrcRef.current !== currentSrc) {
-            lastVideoSrcRef.current = currentSrc;
-            console.log('[MobilePlayer] Video source changed, loading:', dedication?.name);
-            video.load();
-        } else {
-            console.log('[MobilePlayer] Video source unchanged, not reloading');
+        // Autoplay voice greeting
+        else if (dedication.voice_message && audioRef.current) {
+            console.log('[MobilePlayer] Has voice greeting, loading and playing');
+            audioRef.current.src = dedication.voice_message;
+            audioRef.current.load();
+            audioRef.current.play()
+                .then(() => setIsPlaying(true))
+                .catch(e => console.error("Voice autoplay error:", e));
         }
-
-        // If already ready and should play, play now
-        if (isPlaying && video.readyState >= 3 && video.paused) {
-            console.log('[MobilePlayer] Video already ready, playing immediately');
-            video.play().catch(e => console.error("Video play error:", e));
-        } else {
-            console.log('[MobilePlayer] Video loading effect - not playing immediately. readyState:', video.readyState, 'paused:', video.paused);
+        // Autoplay song (no greeting)
+        else if (dedication.song?.local_file && audioRef.current) {
+            console.log('[MobilePlayer] No greeting, loading and playing song');
+            audioRef.current.src = dedication.song.local_file;
+            audioRef.current.load();
+            audioRef.current.play()
+                .then(() => setIsPlaying(true))
+                .catch(e => console.error("Song autoplay error:", e));
         }
-    }, [dedication?.video_message, hasVideoGreeting, isGreeting, isPlaying]);
+    }, [dedication?.id]);
 
-    // Video play/pause sync
+    // Audio element event listeners
     useEffect(() => {
-        console.log('[MobilePlayer] Play/pause sync effect - isPlaying:', isPlaying, 'hasVideoGreeting:', hasVideoGreeting, 'isGreeting:', isGreeting);
-        if (!videoRef.current || !hasVideoGreeting || !isGreeting) {
-            console.log('[MobilePlayer] Play/pause sync - skipping (conditions not met)');
-            return;
-        }
+        const audio = audioRef.current;
+        if (!audio) return;
 
-        const video = videoRef.current;
-
-        if (Math.abs(video.currentTime - currentTime) > 0.5) {
-            console.log('[MobilePlayer] Play/pause sync - seeking video to:', currentTime);
-            video.currentTime = currentTime;
-        }
-
-        if (isPlaying) {
-            if (video.readyState >= 3 && video.paused) {
-                console.log('[MobilePlayer] Play/pause sync - attempting to play video. readyState:', video.readyState);
-                video.play().catch(e => console.error("Video play sync error:", e));
+        const onEnded = () => {
+            console.log('[MobilePlayer] Audio ended, phase:', phase);
+            if (phase === 'greeting') {
+                handleGreetingEnded();
             } else {
-                console.log('[MobilePlayer] Play/pause sync - not playing. readyState:', video.readyState, 'paused:', video.paused);
+                handleSongEnded();
             }
-        } else {
-            if (!video.paused) {
-                console.log('[MobilePlayer] Play/pause sync - pausing video');
-                video.pause();
-            }
-        }
-    }, [isPlaying, currentTime, hasVideoGreeting, isGreeting]);
+        };
 
-    const handleVideoEnded = () => {
-        skipToSong();
-    };
+        const onTimeUpdate = () => setCurrentTime(audio.currentTime);
+        const onLoadedMetadata = () => setDuration(audio.duration);
+        const onPlay = () => setIsPlaying(true);
+        const onPause = () => setIsPlaying(false);
 
-    // Guard video time updates - only update if still in greeting phase
-    // This prevents late timeupdate events during exit animation from overwriting song time
-    const handleVideoTimeUpdate = (time) => {
+        audio.addEventListener('ended', onEnded);
+        audio.addEventListener('timeupdate', onTimeUpdate);
+        audio.addEventListener('loadedmetadata', onLoadedMetadata);
+        audio.addEventListener('play', onPlay);
+        audio.addEventListener('pause', onPause);
+
+        return () => {
+            audio.removeEventListener('ended', onEnded);
+            audio.removeEventListener('timeupdate', onTimeUpdate);
+            audio.removeEventListener('loadedmetadata', onLoadedMetadata);
+            audio.removeEventListener('play', onPlay);
+            audio.removeEventListener('pause', onPause);
+        };
+    }, [phase, handleGreetingEnded, handleSongEnded]);
+
+    // Video element - handle video ended event
+    const handleVideoEnded = useCallback(() => {
+        console.log('[MobilePlayer] Video ended');
+        handleGreetingEnded();
+    }, [handleGreetingEnded]);
+
+    // Video time update (only update local state in greeting phase)
+    const handleVideoTimeUpdate = useCallback((time) => {
         if (phase === 'greeting') {
             setCurrentTime(time);
         }
-    };
+    }, [phase]);
 
-    const handleVideoDurationChange = (dur) => {
+    // Video duration change
+    const handleVideoDurationChange = useCallback((dur) => {
         if (phase === 'greeting') {
             setDuration(dur);
         }
-    };
+    }, [phase]);
 
-    const handleSeek = (time) => {
+    // Handle video can play - autoplay with iOS muted workaround
+    const handleVideoCanPlay = useCallback(() => {
+        console.log('[MobilePlayer] Video can play');
+        if (videoRef.current && videoRef.current.paused) {
+            // Start muted for iOS autoplay compatibility
+            videoRef.current.muted = true;
+            videoRef.current.play()
+                .then(() => {
+                    console.log('[MobilePlayer] Video autoplay succeeded, unmuting');
+                    videoRef.current.muted = false;
+                    setIsPlaying(true);
+                })
+                .catch(e => {
+                    console.error("Video autoplay error:", e);
+                });
+        }
+    }, []);
+
+    // Handle seek for video
+    const handleSeek = useCallback((time) => {
         seek(time);
         if (videoRef.current && hasVideoGreeting && isGreeting) {
             videoRef.current.currentTime = time;
         }
-    };
-
-    const handleTogglePlay = () => {
-        // Ignore clicks that happen right after a swipe gesture
-        if (recentDragRef.current) {
-            console.log('[MobilePlayer] Ignoring toggle - recent drag detected');
-            return;
-        }
-        togglePlay();
-    };
-
-    const handleSkipToSong = () => {
-        skipToSong();
-    };
+    }, [seek, hasVideoGreeting, isGreeting]);
 
     // Swipe handlers
     const handleDragStart = () => {
         setIsDragging(true);
-        recentDragRef.current = true;
     };
 
     const handleDrag = (_, info) => {
@@ -643,15 +703,18 @@ const MobileImmersivePlayer = ({
         setIsDragging(false);
         setSwipeDirection(null);
 
-        // Clear recent drag flag after a short delay to prevent accidental clicks
-        setTimeout(() => {
-            recentDragRef.current = false;
-        }, 300);
-
         const threshold = 80;
         const velocity = info.velocity.x;
         const offset = info.offset.x;
-        console.log('[MobilePlayer] handleDragEnd - offset:', offset, 'velocity:', velocity, 'threshold:', threshold, 'isGreeting:', isGreeting);
+        console.log('[MobilePlayer] handleDragEnd - offset:', offset, 'velocity:', velocity);
+
+        // Stop current media before navigating
+        if (videoRef.current && !videoRef.current.paused) {
+            videoRef.current.pause();
+        }
+        if (audioRef.current && !audioRef.current.paused) {
+            audioRef.current.pause();
+        }
 
         if (offset > threshold || velocity > 500) {
             // Swipe right - go to previous
@@ -662,15 +725,14 @@ const MobileImmersivePlayer = ({
             // Swipe left - go to next (song if greeting, next dedication if song)
             x.set(0);
             if (isGreeting) {
-                console.log('[MobilePlayer] Swipe left (greeting) - calling handleSkipToSong');
-                handleSkipToSong();
+                console.log('[MobilePlayer] Swipe left (greeting) - skipping to song');
+                skipToSong();
             } else {
                 console.log('[MobilePlayer] Swipe left (song) - calling onNext');
                 onNext();
             }
         } else {
-            console.log('[MobilePlayer] Swipe not far enough - snapping back');
-            // Snap back with spring animation
+            // Snap back
             animate(x, 0, { type: "spring", stiffness: 500, damping: 30 });
         }
     };
@@ -686,6 +748,9 @@ const MobileImmersivePlayer = ({
                 paddingTop: 'max(16px, env(safe-area-inset-top))',
             }}
         >
+            {/* Hidden local audio element */}
+            <audio ref={audioRef} preload="metadata" />
+
             {/* Segment Progress Bar */}
             <SegmentProgressBar
                 current={currentIndex}
@@ -696,7 +761,6 @@ const MobileImmersivePlayer = ({
 
             {/* Swipeable Content Container */}
             <motion.div
-                ref={containerRef}
                 className="flex-1 w-full flex flex-col items-center justify-center relative touch-pan-y"
                 style={{ x, opacity: dragOpacity }}
                 drag="x"
@@ -724,16 +788,14 @@ const MobileImmersivePlayer = ({
                             videoRef={videoRef}
                             dedication={dedication}
                             isPlaying={isPlaying}
-                            isPlayingRef={isPlayingRef}
-                            shouldAutoPlayOnMountRef={shouldAutoPlayOnMountRef}
                             progress={currentTime}
                             duration={duration}
-                            onTogglePlay={handleTogglePlay}
-                            onPlay={play}
+                            onTogglePlay={togglePlay}
                             onSeek={handleSeek}
                             onEnded={handleVideoEnded}
                             onTimeUpdate={handleVideoTimeUpdate}
                             onDurationChange={handleVideoDurationChange}
+                            onCanPlay={handleVideoCanPlay}
                         />
                     ) : isGreeting ? (
                         <VoicePhaseView
@@ -751,7 +813,7 @@ const MobileImmersivePlayer = ({
                             isPlaying={isPlaying}
                             progress={currentTime}
                             duration={duration}
-                            onTogglePlay={handleTogglePlay}
+                            onTogglePlay={togglePlay}
                             onSeek={handleSeek}
                         />
                     )}
@@ -768,7 +830,7 @@ const MobileImmersivePlayer = ({
                     {isGreeting && dedication?.song?.local_file && (
                         <UpNextPreview
                             dedication={dedication}
-                            onClick={handleSkipToSong}
+                            onClick={skipToSong}
                         />
                     )}
                 </AnimatePresence>
@@ -776,7 +838,7 @@ const MobileImmersivePlayer = ({
                 {/* Glassmorphic Controls */}
                 <GlassmorphicControls
                     isPlaying={isPlaying}
-                    onTogglePlay={handleTogglePlay}
+                    onTogglePlay={togglePlay}
                     onClose={onClose}
                     showSwipeHint={!isDragging}
                 />
