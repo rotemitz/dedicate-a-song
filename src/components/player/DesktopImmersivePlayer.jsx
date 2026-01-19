@@ -313,6 +313,9 @@ const DesktopImmersivePlayer = ({
     const [duration, setDuration] = useState(0);
     const [phase, setPhase] = useState('greeting'); // 'greeting' or 'song'
     const [volume, setVolume] = useState(1);
+    const pendingAutoplayRef = useRef(false);
+    const retryCountRef = useRef(0);
+    const MAX_RETRIES = 2;
 
     // Track video aspect ratio for layout
     const [videoAspectRatio, setVideoAspectRatio] = useState(null);
@@ -375,15 +378,11 @@ const DesktopImmersivePlayer = ({
 
         // Load and play song
         if (audioRef.current && dedication?.song?.local_file) {
+            console.log('[Desktop Audio] skipToSong - setting src and pendingAutoplay');
+            retryCountRef.current = 0;
             audioRef.current.src = dedication.song.local_file;
             audioRef.current.load();
-            audioRef.current.play()
-                .then(() => setIsPlaying(true))
-                .catch(e => {
-                    if (e.name !== 'AbortError') {
-                        console.error("Song play error:", e);
-                    }
-                });
+            pendingAutoplayRef.current = true;
         } else {
             // No song, go to next dedication
             onNext();
@@ -475,27 +474,19 @@ const DesktopImmersivePlayer = ({
         }
         // Autoplay voice greeting
         else if (dedication.voice_message && audioRef.current) {
+            console.log('[Desktop Audio] Setting voice message src:', dedication.voice_message);
+            retryCountRef.current = 0;
             audioRef.current.src = dedication.voice_message;
             audioRef.current.load();
-            audioRef.current.play()
-                .then(() => setIsPlaying(true))
-                .catch(e => {
-                    if (e.name !== 'AbortError') {
-                        console.error("Voice autoplay error:", e);
-                    }
-                });
+            pendingAutoplayRef.current = true;
         }
         // Autoplay song (no greeting)
         else if (dedication.song?.local_file && audioRef.current) {
+            console.log('[Desktop Audio] Setting song src:', dedication.song.local_file);
+            retryCountRef.current = 0;
             audioRef.current.src = dedication.song.local_file;
             audioRef.current.load();
-            audioRef.current.play()
-                .then(() => setIsPlaying(true))
-                .catch(e => {
-                    if (e.name !== 'AbortError') {
-                        console.error("Song autoplay error:", e);
-                    }
-                });
+            pendingAutoplayRef.current = true;
         }
     }, [dedication?.id]);
 
@@ -513,22 +504,65 @@ const DesktopImmersivePlayer = ({
         };
 
         const onTimeUpdate = () => setCurrentTime(audio.currentTime);
-        const onLoadedMetadata = () => setDuration(audio.duration);
-        const onPlay = () => setIsPlaying(true);
-        const onPause = () => setIsPlaying(false);
+        const onLoadedMetadata = () => {
+            console.log('[Desktop Audio] Event: loadedmetadata - duration:', audio.duration);
+            setDuration(audio.duration);
+        };
+        const onCanPlay = () => {
+            console.log('[Desktop Audio] Event: canplay - readyState:', audio.readyState, 'pendingAutoplay:', pendingAutoplayRef.current);
+            if (pendingAutoplayRef.current) {
+                pendingAutoplayRef.current = false;
+                audio.play()
+                    .then(() => console.log('[Desktop Audio] Playback started from canplay'))
+                    .catch(e => {
+                        if (e.name !== 'AbortError') {
+                            console.error('[Desktop Audio] Play error from canplay:', e);
+                        }
+                    });
+            }
+        };
+        const onPlay = () => {
+            console.log('[Desktop Audio] Event: play');
+            setIsPlaying(true);
+        };
+        const onPause = () => {
+            console.log('[Desktop Audio] Event: pause');
+            setIsPlaying(false);
+        };
+        const onError = (e) => {
+            const error = audio.error;
+            console.error('[Desktop Audio] Event: error - code:', error?.code, 'message:', error?.message);
+
+            if (error?.code === 3 && retryCountRef.current < MAX_RETRIES) {
+                retryCountRef.current++;
+                console.log(`[Desktop Audio] Decode error detected. Attempting retry ${retryCountRef.current}/${MAX_RETRIES}...`);
+                setTimeout(() => {
+                    const currentSrc = audio.src;
+                    audio.src = '';
+                    audio.load();
+                    audio.src = currentSrc;
+                    audio.load();
+                    pendingAutoplayRef.current = true;
+                }, 500);
+            }
+        };
 
         audio.addEventListener('ended', onEnded);
         audio.addEventListener('timeupdate', onTimeUpdate);
         audio.addEventListener('loadedmetadata', onLoadedMetadata);
+        audio.addEventListener('canplay', onCanPlay);
         audio.addEventListener('play', onPlay);
         audio.addEventListener('pause', onPause);
+        audio.addEventListener('error', onError);
 
         return () => {
             audio.removeEventListener('ended', onEnded);
             audio.removeEventListener('timeupdate', onTimeUpdate);
             audio.removeEventListener('loadedmetadata', onLoadedMetadata);
+            audio.removeEventListener('canplay', onCanPlay);
             audio.removeEventListener('play', onPlay);
             audio.removeEventListener('pause', onPause);
+            audio.removeEventListener('error', onError);
         };
     }, [phase, handleGreetingEnded, handleSongEnded]);
 

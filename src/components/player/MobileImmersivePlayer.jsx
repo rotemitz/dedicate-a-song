@@ -509,6 +509,9 @@ const MobileImmersivePlayer = ({
     const [currentTime, setCurrentTime] = useState(0);
     const [duration, setDuration] = useState(0);
     const [phase, setPhase] = useState('greeting'); // 'greeting' or 'song'
+    const pendingAutoplayRef = useRef(false);
+    const retryCountRef = useRef(0);
+    const MAX_RETRIES = 2;
 
     // Swipe gesture state
     const x = useMotionValue(0);
@@ -575,16 +578,11 @@ const MobileImmersivePlayer = ({
 
         // Load and play song
         if (audioRef.current && dedication?.song?.local_file) {
+            console.log('[Audio] skipToSong - setting src and pendingAutoplay');
+            retryCountRef.current = 0;
             audioRef.current.src = dedication.song.local_file;
             audioRef.current.load();
-            audioRef.current.play()
-                .then(() => setIsPlaying(true))
-                .catch(e => {
-                    // AbortError is expected if user navigates quickly - ignore it
-                    if (e.name !== 'AbortError') {
-                        console.error("Song play error:", e);
-                    }
-                });
+            pendingAutoplayRef.current = true;
         } else {
             // No song, go to next dedication
             onNext();
@@ -677,42 +675,18 @@ const MobileImmersivePlayer = ({
         // Autoplay voice greeting
         else if (dedication.voice_message && audioRef.current) {
             console.log('[Audio] Setting voice message src:', dedication.voice_message);
+            retryCountRef.current = 0;
             audioRef.current.src = dedication.voice_message;
-            console.log('[Audio] Calling load(), readyState:', audioRef.current.readyState);
             audioRef.current.load();
-            console.log('[Audio] Calling play() immediately after load, readyState:', audioRef.current.readyState);
-            audioRef.current.play()
-                .then(() => {
-                    console.log('[Audio] Voice play() resolved successfully');
-                    setIsPlaying(true);
-                })
-                .catch(e => {
-                    console.error('[Audio] Voice play() error:', e.name, e.message);
-                    // AbortError is expected if user navigates quickly - ignore it
-                    if (e.name !== 'AbortError') {
-                        console.error("Voice autoplay error:", e);
-                    }
-                });
+            pendingAutoplayRef.current = true;
         }
         // Autoplay song (no greeting)
         else if (dedication.song?.local_file && audioRef.current) {
             console.log('[Audio] Setting song src:', dedication.song.local_file);
+            retryCountRef.current = 0;
             audioRef.current.src = dedication.song.local_file;
-            console.log('[Audio] Calling load(), readyState:', audioRef.current.readyState);
             audioRef.current.load();
-            console.log('[Audio] Calling play() immediately after load, readyState:', audioRef.current.readyState);
-            audioRef.current.play()
-                .then(() => {
-                    console.log('[Audio] Song play() resolved successfully');
-                    setIsPlaying(true);
-                })
-                .catch(e => {
-                    console.error('[Audio] Song play() error:', e.name, e.message);
-                    // AbortError is expected if user navigates quickly - ignore it
-                    if (e.name !== 'AbortError') {
-                        console.error("Song autoplay error:", e);
-                    }
-                });
+            pendingAutoplayRef.current = true;
         }
     }, [dedication?.id]);
 
@@ -736,7 +710,17 @@ const MobileImmersivePlayer = ({
             setDuration(audio.duration);
         };
         const onCanPlay = () => {
-            console.log('[Audio] Event: canplay - readyState:', audio.readyState);
+            console.log('[Audio] Event: canplay - readyState:', audio.readyState, 'pendingAutoplay:', pendingAutoplayRef.current);
+            if (pendingAutoplayRef.current) {
+                pendingAutoplayRef.current = false;
+                audio.play()
+                    .then(() => console.log('[Audio] Playback started from canplay'))
+                    .catch(e => {
+                        if (e.name !== 'AbortError') {
+                            console.error('[Audio] Play error from canplay:', e);
+                        }
+                    });
+            }
         };
         const onCanPlayThrough = () => {
             console.log('[Audio] Event: canplaythrough - readyState:', audio.readyState);
@@ -750,7 +734,24 @@ const MobileImmersivePlayer = ({
             setIsPlaying(false);
         };
         const onError = (e) => {
-            console.error('[Audio] Event: error -', audio.error?.code, audio.error?.message);
+            const error = audio.error;
+            console.error('[Audio] Event: error - code:', error?.code, 'message:', error?.message);
+
+            // Handle Code 3 (MEDIA_ERR_DECODE) - often transient on mobile
+            if (error?.code === 3 && retryCountRef.current < MAX_RETRIES) {
+                retryCountRef.current++;
+                console.log(`[Audio] Decode error detected. Attempting retry ${retryCountRef.current}/${MAX_RETRIES}...`);
+
+                // Give it a moment before retrying
+                setTimeout(() => {
+                    const currentSrc = audio.src;
+                    audio.src = ''; // Clear
+                    audio.load();
+                    audio.src = currentSrc; // Restore and reload
+                    audio.load();
+                    pendingAutoplayRef.current = true;
+                }, 500);
+            }
         };
 
         audio.addEventListener('ended', onEnded);
