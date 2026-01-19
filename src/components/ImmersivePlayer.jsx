@@ -19,7 +19,13 @@ const ImmersivePlayer = ({
     // Fallback dedication prop (used if context is not set)
     dedication: dedicationProp,
 }) => {
-    const [isMobile, setIsMobile] = useState(false);
+    // Initialize with correct value to avoid rendering wrong player first
+    const [isMobile, setIsMobile] = useState(() => {
+        if (typeof window !== 'undefined') {
+            return window.innerWidth < 768;
+        }
+        return false; // SSR fallback
+    });
 
     // Use dedication from context as primary source
     const { currentDedication, currentDedicationIndex } = useAudioPlayer();
