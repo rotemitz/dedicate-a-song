@@ -359,7 +359,6 @@ const DesktopImmersivePlayer = ({
 
     // Skip to song phase
     const skipToSong = useCallback(() => {
-        console.log('[DesktopPlayer] skipToSong called');
 
         // Stop video if playing
         if (videoRef.current) {
@@ -380,17 +379,19 @@ const DesktopImmersivePlayer = ({
             audioRef.current.load();
             audioRef.current.play()
                 .then(() => setIsPlaying(true))
-                .catch(e => console.error("Song play error:", e));
+                .catch(e => {
+                    if (e.name !== 'AbortError') {
+                        console.error("Song play error:", e);
+                    }
+                });
         } else {
             // No song, go to next dedication
-            console.log('[DesktopPlayer] No song available, calling onNext');
             onNext();
         }
     }, [dedication, onNext]);
 
     // Handle greeting ended (voice or video)
     const handleGreetingEnded = useCallback(() => {
-        console.log('[DesktopPlayer] Greeting ended');
         if (dedication?.song?.local_file) {
             skipToSong();
         } else {
@@ -401,7 +402,6 @@ const DesktopImmersivePlayer = ({
 
     // Handle song ended
     const handleSongEnded = useCallback(() => {
-        console.log('[DesktopPlayer] Song ended, calling onNext');
         onNext();
     }, [onNext]);
 
@@ -446,37 +446,56 @@ const DesktopImmersivePlayer = ({
     useEffect(() => {
         if (!dedication) return;
 
-        console.log('[DesktopPlayer] Dedication changed to:', dedication.name);
         const dedicationHasGreeting = dedication.video_message || dedication.voice_message;
         const newPhase = dedicationHasGreeting ? 'greeting' : 'song';
+
+        // IMPORTANT: Stop all current media first to prevent overlap
+        if (videoRef.current) {
+            videoRef.current.pause();
+        }
+        if (audioRef.current) {
+            audioRef.current.pause();
+        }
+        setIsPlaying(false);
 
         setPhase(newPhase);
         setCurrentTime(0);
         setDuration(0);
 
         // Autoplay video greeting
-        if (dedication.video_message && videoRef.current) {
-            console.log('[DesktopPlayer] Has video greeting, will autoplay when ready');
+        // NOTE: Don't check videoRef.current here - it might not exist yet since
+        // the video element only renders when phase='greeting'. We set the phase first,
+        // then the video element will mount and autoplay via handleVideoCanPlay.
+        if (dedication.video_message) {
+            // Clear audio src to prevent any accidental playback
+            if (audioRef.current) {
+                audioRef.current.src = '';
+            }
             // Video autoplay is handled by handleVideoCanPlay callback
-            videoRef.current.load();
         }
         // Autoplay voice greeting
         else if (dedication.voice_message && audioRef.current) {
-            console.log('[DesktopPlayer] Has voice greeting, loading and playing');
             audioRef.current.src = dedication.voice_message;
             audioRef.current.load();
             audioRef.current.play()
                 .then(() => setIsPlaying(true))
-                .catch(e => console.error("Voice autoplay error:", e));
+                .catch(e => {
+                    if (e.name !== 'AbortError') {
+                        console.error("Voice autoplay error:", e);
+                    }
+                });
         }
         // Autoplay song (no greeting)
         else if (dedication.song?.local_file && audioRef.current) {
-            console.log('[DesktopPlayer] No greeting, loading and playing song');
             audioRef.current.src = dedication.song.local_file;
             audioRef.current.load();
             audioRef.current.play()
                 .then(() => setIsPlaying(true))
-                .catch(e => console.error("Song autoplay error:", e));
+                .catch(e => {
+                    if (e.name !== 'AbortError') {
+                        console.error("Song autoplay error:", e);
+                    }
+                });
         }
     }, [dedication?.id]);
 
@@ -486,7 +505,6 @@ const DesktopImmersivePlayer = ({
         if (!audio) return;
 
         const onEnded = () => {
-            console.log('[DesktopPlayer] Audio ended, phase:', phase);
             if (phase === 'greeting') {
                 handleGreetingEnded();
             } else {
@@ -526,16 +544,13 @@ const DesktopImmersivePlayer = ({
 
     // Video element handlers
     const handleVideoEnded = useCallback(() => {
-        console.log('[DesktopPlayer] Video ended');
         handleGreetingEnded();
     }, [handleGreetingEnded]);
 
     const handleVideoCanPlay = useCallback(() => {
-        console.log('[DesktopPlayer] Video can play');
         if (videoRef.current && videoRef.current.paused) {
             videoRef.current.play()
                 .then(() => {
-                    console.log('[DesktopPlayer] Video autoplay succeeded');
                     setIsPlaying(true);
                 })
                 .catch(e => {
