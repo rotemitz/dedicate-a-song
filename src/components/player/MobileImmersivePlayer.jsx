@@ -165,6 +165,7 @@ const VideoPhaseView = ({
 }) => {
     const [isPortrait, setIsPortrait] = useState(null);
     const [isVideoLoading, setIsVideoLoading] = useState(true);
+    const [isMutedForAutoplay, setIsMutedForAutoplay] = useState(true); // Start muted for iOS autoplay
 
     // Reset loading state when video source changes
     // Note: Parent handles video.load() to avoid duplicate calls
@@ -173,6 +174,7 @@ const VideoPhaseView = ({
         console.log('[MobilePlayer] VideoPhaseView - video URL:', dedication.video_message);
         setIsVideoLoading(true);
         setIsPortrait(null);
+        setIsMutedForAutoplay(true); // Reset muted state for new video
     }, [dedication.video_message, videoRef]);
 
     // Handle video loading errors
@@ -235,8 +237,21 @@ const VideoPhaseView = ({
         }
 
         if (shouldPlay && videoRef.current?.paused) {
-            console.log('[MobilePlayer] Triggering autoplay from handleCanPlay');
-            videoRef.current.play().catch(e => console.error("Video auto-play error:", e));
+            console.log('[MobilePlayer] Triggering autoplay from handleCanPlay (muted for iOS)');
+            // Start muted for iOS autoplay compatibility
+            videoRef.current.muted = true;
+            videoRef.current.play()
+                .then(() => {
+                    console.log('[MobilePlayer] Autoplay succeeded, unmuting');
+                    // Unmute after play starts
+                    videoRef.current.muted = false;
+                    setIsMutedForAutoplay(false);
+                })
+                .catch(e => {
+                    console.error("Video auto-play error:", e);
+                    // Keep muted state for UI feedback
+                    setIsMutedForAutoplay(true);
+                });
             // If we're auto-playing due to shouldAutoPlayOnMount, also sync the isPlaying state
             // This prevents the play/pause sync effect from immediately pausing the video
             if (shouldAutoPlay && !isPlayingRef.current) {
