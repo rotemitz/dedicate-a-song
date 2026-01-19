@@ -72,6 +72,7 @@ export const AudioProvider = ({ children }) => {
         setCurrentTime(0);
         setDuration(0);
         setIsPlaying(true);
+        console.log('[loadDedication] State updated - isPlaying set to true');
 
         // Determine source
         let source = null;
@@ -120,6 +121,7 @@ export const AudioProvider = ({ children }) => {
 
     // Play
     const play = useCallback(() => {
+        console.log('[AudioContext] play() called');
         setIsPlaying(true);
         if (audioRef.current) {
             // Always try to play - readyState check is more reliable than src check
@@ -144,6 +146,7 @@ export const AudioProvider = ({ children }) => {
 
     // Pause
     const pause = useCallback(() => {
+        console.log('[AudioContext] pause() called');
         setIsPlaying(false);
         if (audioRef.current) {
             audioRef.current.pause();
@@ -152,6 +155,7 @@ export const AudioProvider = ({ children }) => {
 
     // Toggle play/pause
     const togglePlay = useCallback(() => {
+        console.log('[AudioContext] togglePlay() called - current isPlaying:', isPlaying);
         if (isPlaying) {
             pause();
         } else {
@@ -169,6 +173,7 @@ export const AudioProvider = ({ children }) => {
 
     // Skip to song phase
     const skipToSong = useCallback(() => {
+        console.log('[AudioContext] skipToSong() called - isPlaying:', isPlaying, 'hasSong:', !!currentDedication?.song?.local_file);
         if (!currentDedication?.song?.local_file) {
             // No song available, trigger end
             if (onDedicationEndRef.current) {
@@ -180,24 +185,32 @@ export const AudioProvider = ({ children }) => {
         setPhase('song');
         setCurrentTime(0);
         setDuration(0);
+        console.log('[AudioContext] skipToSong - phase set to song');
 
         if (audioRef.current) {
+            console.log('[AudioContext] skipToSong - loading audio:', currentDedication.song.local_file);
             audioRef.current.src = currentDedication.song.local_file;
             audioRef.current.load();
             audioRef.current.currentTime = 0;
 
             if (isPlaying) {
+                console.log('[AudioContext] skipToSong - isPlaying true, will auto-play when ready');
                 // Wait for audio to be ready before playing (streaming optimized)
                 const handleCanPlay = () => {
+                    console.log('[AudioContext] skipToSong - canplay event fired, playing song');
                     audioRef.current?.play().catch(e => console.error("Skip to song play error:", e));
                     audioRef.current?.removeEventListener('canplay', handleCanPlay);
                 };
 
                 if (audioRef.current.readyState >= 3) {
+                    console.log('[AudioContext] skipToSong - audio already ready, playing immediately');
                     audioRef.current.play().catch(e => console.error("Skip to song play error:", e));
                 } else {
+                    console.log('[AudioContext] skipToSong - waiting for canplay event. readyState:', audioRef.current.readyState);
                     audioRef.current.addEventListener('canplay', handleCanPlay);
                 }
+            } else {
+                console.log('[AudioContext] skipToSong - isPlaying false, not auto-playing');
             }
         }
 

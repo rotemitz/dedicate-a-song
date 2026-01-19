@@ -470,7 +470,11 @@ const MobileImmersivePlayer = ({
 
     // Video loading effect - only load when source actually changes
     useEffect(() => {
-        if (!videoRef.current || !hasVideoGreeting || !isGreeting) return;
+        console.log('[MobilePlayer] Video loading effect - hasVideoGreeting:', hasVideoGreeting, 'isGreeting:', isGreeting, 'isPlaying:', isPlaying);
+        if (!videoRef.current || !hasVideoGreeting || !isGreeting) {
+            console.log('[MobilePlayer] Video loading effect - skipping (conditions not met)');
+            return;
+        }
 
         const video = videoRef.current;
         const currentSrc = dedication?.video_message;
@@ -480,31 +484,44 @@ const MobileImmersivePlayer = ({
             lastVideoSrcRef.current = currentSrc;
             console.log('[MobilePlayer] Video source changed, loading:', dedication?.name);
             video.load();
+        } else {
+            console.log('[MobilePlayer] Video source unchanged, not reloading');
         }
 
         // If already ready and should play, play now
         if (isPlaying && video.readyState >= 3 && video.paused) {
             console.log('[MobilePlayer] Video already ready, playing immediately');
             video.play().catch(e => console.error("Video play error:", e));
+        } else {
+            console.log('[MobilePlayer] Video loading effect - not playing immediately. readyState:', video.readyState, 'paused:', video.paused);
         }
     }, [dedication?.video_message, hasVideoGreeting, isGreeting, isPlaying]);
 
     // Video play/pause sync
     useEffect(() => {
-        if (!videoRef.current || !hasVideoGreeting || !isGreeting) return;
+        console.log('[MobilePlayer] Play/pause sync effect - isPlaying:', isPlaying, 'hasVideoGreeting:', hasVideoGreeting, 'isGreeting:', isGreeting);
+        if (!videoRef.current || !hasVideoGreeting || !isGreeting) {
+            console.log('[MobilePlayer] Play/pause sync - skipping (conditions not met)');
+            return;
+        }
 
         const video = videoRef.current;
 
         if (Math.abs(video.currentTime - currentTime) > 0.5) {
+            console.log('[MobilePlayer] Play/pause sync - seeking video to:', currentTime);
             video.currentTime = currentTime;
         }
 
         if (isPlaying) {
             if (video.readyState >= 3 && video.paused) {
+                console.log('[MobilePlayer] Play/pause sync - attempting to play video. readyState:', video.readyState);
                 video.play().catch(e => console.error("Video play sync error:", e));
+            } else {
+                console.log('[MobilePlayer] Play/pause sync - not playing. readyState:', video.readyState, 'paused:', video.paused);
             }
         } else {
             if (!video.paused) {
+                console.log('[MobilePlayer] Play/pause sync - pausing video');
                 video.pause();
             }
         }
@@ -565,20 +582,25 @@ const MobileImmersivePlayer = ({
         const threshold = 80;
         const velocity = info.velocity.x;
         const offset = info.offset.x;
+        console.log('[MobilePlayer] handleDragEnd - offset:', offset, 'velocity:', velocity, 'threshold:', threshold, 'isGreeting:', isGreeting);
 
         if (offset > threshold || velocity > 500) {
             // Swipe right - go to previous
+            console.log('[MobilePlayer] Swipe right - calling onPrevious');
             x.set(0);
             onPrevious();
         } else if (offset < -threshold || velocity < -500) {
             // Swipe left - go to next (song if greeting, next dedication if song)
             x.set(0);
             if (isGreeting) {
+                console.log('[MobilePlayer] Swipe left (greeting) - calling handleSkipToSong');
                 handleSkipToSong();
             } else {
+                console.log('[MobilePlayer] Swipe left (song) - calling onNext');
                 onNext();
             }
         } else {
+            console.log('[MobilePlayer] Swipe not far enough - snapping back');
             // Snap back with spring animation
             animate(x, 0, { type: "spring", stiffness: 500, damping: 30 });
         }
