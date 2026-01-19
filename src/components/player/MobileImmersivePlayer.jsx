@@ -480,9 +480,13 @@ const MobileImmersivePlayer = ({
     }, []);
 
     // Set auto-play flag when dedication changes and has video greeting
+    // This runs on every dedication change - we set the flag if this dedication has video
+    // The handleCanPlay will check this flag and play automatically when video is ready
     useEffect(() => {
-        if (hasVideoGreeting && isGreeting && isPlaying) {
-            console.log('[MobilePlayer] Setting shouldAutoPlayOnMount for video greeting');
+        const dedicationHasVideo = dedication?.video_message != null;
+        console.log('[MobilePlayer] Dedication changed to:', dedication?.name, '| hasVideo:', dedicationHasVideo, '| isPlaying:', isPlaying);
+        if (dedicationHasVideo) {
+            console.log('[MobilePlayer] Setting shouldAutoPlayOnMount = true');
             shouldAutoPlayOnMountRef.current = true;
         }
     }, [dedication?.id]); // Only trigger on dedication change
