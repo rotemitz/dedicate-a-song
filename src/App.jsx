@@ -36,7 +36,7 @@ const sortDedications = (dedications, orderType) => {
 };
 
 function App() {
-  console.log('[App] Version: 2.0.1');
+  console.log('[App] Version: 2.0.2');
 
   // Screen state: 'welcome' | 'order_select' | 'dedications'
   const [currentScreen, setCurrentScreen] = useState('welcome');

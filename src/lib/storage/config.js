@@ -23,9 +23,9 @@ export const supabaseConfig = {
 
 // Firebase configuration
 export const firebaseConfig = {
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || 'happy-birthday-4b0d2',
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || 'gs://happy-birthday-4b0d2.firebasestorage.app',
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || 'AIzaSyDpYyAI_eedzzhDks0treA1Ezb0Y3exlzM',
 };
 
 // Log current storage provider in development
