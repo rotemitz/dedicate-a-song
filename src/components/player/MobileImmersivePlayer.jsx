@@ -640,15 +640,19 @@ const MobileImmersivePlayer = ({
     useEffect(() => {
         if (!dedication) return;
 
+        console.log('[Audio] Dedication changed - id:', dedication.id);
         const dedicationHasGreeting = dedication.video_message || dedication.voice_message;
         const newPhase = dedicationHasGreeting ? 'greeting' : 'song';
+        console.log('[Audio] Has greeting:', dedicationHasGreeting, 'New phase:', newPhase);
 
         // IMPORTANT: Stop all current media first to prevent overlap
         // This fixes the issue where audio continues playing while video loads
         if (videoRef.current) {
+            console.log('[Audio] Pausing video');
             videoRef.current.pause();
         }
         if (audioRef.current) {
+            console.log('[Audio] Pausing audio, readyState was:', audioRef.current.readyState);
             audioRef.current.pause();
         }
         setIsPlaying(false);
@@ -662,6 +666,7 @@ const MobileImmersivePlayer = ({
         // the video element only renders when phase='greeting'. We set the phase first,
         // then the video element will mount and autoplay via handleVideoCanPlay.
         if (dedication.video_message) {
+            console.log('[Audio] Has video greeting - clearing audio src');
             // Clear audio src to prevent any accidental playback
             if (audioRef.current) {
                 audioRef.current.src = '';
@@ -671,11 +676,18 @@ const MobileImmersivePlayer = ({
         }
         // Autoplay voice greeting
         else if (dedication.voice_message && audioRef.current) {
+            console.log('[Audio] Setting voice message src:', dedication.voice_message);
             audioRef.current.src = dedication.voice_message;
+            console.log('[Audio] Calling load(), readyState:', audioRef.current.readyState);
             audioRef.current.load();
+            console.log('[Audio] Calling play() immediately after load, readyState:', audioRef.current.readyState);
             audioRef.current.play()
-                .then(() => setIsPlaying(true))
+                .then(() => {
+                    console.log('[Audio] Voice play() resolved successfully');
+                    setIsPlaying(true);
+                })
                 .catch(e => {
+                    console.error('[Audio] Voice play() error:', e.name, e.message);
                     // AbortError is expected if user navigates quickly - ignore it
                     if (e.name !== 'AbortError') {
                         console.error("Voice autoplay error:", e);
@@ -684,11 +696,18 @@ const MobileImmersivePlayer = ({
         }
         // Autoplay song (no greeting)
         else if (dedication.song?.local_file && audioRef.current) {
+            console.log('[Audio] Setting song src:', dedication.song.local_file);
             audioRef.current.src = dedication.song.local_file;
+            console.log('[Audio] Calling load(), readyState:', audioRef.current.readyState);
             audioRef.current.load();
+            console.log('[Audio] Calling play() immediately after load, readyState:', audioRef.current.readyState);
             audioRef.current.play()
-                .then(() => setIsPlaying(true))
+                .then(() => {
+                    console.log('[Audio] Song play() resolved successfully');
+                    setIsPlaying(true);
+                })
                 .catch(e => {
+                    console.error('[Audio] Song play() error:', e.name, e.message);
                     // AbortError is expected if user navigates quickly - ignore it
                     if (e.name !== 'AbortError') {
                         console.error("Song autoplay error:", e);
@@ -703,6 +722,7 @@ const MobileImmersivePlayer = ({
         if (!audio) return;
 
         const onEnded = () => {
+            console.log('[Audio] Event: ended');
             if (phase === 'greeting') {
                 handleGreetingEnded();
             } else {
@@ -711,22 +731,46 @@ const MobileImmersivePlayer = ({
         };
 
         const onTimeUpdate = () => setCurrentTime(audio.currentTime);
-        const onLoadedMetadata = () => setDuration(audio.duration);
-        const onPlay = () => setIsPlaying(true);
-        const onPause = () => setIsPlaying(false);
+        const onLoadedMetadata = () => {
+            console.log('[Audio] Event: loadedmetadata - duration:', audio.duration);
+            setDuration(audio.duration);
+        };
+        const onCanPlay = () => {
+            console.log('[Audio] Event: canplay - readyState:', audio.readyState);
+        };
+        const onCanPlayThrough = () => {
+            console.log('[Audio] Event: canplaythrough - readyState:', audio.readyState);
+        };
+        const onPlay = () => {
+            console.log('[Audio] Event: play');
+            setIsPlaying(true);
+        };
+        const onPause = () => {
+            console.log('[Audio] Event: pause');
+            setIsPlaying(false);
+        };
+        const onError = (e) => {
+            console.error('[Audio] Event: error -', audio.error?.code, audio.error?.message);
+        };
 
         audio.addEventListener('ended', onEnded);
         audio.addEventListener('timeupdate', onTimeUpdate);
         audio.addEventListener('loadedmetadata', onLoadedMetadata);
+        audio.addEventListener('canplay', onCanPlay);
+        audio.addEventListener('canplaythrough', onCanPlayThrough);
         audio.addEventListener('play', onPlay);
         audio.addEventListener('pause', onPause);
+        audio.addEventListener('error', onError);
 
         return () => {
             audio.removeEventListener('ended', onEnded);
             audio.removeEventListener('timeupdate', onTimeUpdate);
             audio.removeEventListener('loadedmetadata', onLoadedMetadata);
+            audio.removeEventListener('canplay', onCanPlay);
+            audio.removeEventListener('canplaythrough', onCanPlayThrough);
             audio.removeEventListener('play', onPlay);
             audio.removeEventListener('pause', onPause);
+            audio.removeEventListener('error', onError);
         };
     }, [phase, handleGreetingEnded, handleSongEnded]);
 
