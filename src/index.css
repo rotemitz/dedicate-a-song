@@ -655,10 +655,12 @@ input[type="range"]::-moz-range-thumb {
   justify-content: center;
   align-items: center;
   padding: var(--spacing-md);
-  position: relative;
+  position: fixed;
+  inset: 0;
   overflow: hidden;
-  min-height: 100vh;
-  min-height: 100dvh;
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: auto;
+  touch-action: none;
 }
 
 .order-selection-screen::before {
@@ -686,6 +688,11 @@ input[type="range"]::-moz-range-thumb {
 
 .order-selection-header {
   margin-bottom: var(--spacing-lg);
+  /* GPU acceleration to prevent iOS flickering */
+  will-change: transform, opacity;
+  transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
 }
 
 .order-selection-title {
@@ -723,10 +730,15 @@ input[type="range"]::-moz-range-thumb {
   border: 1px solid rgba(212, 144, 123, 0.2);
   border-radius: var(--radius-lg);
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
   box-shadow: 0 4px 20px rgba(212, 144, 123, 0.1);
   width: 100%;
   text-align: center;
+  /* GPU acceleration to prevent iOS flickering */
+  will-change: transform, opacity;
+  transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
 }
 
 .order-option-card:hover {
