@@ -166,7 +166,6 @@ const VideoPhaseView = ({
     // Reset loading state when video source changes
     useEffect(() => {
         if (!dedication.video_message) return;
-        console.log('[MobilePlayer] VideoPhaseView - video URL:', dedication.video_message);
         setIsVideoLoading(true);
         setIsPortrait(null);
     }, [dedication.video_message]);
@@ -489,7 +488,6 @@ const MobileImmersivePlayer = ({
 
     // Skip to song phase
     const skipToSong = useCallback(() => {
-        console.log('[MobilePlayer] skipToSong called');
 
         // Stop video if playing
         if (videoRef.current) {
@@ -510,17 +508,20 @@ const MobileImmersivePlayer = ({
             audioRef.current.load();
             audioRef.current.play()
                 .then(() => setIsPlaying(true))
-                .catch(e => console.error("Song play error:", e));
+                .catch(e => {
+                    // AbortError is expected if user navigates quickly - ignore it
+                    if (e.name !== 'AbortError') {
+                        console.error("Song play error:", e);
+                    }
+                });
         } else {
             // No song, go to next dedication
-            console.log('[MobilePlayer] No song available, calling onNext');
             onNext();
         }
     }, [dedication, onNext]);
 
     // Handle greeting ended (voice or video)
     const handleGreetingEnded = useCallback(() => {
-        console.log('[MobilePlayer] Greeting ended');
         if (dedication?.song?.local_file) {
             skipToSong();
         } else {
@@ -531,7 +532,6 @@ const MobileImmersivePlayer = ({
 
     // Handle song ended
     const handleSongEnded = useCallback(() => {
-        console.log('[MobilePlayer] Song ended, calling onNext');
         onNext();
     }, [onNext]);
 
@@ -569,38 +569,60 @@ const MobileImmersivePlayer = ({
     useEffect(() => {
         if (!dedication) return;
 
-        console.log('[MobilePlayer] Dedication changed to:', dedication.name);
         const dedicationHasGreeting = dedication.video_message || dedication.voice_message;
         const newPhase = dedicationHasGreeting ? 'greeting' : 'song';
+
+        // IMPORTANT: Stop all current media first to prevent overlap
+        // This fixes the issue where audio continues playing while video loads
+        if (videoRef.current) {
+            videoRef.current.pause();
+        }
+        if (audioRef.current) {
+            audioRef.current.pause();
+        }
+        setIsPlaying(false);
 
         setPhase(newPhase);
         setCurrentTime(0);
         setDuration(0);
 
         // Autoplay video greeting
-        if (dedication.video_message && videoRef.current) {
-            console.log('[MobilePlayer] Has video greeting, will autoplay when ready');
+        // NOTE: Don't check videoRef.current here - it might not exist yet since
+        // the video element only renders when phase='greeting'. We set the phase first,
+        // then the video element will mount and autoplay via handleVideoCanPlay.
+        if (dedication.video_message) {
+            // Clear audio src to prevent any accidental playback
+            if (audioRef.current) {
+                audioRef.current.src = '';
+            }
             // Video autoplay is handled by handleVideoCanPlay callback
-            // Just load the video
-            videoRef.current.load();
+            // videoRef.current.load() will be triggered by the video element mounting
         }
         // Autoplay voice greeting
         else if (dedication.voice_message && audioRef.current) {
-            console.log('[MobilePlayer] Has voice greeting, loading and playing');
             audioRef.current.src = dedication.voice_message;
             audioRef.current.load();
             audioRef.current.play()
                 .then(() => setIsPlaying(true))
-                .catch(e => console.error("Voice autoplay error:", e));
+                .catch(e => {
+                    // AbortError is expected if user navigates quickly - ignore it
+                    if (e.name !== 'AbortError') {
+                        console.error("Voice autoplay error:", e);
+                    }
+                });
         }
         // Autoplay song (no greeting)
         else if (dedication.song?.local_file && audioRef.current) {
-            console.log('[MobilePlayer] No greeting, loading and playing song');
             audioRef.current.src = dedication.song.local_file;
             audioRef.current.load();
             audioRef.current.play()
                 .then(() => setIsPlaying(true))
-                .catch(e => console.error("Song autoplay error:", e));
+                .catch(e => {
+                    // AbortError is expected if user navigates quickly - ignore it
+                    if (e.name !== 'AbortError') {
+                        console.error("Song autoplay error:", e);
+                    }
+                });
         }
     }, [dedication?.id]);
 
@@ -610,7 +632,6 @@ const MobileImmersivePlayer = ({
         if (!audio) return;
 
         const onEnded = () => {
-            console.log('[MobilePlayer] Audio ended, phase:', phase);
             if (phase === 'greeting') {
                 handleGreetingEnded();
             } else {
@@ -640,7 +661,6 @@ const MobileImmersivePlayer = ({
 
     // Video element - handle video ended event
     const handleVideoEnded = useCallback(() => {
-        console.log('[MobilePlayer] Video ended');
         handleGreetingEnded();
     }, [handleGreetingEnded]);
 
@@ -660,13 +680,11 @@ const MobileImmersivePlayer = ({
 
     // Handle video can play - autoplay with iOS muted workaround
     const handleVideoCanPlay = useCallback(() => {
-        console.log('[MobilePlayer] Video can play');
         if (videoRef.current && videoRef.current.paused) {
             // Start muted for iOS autoplay compatibility
             videoRef.current.muted = true;
             videoRef.current.play()
                 .then(() => {
-                    console.log('[MobilePlayer] Video autoplay succeeded, unmuting');
                     videoRef.current.muted = false;
                     setIsPlaying(true);
                 })
@@ -706,7 +724,6 @@ const MobileImmersivePlayer = ({
         const threshold = 80;
         const velocity = info.velocity.x;
         const offset = info.offset.x;
-        console.log('[MobilePlayer] handleDragEnd - offset:', offset, 'velocity:', velocity);
 
         // Stop current media before navigating
         if (videoRef.current && !videoRef.current.paused) {
@@ -718,17 +735,14 @@ const MobileImmersivePlayer = ({
 
         if (offset > threshold || velocity > 500) {
             // Swipe right - go to previous
-            console.log('[MobilePlayer] Swipe right - calling onPrevious');
             x.set(0);
             onPrevious();
         } else if (offset < -threshold || velocity < -500) {
             // Swipe left - go to next (song if greeting, next dedication if song)
             x.set(0);
             if (isGreeting) {
-                console.log('[MobilePlayer] Swipe left (greeting) - skipping to song');
                 skipToSong();
             } else {
-                console.log('[MobilePlayer] Swipe left (song) - calling onNext');
                 onNext();
             }
         } else {
