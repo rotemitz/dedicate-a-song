@@ -164,9 +164,12 @@ const VideoPhaseView = ({
     const [isVideoLoading, setIsVideoLoading] = useState(true);
     const [isVideoReady, setIsVideoReady] = useState(false);
 
+    console.log('[VideoPhaseView] Render - isVideoLoading:', isVideoLoading, 'isVideoReady:', isVideoReady, 'isPlaying:', isPlaying);
+
     // Reset loading state when video source changes
     useEffect(() => {
         if (!dedication.video_message) return;
+        console.log('[VideoPhaseView] Reset effect - video source changed');
         setIsVideoLoading(true);
         setIsVideoReady(false);
         setIsPortrait(null);
@@ -174,14 +177,28 @@ const VideoPhaseView = ({
 
     // Handle video loading errors
     const handleVideoError = (e) => {
-        console.error('[MobilePlayer] Video load error:', e.target.error);
-        console.error('[MobilePlayer] Video URL was:', dedication.video_message);
+        console.error('[VideoPhaseView] Video load error:', e.target.error);
+        console.error('[VideoPhaseView] Video URL was:', dedication.video_message);
         setIsVideoLoading(false);
     };
 
     useEffect(() => {
         const video = videoRef.current;
-        if (!video) return;
+        if (!video) {
+            console.log('[VideoPhaseView] useEffect: videoRef.current is null');
+            return;
+        }
+
+        console.log('[VideoPhaseView] useEffect: video element exists, readyState:', video.readyState, 'src:', video.src);
+
+        // If video already has metadata loaded (readyState >= 1), trigger ready state
+        // This handles the case where the video was already loaded before this effect ran
+        if (video.readyState >= 1) {
+            console.log('[VideoPhaseView] useEffect: Video already has metadata, setting ready');
+            detectOrientation();
+            setIsVideoLoading(false);
+            setIsVideoReady(true);
+        }
 
         const handleTimeUpdate = () => onTimeUpdate(video.currentTime);
         const handleDurationChange = () => onDurationChange(video.duration);
@@ -212,15 +229,25 @@ const VideoPhaseView = ({
         return false;
     };
 
-    // When metadata loads, we can detect orientation
+    // When metadata loads, we can detect orientation and show play button
+    // On mobile with preload="metadata", loadeddata might not fire, so we use this as primary trigger
     const handleLoadedMetadata = () => {
+        console.log('[VideoPhaseView] loadedmetadata fired');
         detectOrientation();
-    };
-
-    // When first frame is available (loadeddata), stop spinner and show first frame
-    const handleLoadedData = () => {
+        // Stop spinner and show play button - metadata is enough to display the frame
+        console.log('[VideoPhaseView] Setting video ready from loadedmetadata');
         setIsVideoLoading(false);
         setIsVideoReady(true);
+    };
+
+    // When first frame is available (loadeddata) - backup handler
+    const handleLoadedData = () => {
+        console.log('[VideoPhaseView] loadeddata fired - first frame ready');
+        // Ensure we're ready (might already be set by loadedmetadata)
+        if (isVideoLoading) {
+            setIsVideoLoading(false);
+            setIsVideoReady(true);
+        }
         if (isPortrait === null) {
             detectOrientation();
         }
@@ -228,6 +255,7 @@ const VideoPhaseView = ({
 
     // When video can play through, notify parent to attempt autoplay
     const handleCanPlay = () => {
+        console.log('[VideoPhaseView] canplay fired');
         // Notify parent that video is ready for playback attempt
         onCanPlay();
     };
