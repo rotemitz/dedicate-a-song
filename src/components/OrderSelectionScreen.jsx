@@ -1,6 +1,10 @@
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
+import { saveSort } from '../lib/routingUtils';
 
-const OrderSelectionScreen = ({ onSelect }) => {
+const OrderSelectionScreen = () => {
+    const navigate = useNavigate();
+
     const options = [
         {
             id: 'emotional',
@@ -21,6 +25,14 @@ const OrderSelectionScreen = ({ onSelect }) => {
             description: 'מתחילים מהאנשים הכי קרובים',
         },
     ];
+
+    const handleSelect = (sortType) => {
+        // Save sort preference
+        saveSort(sortType);
+
+        // Navigate to dedications with sort parameter and autoplay flag
+        navigate(`/dedications?sort=${sortType}&autoplay=true`);
+    };
 
     const containerVariants = {
         hidden: { opacity: 0 },
@@ -74,7 +86,7 @@ const OrderSelectionScreen = ({ onSelect }) => {
                             key={option.id}
                             className="order-option-card"
                             variants={itemVariants}
-                            onClick={() => onSelect(option.id)}
+                            onClick={() => handleSelect(option.id)}
                             whileHover={{ scale: 1.03, y: -4 }}
                             whileTap={{ scale: 0.98 }}
                         >

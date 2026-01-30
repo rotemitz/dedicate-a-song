@@ -1,109 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import WelcomeScreen from './components/WelcomeScreen';
-import OrderSelectionScreen from './components/OrderSelectionScreen';
-import DedicationsScreen from './components/DedicationsScreen';
-import { transformAllDedications, getMediaUrl } from './lib/storage';
-
-// Sorting functions for dedications
-const sortDedications = (dedications, orderType) => {
-  const sorted = [...dedications];
-
-  switch (orderType) {
-    case 'emotional':
-      // Sort by emotional_journey priority (ascending)
-      return sorted.sort((a, b) =>
-        (a.sort_priority?.emotional_journey || 999) - (b.sort_priority?.emotional_journey || 999)
-      );
-
-    case 'close_first':
-      // Sort by close_first priority (ascending)
-      return sorted.sort((a, b) =>
-        (a.sort_priority?.close_first || 999) - (b.sort_priority?.close_first || 999)
-      );
-
-    case 'random':
-      // Fisher-Yates shuffle
-      for (let i = sorted.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [sorted[i], sorted[j]] = [sorted[j], sorted[i]];
-      }
-      return sorted;
-
-    default:
-      return sorted;
-  }
-};
+import React from 'react';
+import { Routes, Route } from 'react-router-dom';
+import { routes } from './routes/Router';
+import { useDedications } from './contexts/DedicationsContext';
 
 function App() {
-  console.log('[App] Version: 2.1.0');
+  console.log('[App] Version: 3.0.0 - Routing enabled');
 
-  // Screen state: 'welcome' | 'order_select' | 'dedications'
-  const [currentScreen, setCurrentScreen] = useState('welcome');
-  const [dedications, setDedications] = useState([]);
-  const [sortedDedications, setSortedDedications] = useState([]);
-  const [autoStartPlayer, setAutoStartPlayer] = useState(false);
-  const [finaleData, setFinaleData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    // Return visitors skip to order selection (they've already seen welcome)
-    // Comment out for testing: if (localStorage.getItem('birthday_app_visited')) {
-    //   setCurrentScreen('order_select');
-    // }
-
-    // Load Data
-    fetch('data/dedications.json')
-      .then(res => {
-        if (!res.ok) {
-          throw new Error('Failed to load dedications');
-        }
-        return res.json();
-      })
-      .then(data => {
-        // Transform local paths to storage URLs (don't sort yet)
-        const withStorageUrls = transformAllDedications(data.dedications);
-        setDedications(withStorageUrls);
-
-        // Extract and transform finale data if present
-        if (data.finale) {
-          setFinaleData({
-            ...data.finale,
-            video: getMediaUrl(data.finale.video)
-          });
-        }
-
-        setLoading(false);
-      })
-      .catch(err => {
-        console.error("Failed to load dedications", err);
-        setError(err.message || 'Failed to load dedications');
-        setLoading(false);
-      });
-  }, []);
-
-  const handleStart = () => {
-    // Mark visited
-    localStorage.setItem('birthday_app_visited', 'true');
-
-    // Delay for confetti, then show order selection
-    setTimeout(() => {
-      setCurrentScreen('order_select');
-    }, 1500);
-  };
-
-  const handleOrderSelect = (orderType) => {
-    // Sort dedications based on selected order
-    const sorted = sortDedications(dedications, orderType);
-    setSortedDedications(sorted);
-    setAutoStartPlayer(true);
-    setCurrentScreen('dedications');
-  };
-
-  const handleBackToOrderSelect = () => {
-    setCurrentScreen('order_select');
-    setAutoStartPlayer(false);
-  };
+  const { loading, error, dedications } = useDedications();
 
   if (loading) {
     return (
@@ -161,24 +64,13 @@ function App() {
   }
 
   return (
-    <>
-      {currentScreen === 'welcome' && (
-        <WelcomeScreen onStart={handleStart} />
-      )}
-      {currentScreen === 'order_select' && (
-        <OrderSelectionScreen onSelect={handleOrderSelect} />
-      )}
-      {currentScreen === 'dedications' && (
-        <DedicationsScreen
-          dedications={sortedDedications}
-          finaleData={finaleData}
-          onBack={handleBackToOrderSelect}
-          autoStartPlayer={autoStartPlayer}
-          onAutoStartHandled={() => setAutoStartPlayer(false)}
-        />
-      )}
-    </>
+    <Routes>
+      {routes.map((route, index) => (
+        <Route key={index} path={route.path} element={route.element} />
+      ))}
+    </Routes>
   );
 }
 
 export default App;
+

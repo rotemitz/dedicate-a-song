@@ -1,7 +1,11 @@
 import React, { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import confetti from 'canvas-confetti';
+import { markAsVisited } from '../lib/routingUtils';
 
-const WelcomeScreen = ({ onStart }) => {
+const WelcomeScreen = () => {
+    const navigate = useNavigate();
+
     // Lock scroll on welcome screen
     useEffect(() => {
         document.body.style.overflow = 'hidden';
@@ -15,6 +19,9 @@ const WelcomeScreen = ({ onStart }) => {
     // Twinkle effect (handled by CSS, but we can enhance if needed)
 
     const handleStart = (e) => {
+        // Mark as visited
+        markAsVisited();
+
         // Get button position for confetti origin
         const button = e.currentTarget;
         const rect = button.getBoundingClientRect();
@@ -58,7 +65,10 @@ const WelcomeScreen = ({ onStart }) => {
             startVelocity: 45,
         });
 
-        onStart();
+        // Navigate to sorting screen after confetti
+        setTimeout(() => {
+            navigate('/sorting');
+        }, 1000);
     };
 
     return (

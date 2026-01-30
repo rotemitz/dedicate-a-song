@@ -496,6 +496,7 @@ const MobileImmersivePlayer = ({
     dedication,
     currentIndex = 0,
     totalCount = 1,
+    initialPlayerState = null, // 'greeting' | 'song' | null (natural flow)
     onClose,
     onNext,
     onPrevious,
@@ -508,10 +509,11 @@ const MobileImmersivePlayer = ({
     const [isPlaying, setIsPlaying] = useState(false);
     const [currentTime, setCurrentTime] = useState(0);
     const [duration, setDuration] = useState(0);
-    const [phase, setPhase] = useState('greeting'); // 'greeting' or 'song'
+    const [phase, setPhase] = useState(initialPlayerState || 'greeting'); // Use URL state or default to 'greeting'
     const pendingAutoplayRef = useRef(false);
     const retryCountRef = useRef(0);
     const MAX_RETRIES = 2;
+    const initialStateUsedRef = useRef(false); // Track if we've used initialPlayerState
 
     // Swipe gesture state
     const x = useMotionValue(0);
@@ -640,8 +642,17 @@ const MobileImmersivePlayer = ({
 
         console.log('[Audio] Dedication changed - id:', dedication.id);
         const dedicationHasGreeting = dedication.video_message || dedication.voice_message;
-        const newPhase = dedicationHasGreeting ? 'greeting' : 'song';
-        console.log('[Audio] Has greeting:', dedicationHasGreeting, 'New phase:', newPhase);
+
+        // Use initialPlayerState on first load if provided, otherwise use natural flow
+        let newPhase;
+        if (initialPlayerState && !initialStateUsedRef.current) {
+            newPhase = initialPlayerState;
+            initialStateUsedRef.current = true;
+            console.log('[Audio] Using initialPlayerState:', newPhase);
+        } else {
+            newPhase = dedicationHasGreeting ? 'greeting' : 'song';
+            console.log('[Audio] Using natural flow - Has greeting:', dedicationHasGreeting, 'New phase:', newPhase);
+        }
 
         // IMPORTANT: Stop all current media first to prevent overlap
         // This fixes the issue where audio continues playing while video loads
@@ -660,35 +671,31 @@ const MobileImmersivePlayer = ({
         setDuration(0);
 
         // Autoplay video greeting
-        // NOTE: Don't check videoRef.current here - it might not exist yet since
-        // the video element only renders when phase='greeting'. We set the phase first,
-        // then the video element will mount and autoplay via handleVideoCanPlay.
-        if (dedication.video_message) {
+        if (newPhase === 'greeting' && dedication.video_message) {
             console.log('[Audio] Has video greeting - clearing audio src');
             // Clear audio src to prevent any accidental playback
             if (audioRef.current) {
                 audioRef.current.src = '';
             }
             // Video autoplay is handled by handleVideoCanPlay callback
-            // videoRef.current.load() will be triggered by the video element mounting
         }
         // Autoplay voice greeting
-        else if (dedication.voice_message && audioRef.current) {
+        else if (newPhase === 'greeting' && dedication.voice_message && audioRef.current) {
             console.log('[Audio] Setting voice message src:', dedication.voice_message);
             retryCountRef.current = 0;
             audioRef.current.src = dedication.voice_message;
             audioRef.current.load();
             pendingAutoplayRef.current = true;
         }
-        // Autoplay song (no greeting)
-        else if (dedication.song?.local_file && audioRef.current) {
+        // Autoplay song
+        else if (newPhase === 'song' && dedication.song?.local_file && audioRef.current) {
             console.log('[Audio] Setting song src:', dedication.song.local_file);
             retryCountRef.current = 0;
             audioRef.current.src = dedication.song.local_file;
             audioRef.current.load();
             pendingAutoplayRef.current = true;
         }
-    }, [dedication?.id]);
+    }, [dedication?.id, initialPlayerState]);
 
     // Audio element event listeners
     useEffect(() => {
